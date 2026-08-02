@@ -1,0 +1,1503 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* =====================================================
+   STREETWEAR MOTORSPORT TYPOGRAPHY — Self-hosted via next/font
+   ===================================================== */
+
+/* =====================================================
+   CSS CUSTOM PROPERTIES — Design Tokens
+   ===================================================== */
+:root {
+  --background: #000000;
+  --foreground: #F5F5F3;
+
+  /* Core Colors */
+  --color-black: #000000;
+  --color-charcoal: #121212;
+  --color-graphite: #222222;
+  --color-muted: #2C2C2C;
+  --color-gray: #8A8A8A;
+  --color-silver: #A0A0A0;
+  --color-stone: #8A8A8A;
+  --color-stone-light: #E5E5E5;
+  --color-cream: #EAE7E0;
+  --color-offwhite: #F5F5F3;
+  --color-red: #FFFFFF;
+  /* NEW: editorial accent — Amber/Ember (grayscale) */
+  --color-amber: #8A8A8A;
+  --color-amber-light: #A0A0A0;
+
+  /* Spacing Grid */
+  --container-max: 1440px;
+
+  /* Transitions — all defined */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-streetwear: 350ms cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-luxury: 600ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+  /* Typography Scale */
+  --text-display: clamp(3.5rem, 9vw, 8.5rem);
+  --text-hero: clamp(2.5rem, 7vw, 6rem);
+  --text-headline: clamp(1.75rem, 4vw, 3.5rem);
+
+  /* Dynamic Hero Contrast Tokens */
+  --hero-fg: #FFFFFF;
+  --hero-bg-accent: #FFFFFF;
+  --hero-bg-contrast: #0A0A0A;
+}
+
+/* =====================================================
+   HERO DYNAMIC CONTRAST MODES & CSS BACKGROUND ENFORCEMENT
+   ===================================================== */
+#hero-scene,
+.hero-contrast-wrapper,
+.pin-spacer {
+  background-color: #000000 !important;
+}
+
+.hero-contrast-wrapper {
+  --hero-fg: #FFFFFF;
+  --hero-bg-accent: #FFFFFF;
+  --hero-bg-contrast: #0A0A0A;
+  transition: background-color 0.35s ease;
+}
+
+.hero-contrast-wrapper[data-contrast-mode="dark"] {
+  --hero-fg: #FFFFFF;
+  --hero-bg-accent: #FFFFFF;
+  --hero-bg-contrast: #0A0A0A;
+  color: #FFFFFF;
+}
+
+.hero-contrast-wrapper[data-contrast-mode="light"] {
+  --hero-fg: #0A0A0A;
+  --hero-bg-accent: #0A0A0A;
+  --hero-bg-contrast: #F5F5F3;
+  color: #0A0A0A;
+}
+
+.hero-dynamic-text {
+  color: var(--hero-fg);
+  transition: color 0.35s ease;
+}
+
+.hero-dynamic-btn-primary {
+  background-color: var(--hero-fg);
+  color: var(--hero-bg-contrast) !important;
+  border: 1px solid var(--hero-fg);
+  transition: background-color 0.35s ease, color 0.35s ease, border-color 0.35s ease, transform 0.15s ease;
+}
+
+.hero-dynamic-btn-primary:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
+}
+
+.hero-dynamic-btn-secondary {
+  background-color: transparent;
+  color: var(--hero-fg) !important;
+  border: 1px solid var(--hero-fg);
+  transition: color 0.35s ease, border-color 0.35s ease, background-color 0.35s ease;
+}
+
+.hero-dynamic-btn-secondary:hover {
+  background-color: var(--hero-fg);
+  color: var(--hero-bg-contrast) !important;
+}
+
+/* Continuous GPU-cheap spin animation for circular scroll badge */
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 18s linear infinite;
+  transform-origin: center center;
+}
+
+/* Hollow text stroke utility for text fill-on-scroll */
+.text-stroke-hollow {
+  color: transparent;
+  -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.4);
+}
+
+/* =====================================================
+   BASE RESET & GLOBAL STYLES
+   ===================================================== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  scroll-behavior: smooth;
+}
+
+body {
+  color: var(--color-offwhite);
+  background: var(--color-black);
+  font-family: 'Outfit', system-ui, sans-serif;
+  overflow-x: hidden;
+  line-height: 1.6;
+  font-size: 15px;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: 'Oxanium', 'Outfit', sans-serif;
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+/* =====================================================
+   CUSTOM GLOBAL SLEEK SCROLLBAR (Mobile & Desktop)
+   ===================================================== */
+@layer utilities {
+  /* Target the global scroll tracking layer */
+  ::-webkit-scrollbar {
+    width: 5px !important; /* Short, ultra-thin, sleek structural layout footprint */
+    height: 5px !important;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: #000000 !important; /* Lock background matching dark mode theme palette */
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: #27272a !important; /* Zinc-800 tone subtle, clean track slider overlay */
+    border-radius: 9999px !important;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #3f3f46 !important;
+  }
+
+  /* Support standard non-webkit engines */
+  html {
+    scrollbar-width: thin !important;
+    scrollbar-color: #27272a #000000 !important;
+    overflow-x: hidden;
+    max-width: 100vw;
+  }
+
+  body {
+    overflow-x: hidden;
+    max-width: 100vw;
+  }
+}
+
+/* =====================================================
+   GLASS MORPHISM UTILITIES (Mobile-optimized GPU rendering)
+   ===================================================== */
+.glass-nav {
+  background: rgba(0, 0, 0, 0.92);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border-bottom: 1px solid rgba(245, 243, 239, 0.06);
+}
+
+.glass-panel {
+  background: rgba(20, 20, 20, 0.75);
+  backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  border: 1px solid rgba(245, 243, 239, 0.07);
+}
+
+.glass-card {
+  background: rgba(18, 18, 18, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+@media (max-width: 767px) {
+  .glass-nav {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    background: rgba(0, 0, 0, 0.96);
+  }
+  .glass-panel {
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    background: rgba(12, 12, 12, 0.92);
+  }
+  .glass-card {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: rgba(18, 18, 18, 0.95);
+  }
+}
+
+/* =====================================================
+   FEATURED BADGE SHIMMER & CTA MICRO-INTERACTION ANIMATIONS
+   ===================================================== */
+@keyframes shimmer-sweep {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.badge-featured-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.1) 0%,
+    rgba(255, 255, 255, 0.75) 50%,
+    rgba(255, 255, 255, 0.1) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer-sweep 3.2s infinite linear;
+}
+
+@keyframes scale-bounce {
+  0% { transform: scale(1); }
+  35% { transform: scale(0.82); }
+  70% { transform: scale(1.18); }
+  100% { transform: scale(1); }
+}
+
+.animate-scale-bounce {
+  animation: scale-bounce 350ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+
+/* =====================================================
+   LUXURY BUTTON STYLES
+   ===================================================== */
+.btn-primary {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  overflow: hidden;
+  background: #FFFFFF;
+  color: #000000 !important;
+  font-family: 'Outfit', 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 1rem 2.25rem;
+  transition: background-color 0.2s ease, transform 0.15s ease, opacity 0.2s ease;
+  border: 1px solid #FFFFFF;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  background: #E5E5E5;
+  color: #000000 !important;
+  border-color: #E5E5E5;
+}
+
+.btn-primary:active {
+  transform: scale(0.97);
+  background: #D4D4D4;
+}
+
+.btn-primary span {
+  position: relative;
+  z-index: 1;
+  color: #000000 !important;
+}
+
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: transparent;
+  color: var(--color-offwhite);
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 1rem 2.25rem;
+  border: 1px solid rgba(245, 243, 239, 0.45);
+  transition: all var(--transition-streetwear);
+}
+
+.btn-outline:hover {
+  border-color: var(--color-offwhite);
+  background: rgba(245, 243, 239, 0.06);
+}
+
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: transparent;
+  color: var(--color-silver);
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  transition: color var(--transition-fast);
+}
+
+.btn-ghost:hover {
+  color: var(--color-offwhite);
+}
+
+/* btn-electric — defined (was previously missing!) */
+.btn-electric {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 700;
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  transition: all var(--transition-streetwear);
+}
+
+.btn-primary-accent {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(11, 13, 16, 0.75);
+  color: var(--color-red);
+  /* Electric Blue */
+  border: 1.5px solid var(--color-red);
+  border-radius: 8px;
+  padding: 12px 28px;
+  font-weight: 700;
+  font-family: 'Outfit', sans-serif;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  transition: all var(--transition-base);
+}
+
+.btn-primary-accent:hover {
+  background: var(--color-red);
+  color: var(--color-black);
+}
+
+.btn-secondary-dark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  color: var(--color-stone);
+  border: 1.5px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 12px 28px;
+  font-weight: 600;
+  font-family: 'Outfit', sans-serif;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  font-size: 0.65rem;
+  transition: all var(--transition-base);
+}
+
+.btn-secondary-dark:hover {
+  border-color: var(--color-offwhite);
+  color: var(--color-offwhite);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+/* =====================================================
+   MARQUEE TICKER
+   ===================================================== */
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee 35s linear infinite;
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+/* =====================================================
+   PRODUCT CARD HOVER REVEAL
+   ===================================================== */
+.product-card-image {
+  overflow: hidden;
+  position: relative;
+}
+
+.product-card-image img {
+  transition: transform var(--transition-luxury);
+  will-change: transform;
+}
+
+.product-card:hover .product-card-image img {
+  transform: scale(1.05);
+}
+
+.product-card-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, transparent 50%);
+  opacity: 0;
+  transition: opacity var(--transition-base);
+}
+
+.product-card:hover .product-card-overlay {
+  opacity: 1;
+}
+
+/* =====================================================
+   EDITORIAL SECTION DIVIDER
+   ===================================================== */
+.section-divider {
+  width: 40px;
+  height: 1px;
+  background: var(--color-amber);
+  display: block;
+}
+
+/* =====================================================
+   FORM INPUTS
+   ===================================================== */
+input,
+select,
+textarea {
+  background-color: var(--color-graphite) !important;
+  color: var(--color-offwhite) !important;
+  border: 1px solid var(--color-muted) !important;
+  outline: none !important;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  font-family: 'Inter', sans-serif;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--color-amber) !important;
+  box-shadow: 0 0 0 1px var(--color-amber) !important;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+/* =====================================================
+   NOISE TEXTURE OVERLAY
+   ===================================================== */
+.noise-overlay {
+  position: relative;
+}
+
+.noise-overlay::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* =====================================================
+   SCROLL-TRIGGERED ANIMATION CLASSES
+   ===================================================== */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.reveal-delay-1 {
+  transition-delay: 0.08s;
+}
+
+.reveal-delay-2 {
+  transition-delay: 0.16s;
+}
+
+.reveal-delay-3 {
+  transition-delay: 0.24s;
+}
+
+.reveal-delay-4 {
+  transition-delay: 0.32s;
+}
+
+.reveal-delay-5 {
+  transition-delay: 0.40s;
+}
+
+/* =====================================================
+   LUXURY CARD BORDER ANIMATION
+   ===================================================== */
+.border-animate {
+  position: relative;
+}
+
+.border-animate::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: var(--color-amber);
+  transition: width var(--transition-base);
+}
+
+.border-animate:hover::after {
+  width: 100%;
+}
+
+/* =====================================================
+   SHIMMER LOADING
+   ===================================================== */
+.shimmer {
+  background: linear-gradient(90deg,
+      var(--color-graphite) 25%,
+      var(--color-muted) 50%,
+      var(--color-graphite) 75%);
+  background-size: 400% 100%;
+  animation: shimmer 1.8s linear infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* =====================================================
+   HERO VIDEO GRADIENT
+   ===================================================== */
+.hero-gradient {
+  background: linear-gradient(180deg,
+      rgba(0, 0, 0, 0.15) 0%,
+      rgba(0, 0, 0, 0.35) 40%,
+      rgba(0, 0, 0, 0.88) 80%,
+      rgba(0, 0, 0, 1) 100%);
+}
+
+/* =====================================================
+   ACCORDION — Details / Shipping / Returns
+   ===================================================== */
+.accordion-content {
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  transition:
+    max-height 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 0.3s ease;
+}
+
+.accordion-content.open {
+  max-height: 600px;
+  opacity: 1;
+}
+
+.accordion-trigger {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 1rem 0;
+  border-bottom: 1px solid rgba(245, 243, 239, 0.08);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--color-offwhite);
+  transition: color var(--transition-fast);
+}
+
+.accordion-trigger:hover {
+  color: var(--color-amber);
+}
+
+.accordion-trigger .accordion-icon {
+  width: 16px;
+  height: 16px;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  flex-shrink: 0;
+}
+
+.accordion-trigger.open .accordion-icon {
+  transform: rotate(45deg);
+}
+
+/* =====================================================
+   MOBILE FILTER BOTTOM SHEET
+   ===================================================== */
+.filter-drawer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 200;
+  background: var(--color-charcoal);
+  border-top: 1px solid rgba(245, 243, 239, 0.08);
+  border-radius: 16px 16px 0 0;
+  transform: translateY(100%);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  max-height: 90vh;
+  overflow-y: auto;
+  padding-bottom: env(safe-area-inset-bottom, 16px);
+}
+
+.filter-drawer.open {
+  transform: translateY(0);
+}
+
+.filter-drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 199;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.filter-drawer-backdrop.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* =====================================================
+   FULL-SCREEN MOBILE MENU
+   ===================================================== */
+.mobile-menu-fullscreen {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  background: var(--color-black);
+  transform: translateX(100%);
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.mobile-menu-fullscreen.open {
+  transform: translateX(0);
+}
+
+/* =====================================================
+   STICKY ATC BAR (Mobile PDP)
+   ===================================================== */
+.sticky-atc-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 150;
+  background: rgba(0, 0, 0, 0.97);
+  border-top: 1px solid rgba(245, 243, 239, 0.08);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  padding: 1rem 1.25rem;
+  padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
+  transform: translateY(100%);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.sticky-atc-bar.visible {
+  transform: translateY(0);
+}
+
+/* =====================================================
+   SHIPPING PROGRESS BAR (Cart Drawer)
+   ===================================================== */
+.shipping-progress-bar {
+  height: 2px;
+  background: var(--color-muted);
+  border-radius: 1px;
+  overflow: hidden;
+  position: relative;
+}
+
+.shipping-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-amber) 0%, var(--color-amber-light) 100%);
+  border-radius: 1px;
+  transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* =====================================================
+   CATEGORY FILTER PILLS
+   ===================================================== */
+.filter-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.4rem 0.875rem;
+  border: 1px solid rgba(245, 243, 239, 0.12);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-silver);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all var(--transition-fast);
+  background: transparent;
+}
+
+.filter-pill:hover {
+  border-color: rgba(245, 243, 239, 0.3);
+  color: var(--color-offwhite);
+}
+
+.filter-pill.active {
+  border-color: var(--color-amber);
+  color: var(--color-offwhite);
+  background: rgba(201, 123, 58, 0.08);
+}
+
+/* =====================================================
+   UTILITY ANIMATIONS
+   ===================================================== */
+@keyframes fadeUp {
+  0% {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes scaleIn {
+  0% {
+    transform: scale(0.85);
+    opacity: 0;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-fade-up {
+  animation: fadeUp 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.6s ease forwards;
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* =====================================================
+   EYEBROW LABEL UTILITY
+   ===================================================== */
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--color-stone);
+}
+
+.eyebrow::before {
+  content: '';
+  display: block;
+  width: 24px;
+  height: 1px;
+  background: var(--color-amber);
+  flex-shrink: 0;
+}
+
+/* =====================================================
+   TRUST STRIP
+   ===================================================== */
+.trust-strip {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 0.75rem 0;
+  border-top: 1px solid rgba(245, 243, 239, 0.06);
+  border-bottom: 1px solid rgba(245, 243, 239, 0.06);
+}
+
+.trust-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.6rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-stone);
+}
+
+
+/* =====================================================
+   HERO SECTION — Kinetic Masked Typography
+   Moved out of inline <style> to fix SSR hydration
+   mismatch (server encodes ' as &#x27; in style tags).
+   ===================================================== */
+
+.hero-section-height {
+  height: clamp(580px, 90vh, 950px);
+}
+
+/*
+  Giant masked headline.
+  Desktop: ~18vw, hero image bleeds through letterforms
+  via background-clip:text.
+  Mobile (<=639px): falls back to opaque white — bg-clip:text
+  is too subtle on small phone screens.
+*/
+.hero-masked-words {
+  font-size: clamp(2.8rem, 16vw, 6.8rem);
+  font-weight: 900;
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+  color: #ffffff;
+  -webkit-text-fill-color: #ffffff;
+  -webkit-text-stroke: unset;
+  background-image: none;
+  -webkit-background-clip: unset;
+  background-clip: unset;
+  text-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
+}
+
+@media (min-width: 1024px) {
+  .hero-masked-words {
+    font-size: clamp(4rem, 6vw, 6.2rem);
+    line-height: 1.05;
+  }
+}
+
+@media (max-width: 639px) {
+  .hero-masked-words {
+    font-size: clamp(2rem, 11vw, 3.2rem);
+  }
+}
+
+.hero-masked-word {
+  display: inline-block;
+  will-change: transform;
+}
+
+/* Drift Line Redesign Animations & Keyframes */
+@keyframes driftWipe {
+  0% {
+    transform: translateX(-100%) skewX(-20deg);
+    opacity: 0;
+  }
+
+  15% {
+    opacity: 0.2;
+  }
+
+  85% {
+    opacity: 0.2;
+  }
+
+  100% {
+    transform: translateX(200%) skewX(-20deg);
+    opacity: 0;
+  }
+}
+
+@keyframes heroResolve {
+  0% {
+    opacity: 0;
+    transform: scale(1.05);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slideUp {
+  0% {
+    transform: translateY(102%);
+  }
+
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.drift-wipe-streak {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(200, 57, 42, 0.25), transparent);
+  transform: skewX(-20deg);
+  pointer-events: none;
+  z-index: 40;
+  will-change: transform;
+}
+
+.animate-drift-wipe {
+  animation: driftWipe 0.85s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+.animate-hero-resolve {
+  animation: heroResolve 1s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+/* Custom speed tracking styles */
+.drift-line-canvas {
+  filter: drop-shadow(0 0 6px rgba(200, 57, 42, 0.35));
+}
+
+@keyframes infinite-loading {
+  0% {
+    left: -40%;
+  }
+
+  100% {
+    left: 100%;
+  }
+}
+
+.animate-infinite-loading {
+  position: absolute;
+  height: 100%;
+  width: 40%;
+  animation: infinite-loading 1.5s infinite linear;
+}
+
+@keyframes avatarGlowPulse {
+  0% {
+    box-shadow: 0 0 0 0px rgba(255, 255, 255, 0.15);
+  }
+
+  50% {
+    box-shadow: 0 0 0 8px rgba(255, 255, 255, 0.35);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0px rgba(255, 255, 255, 0.15);
+  }
+}
+
+@keyframes scanlineAnim {
+  0% {
+    background-position: 0% 0%;
+  }
+
+  100% {
+    background-position: 0% 200%;
+  }
+}
+
+.focus-scanline:focus {
+  background: linear-gradient(to bottom,
+      rgba(0, 0, 0, 0.7) 0%,
+      rgba(255, 255, 255, 0.04) 50%,
+      rgba(0, 0, 0, 0.7) 100%) !important;
+  background-size: 100% 200% !important;
+  animation: scanlineAnim 4s linear infinite !important;
+}
+
+@keyframes ticker-progress {
+  0% {
+    transform: scaleX(0);
+  }
+  100% {
+    transform: scaleX(1);
+  }
+}
+
+.animate-ticker-progress {
+  animation: ticker-progress 3.4s linear forwards;
+}
+
+@keyframes glowPulse {
+  0%, 100% { opacity: 0.12; }
+  50% { opacity: 0.28; }
+}
+
+.animate-glow-pulse {
+  animation: glowPulse 4.5s ease-in-out infinite;
+}
+
+@keyframes heroGlowPulse {
+  0%, 100% { opacity: 0.15; }
+  50% { opacity: 0.35; }
+}
+
+.animate-hero-glow-pulse {
+  animation: heroGlowPulse 4s ease-in-out infinite;
+}
+
+@keyframes heroGlowPulseDesktop {
+  0%, 100% { opacity: 0.15; }
+  50% { opacity: 0.3; }
+}
+
+.animate-hero-glow-pulse-desktop {
+  animation: heroGlowPulseDesktop 4.5s ease-in-out infinite;
+}
+
+@keyframes ambientDrift {
+  0% { transform: translate(0px, 0px); }
+  33% { transform: translate(35px, -40px); }
+  66% { transform: translate(-20px, 25px); }
+  100% { transform: translate(0px, 0px); }
+}
+
+.animate-ambient-drift {
+  animation: ambientDrift 12s ease-in-out infinite;
+}
+
+@keyframes neonFlicker {
+  /* Opacity-only flicker — GPU-composited, no filter repaint on every frame */
+  0%, 2.4%, 4.8%, 100% { opacity: 0.9; }
+  0.6%, 3.0% { opacity: 1; }
+  1.8%, 4.2% { opacity: 0.75; }
+}
+
+.animate-neon-flicker {
+  /* Static filter set once — never animated — Safari doesn't repaint per-frame */
+  filter: grayscale(1) contrast(1.1) brightness(0.85);
+  animation: neonFlicker 8s infinite linear;
+}
+
+@keyframes smokeParallax {
+  0% {
+    transform: translate(0px, 0px) rotate(0deg);
+    opacity: 0.5;
+  }
+  50% {
+    transform: translate(8px, 12px) rotate(1deg);
+    opacity: 0.6;
+  }
+  100% {
+    transform: translate(3px, 4px) rotate(0.5deg);
+    opacity: 0.45;
+  }
+}
+
+.animate-smoke-parallax {
+  animation: smokeParallax 8s ease-in-out infinite alternate;
+}
+
+
+
+/* ═══════════════════════════════════════════════════
+   ULTRA-PREMIUM SMOOTHNESS SYSTEM
+   Better than ₹2L Shopify themes — pure CSS, zero JS
+   ═══════════════════════════════════════════════════ */
+
+/* ── 1. View Transitions API — seamless page navigation ── */
+@view-transition {
+  navigation: auto;
+}
+
+::view-transition-old(root) {
+  animation: vt-slide-out 0.22s cubic-bezier(0.76, 0, 0.24, 1) both;
+}
+
+::view-transition-new(root) {
+  animation: vt-slide-in 0.22s cubic-bezier(0.76, 0, 0.24, 1) both;
+}
+
+@keyframes vt-slide-out {
+  0%   { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@keyframes vt-slide-in {
+  0%   { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+/* ── 2. Premium Spring Easing Tokens ── */
+:root {
+  --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-in-out-quint: cubic-bezier(0.83, 0, 0.17, 1);
+  --ease-magnetic: cubic-bezier(0.23, 1, 0.32, 1);
+  --duration-instant: 80ms;
+  --duration-swift: 180ms;
+  --duration-smooth: 340ms;
+  --duration-cinematic: 680ms;
+}
+
+/* ── 3. GPU-Accelerated product image hover — scale + sharpen ── */
+.product-image-hoverable img,
+.product-image-hoverable [data-img] {
+  will-change: transform;
+  transform: scale(1) translateZ(0);
+  transition:
+    transform var(--duration-cinematic) var(--ease-out-expo),
+    filter var(--duration-smooth) ease;
+}
+
+.product-image-hoverable:hover img,
+.product-image-hoverable:hover [data-img] {
+  transform: scale(1.048) translateZ(0);
+  filter: contrast(1.04) brightness(1.02);
+}
+
+/* ── 4. Link & button micro-interactions ── */
+a, button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+a:not([class]), button:not([class]) {
+  transition: opacity var(--duration-swift) ease;
+}
+
+.btn-primary, .btn-outline, .btn-ghost, .btn-electric {
+  transition:
+    background var(--duration-smooth) var(--ease-out-expo),
+    color var(--duration-smooth) var(--ease-out-expo),
+    border-color var(--duration-smooth) var(--ease-out-expo),
+    transform var(--duration-swift) var(--ease-spring),
+    box-shadow var(--duration-smooth) var(--ease-out-expo);
+}
+
+.btn-primary:active,
+.btn-outline:active,
+.btn-electric:active {
+  transform: scale(0.96) translateY(1px);
+}
+
+/* ── 5. Image crossfade — ultra-smooth reveal ── */
+.img-reveal {
+  position: relative;
+  overflow: hidden;
+  background: #111;
+}
+
+.img-reveal img {
+  transition:
+    opacity 0.55s var(--ease-out-expo),
+    transform var(--duration-cinematic) var(--ease-out-expo);
+}
+
+.img-reveal[data-loaded="true"] img {
+  opacity: 1 !important;
+}
+
+/* ── 6. Scroll-driven opacity reveal (native CSS, no JS) ── */
+@supports (animation-timeline: scroll()) {
+  .scroll-fade-in {
+    animation: scroll-reveal linear both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 25%;
+  }
+
+  @keyframes scroll-reveal {
+    from { opacity: 0; transform: translateY(24px) scale(0.98); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  .scroll-fade-up {
+    animation: scroll-fade-up-anim linear both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 30%;
+  }
+
+  @keyframes scroll-fade-up-anim {
+    from { opacity: 0; transform: translateY(40px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+}
+
+/* ── 7. Product card — ultra smooth hover lift (compositor-only) ── */
+.product-card-wrap {
+  transition:
+    transform var(--duration-smooth) var(--ease-out-expo),
+    box-shadow var(--duration-smooth) var(--ease-out-expo);
+  will-change: transform;
+}
+
+.product-card-wrap:hover {
+  transform: scale(1.012) translateZ(0);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+}
+
+.product-card-wrap:active {
+  transform: scale(0.985) translateZ(0);
+}
+
+/* ── 8. Mobile rubber-band overscroll & momentum ── */
+html {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: none;
+}
+
+@media (max-width: 767px) {
+  html {
+    overscroll-behavior-y: contain;
+  }
+
+  /* Prevent content shift on iOS keyboard open */
+  body {
+    min-height: -webkit-fill-available;
+  }
+
+  /* Full-height fix for iOS Safari */
+  .min-h-screen {
+    min-height: -webkit-fill-available;
+  }
+}
+
+/* ── 9. Nav link underline slide animation ── */
+.nav-link-premium {
+  position: relative;
+  transition: color var(--duration-swift) var(--ease-out-expo);
+}
+
+.nav-link-premium::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: right center;
+  transition: transform var(--duration-smooth) var(--ease-out-expo);
+}
+
+.nav-link-premium:hover::after,
+.nav-link-premium[aria-current="page"]::after {
+  transform: scaleX(1);
+  transform-origin: left center;
+}
+
+/* ── 10. Shimmer v2 — faster, smoother ── */
+.shimmer-v2 {
+  position: relative;
+  overflow: hidden;
+  background: #111;
+}
+
+.shimmer-v2::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 40%,
+    rgba(255, 255, 255, 0.04) 50%,
+    transparent 60%
+  );
+  background-size: 200% 100%;
+  animation: shimmer-v2-anim 1.4s ease infinite;
+}
+
+@keyframes shimmer-v2-anim {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ── 11. Focus ring — premium keyboard navigation ── */
+:focus-visible {
+  outline: 1.5px solid rgba(255, 255, 255, 0.6);
+  outline-offset: 3px;
+  border-radius: 2px;
+  transition: outline-color var(--duration-swift) ease;
+}
+
+/* ── 12. Reduced motion — respect user preference ── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+  }
+}
+
+/* ── 13. Typography kerning & sub-pixel polish ── */
+h1, h2, h3, h4, h5, h6 {
+  text-rendering: geometricPrecision;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── 14. Selection color — brand-matched ── */
+::selection {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+}
+
+/* ── 15. Cart & drawer ultra-smooth transitions ── */
+.cart-drawer-enter {
+  transform: translateX(100%);
+  transition: transform var(--duration-cinematic) var(--ease-out-expo);
+}
+
+.cart-drawer-open {
+  transform: translateX(0);
+}
+
+/* ── 16. Image progressive load — blur-up polish ── */
+.blur-up {
+  filter: blur(8px);
+  transition: filter 0.5s var(--ease-out-expo);
+}
+
+.blur-up.loaded {
+  filter: blur(0);
+}
+
+/* ── 17. Scroll progress bar — ultra-thin, premium ── */
+.scroll-progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 1.5px;
+  background: transparent;
+  z-index: 99999;
+  pointer-events: none;
+}
+
+.scroll-progress-fill {
+  height: 100%;
+  background: rgba(255, 255, 255, 0.7);
+  transform-origin: left;
+  transition: transform 0.1s linear;
+}
+
+/* ── 18. Mobile bottom nav — spring transition ── */
+.mobile-nav-bar {
+  transition:
+    transform var(--duration-smooth) var(--ease-out-expo),
+    background var(--duration-smooth) ease;
+}
+
+/* ── 19. Ping animation — more premium ── */
+@keyframes premium-ping {
+  0%   { transform: scale(1); opacity: 0.8; }
+  70%  { transform: scale(2); opacity: 0; }
+  100% { transform: scale(2); opacity: 0; }
+}
+
+.premium-ping {
+  animation: premium-ping 1.4s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+/* ── 20. Stagger children utility ── */
+.stagger-children > * {
+  opacity: 0;
+  transform: translateY(16px);
+  animation: stagger-reveal 0.5s var(--ease-out-expo) forwards;
+}
+
+.stagger-children > *:nth-child(1) { animation-delay: 0ms; }
+.stagger-children > *:nth-child(2) { animation-delay: 60ms; }
+.stagger-children > *:nth-child(3) { animation-delay: 120ms; }
+.stagger-children > *:nth-child(4) { animation-delay: 180ms; }
+.stagger-children > *:nth-child(5) { animation-delay: 240ms; }
+.stagger-children > *:nth-child(6) { animation-delay: 300ms; }
+.stagger-children > *:nth-child(7) { animation-delay: 360ms; }
+.stagger-children > *:nth-child(8) { animation-delay: 420ms; }
+
+@keyframes stagger-reveal {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── 21. Pure CSS Marquee Keyframes (GPU-cheap transform) ── */
+@keyframes marquee-continuous {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.animate-marquee-continuous {
+  animation: marquee-continuous 24s linear infinite;
+  will-change: transform;
+}
