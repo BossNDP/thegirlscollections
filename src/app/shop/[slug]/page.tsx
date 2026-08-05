@@ -1,124 +1,99 @@
-// Server component — fetches product data with ISR caching (180s revalidate)
-// Drops document request latency from ~1,690ms to ~20-50ms (Vercel Edge CDN cache)
-import type { Metadata } from 'next';
+'use client';
+
+import React from 'react';
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { cache } from 'react';
-import { dbService } from '@/lib/db';
-import { getOptimizedImageUrl } from '@/lib/cloudinary';
-import ProductDetailClient from './_ProductDetailClient';
+import { ChevronRight } from 'lucide-react';
+import { MOCK_PRODUCTS } from '@/data/shopData';
+import { ProductGallery } from '@/components/pdp/ProductGallery';
+import { ProductInfo } from '@/components/pdp/ProductInfo';
+import { StickyAddToCartBar } from '@/components/pdp/StickyAddToCartBar';
+import { ProductCard } from '@/components/ProductCard';
+import { useShop } from '@/context/ShopContext';
+import { ButterflyMotif } from '@/components/ui/Motifs';
 
-// Enable Incremental Static Regeneration (ISR) with 180-second window
-export const revalidate = 180;
-
-// Wrap product fetcher in React cache() so generateMetadata and ProductDetailPage share 1 single DB execution per request
-const getCachedProduct = cache(async (slug: string) => {
-  return dbService.getProductBySlug(slug);
-});
-
-interface Props {
-  params: { slug: string };
-  searchParams: { color?: string };
-}
-
-/**
- * NOT SHOPIFY APPS:
- * Dynamic per-variant OpenGraph metadata generated on-the-fly via Cloudinary transformation pipelines.
- * When a user shares a specific color variant link (e.g. ?color=black-edition), WhatsApp, Twitter, Discord,
- * Telegram, Slack, and Facebook receive an exact 1200x630 large image preview card.
- */
-export async function generateMetadata({ params, searchParams }: Props): Promise<Metadata> {
-  const product = await getCachedProduct(params.slug);
-
-  if (!product) {
-    return {
-      title: 'Product Not Found | DRFTN CLOTHING',
-      description: 'This streetwear product could not be found.',
-    };
-  }
-
-  // Find matching variant if color parameter exists
-  let targetImage = product.images[0] ?? '';
-  let colorTitle = '';
-
-  if (searchParams?.color && product.variants && product.variants.length > 0) {
-    const matchedVariant = product.variants.find(
-      (v) => v.colour_name.toLowerCase().replace(/[^a-z0-9]+/g, '-') === searchParams.color?.toLowerCase()
-    );
-    if (matchedVariant && matchedVariant.images && matchedVariant.images.length > 0) {
-      targetImage = matchedVariant.images[0];
-      colorTitle = ` — ${matchedVariant.colour_name}`;
-    }
-  }
-
-  const priceFormatted = `₹${Math.round(product.price / 100).toLocaleString('en-IN')}`;
-
-  // Cloudinary Dynamic OG Image Generation (1200x630 landscape format for large social cards)
-  const ogImageUrl = targetImage
-    ? getOptimizedImageUrl(targetImage, 1200)
-    : 'https://www.drftnclothing.in/og-default.jpg';
-
-  const desc = product.description || '';
-  const cleanDesc = desc.includes('\n\nTags: ') ? desc.split('\n\nTags: ')[0] : desc;
-  const ogDescription = `${priceFormatted} • Heavyweight D2C Streetwear • ${cleanDesc.slice(0, 120).trim()}${cleanDesc.length > 120 ? '…' : ''}`;
-  const title = `${product.name}${colorTitle} | DRFTN`;
-  const pageUrl = `https://www.drftnclothing.in/shop/${product.slug}${searchParams?.color ? `?color=${searchParams.color}` : ''}`;
-
-  return {
-    title,
-    description: ogDescription,
-    openGraph: {
-      title,
-      description: ogDescription,
-      url: pageUrl,
-      type: 'website',
-      siteName: 'DRFTN CLOTHING',
-      images: [
-        {
-          url: ogImageUrl,
-          width: 1200,
-          height: 630,
-          alt: `${product.name}${colorTitle}`,
-        },
-      ],
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title,
-      description: ogDescription,
-      images: [ogImageUrl],
-    },
+interface PDPProps {
+  params: {
+    slug: string;
   };
 }
 
-export default async function ProductDetailPage({ params, searchParams }: Props) {
-  // Use React.cache() single-fetch execution
-  const product = await getCachedProduct(params.slug);
+export default function ProductDetailPage({ params }: PDPProps) {
+  const { addToCart } = useShop();
+
+  const product = MOCK_PRODUCTS.find((p) => p.slug === params.slug) || MOCK_PRODUCTS[0];
 
   if (!product) {
     notFound();
   }
 
-  // Fetch 4 related products using category query (LIMIT 4) instead of getProducts() catalog dump
-  const relatedProducts = await dbService.getRelatedProducts(product.category, product.id, 4);
+  const selectedSize = product.sizes.find((s) => s.inStock)?.size || 'Free Size';
 
-  const heroImageUrl = product.images[0] ? getOptimizedImageUrl(product.images[0], 1400) : '';
+  const relatedProducts = MOCK_PRODUCTS.filter(
+    (p) => p.id !== product.id && (p.category === product.category || p.target === product.target)
+  ).slice(0, 4);
 
   return (
-    <>
-      {heroImageUrl && (
-        <link
-          rel="preload"
-          as="image"
-          href={heroImageUrl}
-          // @ts-ignore - fetchPriority is supported in modern browsers
-          fetchPriority="high"
-        />
+    <div className="bg-ivory text-navy min-h-screen pb-24">
+      {/* Breadcrumbs Navigation with Graceful Ellipsis Truncation */}
+      <div className="bg-blush/15 border-b border-roseGold/20 py-3.5 px-4 sm:px-8 overflow-hidden">
+        <div className="max-w-7xl mx-auto">
+          <nav className="flex items-center space-x-1.5 text-xs font-sans text-charcoal-muted overflow-hidden whitespace-nowrap">
+            <Link href="/" className="hover:text-roseGold transition-colors shrink-0">Home</Link>
+            <ChevronRight className="w-3 h-3 text-roseGold/40 shrink-0" />
+            <Link href="/shop" className="hover:text-roseGold transition-colors shrink-0">Shop</Link>
+            <ChevronRight className="w-3 h-3 text-roseGold/40 shrink-0" />
+            <span className="capitalize shrink-0">{product.target}</span>
+            <ChevronRight className="w-3 h-3 text-roseGold/40 shrink-0" />
+            <span className="text-navy font-semibold truncate min-w-0 max-w-[140px] sm:max-w-[280px]">
+              {product.name}
+            </span>
+          </nav>
+        </div>
+      </div>
+
+      {/* Main PDP Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-8 pt-8 sm:pt-12">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-start">
+          {/* Left Column: Image Gallery */}
+          <div className="lg:col-span-7 lg:sticky lg:top-28">
+            <ProductGallery images={product.images} productName={product.name} />
+          </div>
+
+          {/* Right Column: Product Information & CTAs */}
+          <div className="lg:col-span-5">
+            <ProductInfo product={product} />
+          </div>
+        </div>
+      </div>
+
+      {/* "You May Also Like" Section */}
+      {relatedProducts.length > 0 && (
+        <section className="max-w-7xl mx-auto px-4 sm:px-8 pt-16 sm:pt-20 border-t border-roseGold/20 mt-16 sm:mt-20">
+          <div className="text-center mb-10 sm:mb-12">
+            <div className="flex items-center justify-center space-x-2 text-roseGold text-xs uppercase tracking-eyebrow font-semibold">
+              <ButterflyMotif className="w-4 h-4" />
+              <span>Curated Recommendations</span>
+            </div>
+            <h2 className="text-2xl sm:text-4xl font-serif font-bold text-navy mt-1">
+              You May Also Like
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+            {relatedProducts.map((rel) => (
+              <ProductCard key={rel.id} product={rel} />
+            ))}
+          </div>
+        </section>
       )}
-      <ProductDetailClient
-        params={params}
-        initialProduct={product}
-        initialRelatedProducts={relatedProducts}
+
+      {/* Mobile Sticky Add To Bag Bar */}
+      <StickyAddToCartBar
+        product={product}
+        selectedSize={selectedSize}
+        onAddToCart={() => addToCart(product, selectedSize)}
       />
-    </>
+    </div>
   );
 }

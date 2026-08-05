@@ -124,8 +124,8 @@ export default function NotificationToast() {
       setIsVisible(false);
     } catch (error) {
       console.error('Push subscription failed:', error);
-      addToast('Could not enable notifications.', 'error');
-      setIsVisible(false); // Make toast disappear on error too
+      // Fail silently without disturbing user experience with error toasts
+      setIsVisible(false);
     } finally {
       setIsSubscribing(false);
     }

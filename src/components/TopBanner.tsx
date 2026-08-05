@@ -1,118 +1,44 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
-import { useDriftMode } from '@/context/DriftModeContext';
+import React, { useState, useEffect } from 'react';
+
+const MESSAGES = [
+  "COMPLIMENTARY PAN-INDIA SHIPPING ON ORDERS ABOVE ₹1,999",
+  "FESTIVE EDIT '26 LIVE NOW — USE CODE 'FESTIVE10' FOR 10% OFF",
+  "EASY 7-DAY RETURNS & COMPLIMENTARY ROYAL GIFT PACKAGING",
+];
 
 export const TopBanner: React.FC = () => {
-  const { isActive, discountPercent } = useDriftMode();
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [isPaused, setIsPaused] = useState(false);
+  const [index, setIndex] = useState(0);
+  const [fade, setFade] = useState(true);
 
   useEffect(() => {
-    if (!isActive) return;
+    const timer = setInterval(() => {
+      setFade(false);
+      setTimeout(() => {
+        setIndex((prev) => (prev + 1) % MESSAGES.length);
+        setFade(true);
+      }, 500);
+    }, 4500);
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          setIsPaused(!entry.isIntersecting);
-        });
-      },
-      { threshold: 0.1 }
-    );
-
-    if (containerRef.current) {
-      observer.observe(containerRef.current);
-    }
-
-    const handleVisibilityChange = () => {
-      setIsPaused(document.hidden);
-    };
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-
-    return () => {
-      observer.disconnect();
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-    };
-  }, [isActive]);
-
-  if (!isActive) return null;
-
-  const repeatCount = 6;
-  const items = Array.from({ length: repeatCount });
+    return () => clearInterval(timer);
+  }, []);
 
   return (
     <div
-      ref={containerRef}
-      aria-label="Drift Mode Announcement"
-      className="relative w-full bg-black h-7 border-b border-zinc-900 text-white flex items-center overflow-hidden select-none z-40"
+      aria-label="Brand Announcements"
+      className="relative w-full bg-gradient-to-r from-navy-dark via-navy to-navy-dark h-8 text-ivory flex items-center justify-center border-b border-roseGold/25 px-4 overflow-hidden select-none z-40"
     >
-      <style jsx>{`
-        @keyframes driftMarquee {
-          0% {
-            transform: translate3d(0, 0, 0);
-          }
-          100% {
-            transform: translate3d(-50%, 0, 0);
-          }
-        }
-        @keyframes dotPulse {
-          0%, 100% {
-            opacity: 0.4;
-          }
-          50% {
-            opacity: 1;
-          }
-        }
-        .animate-drift-marquee {
-          display: inline-flex;
-          white-space: nowrap;
-          will-change: transform;
-          animation: driftMarquee 70s linear infinite;
-        }
-        .animate-dot-pulse {
-          animation: dotPulse 1.5s ease-in-out infinite;
-        }
-        @media (prefers-reduced-motion: reduce) {
-          .animate-drift-marquee {
-            animation: none !important;
-            transform: none !important;
-          }
-        }
-      `}</style>
-
-      <div
-        className="animate-drift-marquee text-[10px] sm:text-[11px] font-mono tracking-[0.12em] uppercase font-bold text-white"
-        style={{
-          animationPlayState: isPaused ? 'paused' : 'running',
-        }}
-      >
-        <div className="inline-flex items-center">
-          {items.map((_, i) => (
-            <span key={`a-${i}`} className="inline-flex items-center mx-4">
-              <span className="inline-block w-1.5 h-1.5 rounded-full bg-white animate-dot-pulse mr-2.5" />
-              <span>DRIFT MODE: ON</span>
-              <span className="mx-3 text-zinc-600 font-normal">•</span>
-              <span>FLAT {discountPercent}% OFF YOUR FIRST ORDER</span>
-              <span className="mx-3 text-zinc-600 font-normal">•</span>
-              <span>FREE SHIPPING & COD ACROSS INDIA</span>
-              <span className="mx-3 text-zinc-600 font-normal">•</span>
-            </span>
-          ))}
-        </div>
-        <div className="inline-flex items-center">
-          {items.map((_, i) => (
-            <span key={`b-${i}`} className="inline-flex items-center mx-4">
-              <span className="inline-block w-1.5 h-1.5 rounded-full bg-white animate-dot-pulse mr-2.5" />
-              <span>DRIFT MODE: ON</span>
-              <span className="mx-3 text-zinc-600 font-normal">•</span>
-              <span>FLAT {discountPercent}% OFF YOUR FIRST ORDER</span>
-              <span className="mx-3 text-zinc-600 font-normal">•</span>
-              <span>FREE SHIPPING & COD ACROSS INDIA</span>
-              <span className="mx-3 text-zinc-600 font-normal">•</span>
-            </span>
-          ))}
-        </div>
+      <div className="max-w-7xl mx-auto w-full flex items-center justify-center text-center">
+        <span
+          className={`text-[10px] sm:text-xs font-sans tracking-widest uppercase text-ivory/90 font-medium transition-opacity duration-500 ease-in-out flex items-center gap-2 ${
+            fade ? 'opacity-100' : 'opacity-0'
+          }`}
+        >
+          <span className="w-1.5 h-1.5 rounded-full bg-roseGold inline-block animate-pulse shrink-0" />
+          <span className="text-roseGold font-semibold">THE GIRLS EDIT:</span>
+          <span className="truncate max-w-[280px] sm:max-w-none">{MESSAGES[index]}</span>
+        </span>
       </div>
     </div>
   );

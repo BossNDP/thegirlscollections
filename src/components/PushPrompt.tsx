@@ -111,8 +111,8 @@ export default function PushPrompt() {
       setIsVisible(false);
     } catch (error) {
       console.error('Push subscription failed:', error);
-      toast.error('Could not enable notifications. Please try again.');
-      setIsVisible(false); // Make prompt disappear on error too
+      // Fail silently without disturbing user experience with error toasts
+      setIsVisible(false);
     } finally {
       setIsSubscribing(false);
     }

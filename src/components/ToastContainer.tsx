@@ -25,20 +25,19 @@ export default function ToastContainer() {
   return (
     <div className="fixed bottom-24 md:bottom-6 right-4 left-4 md:left-auto z-50 flex flex-col gap-2 max-w-sm w-auto md:w-full">
       {toasts.map((t) => {
-        // Dismiss handler
         const handleDismiss = () => {
           setToasts((prev) => prev.filter((item) => item.id !== t.id));
         };
 
-        // Render custom Product Add-to-Cart toast
+        // Custom Product Add-to-Cart toast
         if (t.productImage && t.productName) {
           return (
             <div
               key={t.id}
-              className="bg-brand-black border border-brand-offwhite/20 p-3.5 shadow-2xl relative flex items-center gap-3.5 text-brand-offwhite w-full rounded-none animate-in slide-in-from-bottom-5 md:slide-in-from-right-5 duration-300"
+              className="bg-navy border border-roseGold/30 p-3.5 shadow-2xl relative flex items-center gap-3.5 text-ivory w-full rounded-xl animate-in slide-in-from-bottom-5 md:slide-in-from-right-5 duration-300"
             >
               {/* Product Thumbnail */}
-              <div className="relative w-12 h-16 bg-brand-charcoal shrink-0 border border-white/5">
+              <div className="relative w-12 h-16 bg-navy-dark shrink-0 rounded-md overflow-hidden border border-roseGold/20">
                 <Image
                   src={t.productImage}
                   alt={t.productName}
@@ -51,20 +50,20 @@ export default function ToastContainer() {
               {/* Toast Details */}
               <div className="flex-1 min-w-0 flex flex-col justify-between h-14 py-0.5">
                 <div className="flex items-center justify-between">
-                  <span className="text-[9px] tracking-[0.2em] text-brand-red font-bold uppercase font-body">
+                  <span className="text-[9px] tracking-[0.2em] text-roseGold font-bold uppercase font-sans">
                     Added to Bag
                   </span>
-                  <div className="relative w-[40px] h-[40px] -my-[14px] shrink-0 opacity-40">
+                  <div className="relative w-7 h-7 shrink-0">
                     <Image
-                      src="/logo.png?v=3"
-                      alt="DRFTN"
+                      src="/logo.png"
+                      alt="The Girls Collection"
                       fill
-                      sizes="40px"
-                      className="object-contain object-right"
+                      sizes="28px"
+                      className="object-contain"
                     />
                   </div>
                 </div>
-                <h4 className="text-xs font-semibold text-brand-offwhite font-body truncate leading-normal">
+                <h4 className="text-xs font-serif font-bold text-ivory truncate leading-normal">
                   {t.productName}
                 </h4>
               </div>
@@ -72,7 +71,7 @@ export default function ToastContainer() {
               {/* Close Button */}
               <button
                 onClick={handleDismiss}
-                className="text-brand-silver hover:text-brand-offwhite transition-colors self-start p-1"
+                className="text-ivory/70 hover:text-ivory transition-colors self-start p-1"
                 aria-label="Dismiss"
               >
                 <X className="w-3.5 h-3.5" />
@@ -82,33 +81,33 @@ export default function ToastContainer() {
         }
 
         // Standard Alert Styling
-        const bgColor = 'bg-brand-charcoal';
-        let borderColor = 'border-brand-muted';
+        const bgColor = 'bg-navy';
+        let borderColor = 'border-roseGold/30';
         let Icon = Info;
-        let iconColor = 'text-brand-silver';
+        let iconColor = 'text-roseGold';
 
         if (t.type === 'success') {
-          borderColor = 'border-emerald-500/20';
+          borderColor = 'border-emerald-500/30';
           Icon = CheckCircle;
           iconColor = 'text-emerald-400';
         } else if (t.type === 'error') {
-          borderColor = 'border-brand-red/30';
+          borderColor = 'border-mutedMauve/50';
           Icon = AlertCircle;
-          iconColor = 'text-brand-red';
+          iconColor = 'text-mutedMauve';
         }
 
         return (
           <div
             key={t.id}
-            className={`flex items-center justify-between p-4 shadow-2xl border ${bgColor} ${borderColor} rounded-none animate-in slide-in-from-bottom-5 md:slide-in-from-right-5 duration-300`}
+            className={`flex items-center justify-between p-4 shadow-2xl border ${bgColor} ${borderColor} text-ivory rounded-xl animate-in slide-in-from-bottom-5 md:slide-in-from-right-5 duration-300`}
           >
             <div className="flex items-center gap-3">
               <Icon className={`w-4 h-4 ${iconColor}`} />
-              <p className="text-xs font-medium text-brand-offwhite font-body leading-normal">{t.message}</p>
+              <p className="text-xs font-medium text-ivory font-sans leading-normal">{t.message}</p>
             </div>
             <button
               onClick={handleDismiss}
-              className="text-brand-silver hover:text-brand-offwhite transition-colors ml-4"
+              className="text-ivory/70 hover:text-ivory transition-colors ml-4"
               aria-label="Dismiss"
             >
               <X className="w-3.5 h-3.5" />
