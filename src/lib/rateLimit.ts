@@ -12,7 +12,7 @@
  * in middleware.ts do not need to change.
  */
 import { Ratelimit } from '@upstash/ratelimit';
-import { redis } from './redis';
+import { redis, isRedisConfigured } from './redis';
 
 export interface RateLimitResult {
   success: boolean;
@@ -54,6 +54,14 @@ export async function rateLimit(
   windowMs: number
 ): Promise<RateLimitResult> {
   const windowSeconds = Math.max(1, Math.round(windowMs / 1000));
+  if (!isRedisConfigured()) {
+    return {
+      success: true,
+      limit,
+      remaining: Math.max(0, limit - 1),
+      reset: windowSeconds,
+    };
+  }
   const limiter = getLimiter(limit, windowSeconds);
 
   try {
