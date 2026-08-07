@@ -3,7 +3,8 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ChevronRight, ArrowLeft, Sparkles } from 'lucide-react';
+import { ChevronRight, ArrowLeft, Sparkles, X } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { CATEGORY_TAXONOMY } from '@/data/categoryTaxonomy';
 
 interface MegaMenuProps {
@@ -133,7 +134,7 @@ export const DesktopMegaMenu: React.FC<MegaMenuProps> = ({ activeCategory, onClo
           <div className="col-span-6 pl-4 flex flex-col justify-between">
             <div className="relative h-56 w-full rounded-xl overflow-hidden shadow-md group">
               <Image
-                src="https://images.unsplash.com/photo-1596870230751-ebdfce98ec42?auto=format&fit=crop&q=85&w=600"
+                src="https://images.unsplash.com/photo-1621600411688-4be93cd68504?auto=format&fit=crop&q=85&w=800"
                 alt="Kids Pattu Frocks"
                 fill
                 className="object-cover group-hover:scale-105 transition-transform duration-700"
@@ -187,143 +188,170 @@ export const MobileMegaMenu: React.FC<{ isOpen: boolean; onClose: () => void }> 
 }) => {
   const [selectedMain, setSelectedMain] = React.useState<'women' | 'kids' | null>(null);
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 z-[80] bg-ivory text-charcoal overflow-y-auto animate-slide-in-right">
-      {/* Top Header */}
-      <div className="p-4 border-b border-roseGold/20 flex items-center justify-between bg-ivory sticky top-0 z-10">
-        {selectedMain ? (
-          <button
-            onClick={() => setSelectedMain(null)}
-            className="flex items-center text-xs font-semibold uppercase tracking-wider text-roseGold min-h-[44px]"
+    <AnimatePresence>
+      {isOpen && (
+        <>
+          {/* Smooth Dimming Backdrop Overlay */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            onClick={onClose}
+            className="fixed inset-0 z-[75] bg-navy/60 backdrop-blur-xs"
+          />
+
+          {/* Smooth Sliding Mobile Navigation Drawer */}
+          <motion.div
+            initial={{ x: '-100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '-100%' }}
+            transition={{ type: 'spring', damping: 25, stiffness: 220 }}
+            className="fixed inset-y-0 left-0 w-full max-w-[340px] sm:max-w-[400px] z-[80] bg-navy text-ivory flex flex-col shadow-2xl overflow-hidden"
           >
-            <ArrowLeft className="w-4 h-4 mr-1" />
-            Back to Categories
-          </button>
-        ) : (
-          <span className="text-sm font-serif font-bold text-navy">The Girls Collection</span>
-        )}
-        <button
-          onClick={onClose}
-          className="text-xs uppercase font-semibold text-charcoal-muted hover:text-navy min-h-[44px] px-2 flex items-center"
-        >
-          Close
-        </button>
-      </div>
-
-      <div className="p-6">
-        {!selectedMain ? (
-          <div className="space-y-4">
-            <p className="text-[11px] uppercase tracking-eyebrow text-roseGold font-bold">
-              Explore Collections
-            </p>
-            <div className="divide-y divide-roseGold/15">
-              <button
-                onClick={() => setSelectedMain('women')}
-                className="w-full py-4 flex items-center justify-between text-left group min-h-[44px]"
-              >
-                <span className="text-lg font-serif font-bold text-navy group-hover:text-roseGold">
-                  Women
-                </span>
-                <ChevronRight className="w-5 h-5 text-roseGold" />
-              </button>
-
-              <button
-                onClick={() => setSelectedMain('kids')}
-                className="w-full py-4 flex items-center justify-between text-left group min-h-[44px]"
-              >
-                <span className="text-lg font-serif font-bold text-navy group-hover:text-roseGold">
-                  Kids Ethnic
-                </span>
-                <ChevronRight className="w-5 h-5 text-roseGold" />
-              </button>
-
-              <Link
-                href="/shop?isNew=true"
-                onClick={onClose}
-                className="block py-4 text-lg font-serif font-bold text-navy hover:text-roseGold min-h-[44px]"
-              >
-                New Arrivals
-              </Link>
-
-              <Link
-                href="/shop?occasion=Festive"
-                onClick={onClose}
-                className="block py-4 text-lg font-serif font-bold text-navy hover:text-roseGold min-h-[44px]"
-              >
-                Festive Edit
-              </Link>
-
-              <Link
-                href="/shop?isSale=true"
-                onClick={onClose}
-                className="block py-4 text-lg font-serif font-bold text-mutedMauve hover:text-navy min-h-[44px]"
-              >
-                Sale
-              </Link>
-
-              <Link
-                href="/#discover-brand-world"
-                onClick={onClose}
-                className="block py-4 text-lg font-serif font-bold text-navy hover:text-roseGold min-h-[44px]"
-              >
-                Discover Brand World
-              </Link>
-            </div>
-          </div>
-        ) : selectedMain === 'women' ? (
-          <div className="space-y-6 animate-fade-in">
-            <h3 className="text-xl font-serif font-bold text-navy">Women&apos;s Collection</h3>
-
-            <div>
-              <p className="text-xs uppercase tracking-eyebrow text-roseGold font-bold mb-2">
-                Traditional
-              </p>
-              {CATEGORY_TAXONOMY.find((c) => c.id === 'women')?.groups.find((g) => g.id === 'women-traditional')?.items.map((sub) => (
-                <Link
-                  key={sub.id}
-                  href={`/shop?category=${sub.slug}`}
-                  onClick={onClose}
-                  className="block py-2.5 text-base font-serif text-charcoal hover:text-roseGold border-b border-roseGold/10"
+            {/* Top Header with Prominent Cross Mark (X) Close Button */}
+            <div className="p-4 border-b border-roseGold/20 flex items-center justify-between bg-navy shrink-0">
+              {selectedMain ? (
+                <button
+                  onClick={() => setSelectedMain(null)}
+                  className="flex items-center text-xs font-semibold uppercase tracking-[0.14em] text-roseGold hover:text-ivory transition-colors min-h-[44px]"
                 >
-                  {sub.name}
-                </Link>
-              ))}
+                  <ArrowLeft className="w-4 h-4 mr-1.5" />
+                  Back to Categories
+                </button>
+              ) : (
+                <span className="text-xs uppercase tracking-[0.18em] font-semibold text-roseGold">
+                  THE GIRLS COLLECTION
+                </span>
+              )}
+
+              {/* Prominent Cross Mark (X) Button */}
+              <button
+                onClick={onClose}
+                className="w-9 h-9 rounded-full bg-white/10 hover:bg-roseGold hover:text-navy text-ivory flex items-center justify-center transition-all duration-300 focus:outline-none"
+                aria-label="Close Navigation Menu"
+              >
+                <X className="w-5 h-5" />
+              </button>
             </div>
 
-            <div>
-              <p className="text-xs uppercase tracking-eyebrow text-roseGold font-bold mb-2">
-                Frocks &amp; Western
-              </p>
-              {CATEGORY_TAXONOMY.find((c) => c.id === 'women')?.groups.find((g) => g.id === 'women-frocks-western')?.items.map((sub) => (
-                <Link
-                  key={sub.id}
-                  href={`/shop?category=${sub.slug}`}
-                  onClick={onClose}
-                  className="block py-2.5 text-base font-serif text-charcoal hover:text-roseGold border-b border-roseGold/10"
-                >
-                  {sub.name}
-                </Link>
-              ))}
+            {/* Scrollable Drawer Content */}
+            <div className="p-6 overflow-y-auto flex-1 space-y-6">
+              {!selectedMain ? (
+                <div className="space-y-4">
+                  <p className="text-[11px] uppercase tracking-[0.2em] text-roseGold font-medium">
+                    Explore Collections
+                  </p>
+                  <div className="divide-y divide-roseGold/10">
+                    <button
+                      onClick={() => setSelectedMain('women')}
+                      className="w-full py-4 flex items-center justify-between text-left group min-h-[44px]"
+                    >
+                      <span className="text-xl font-serif font-bold text-ivory group-hover:text-roseGold transition-colors">
+                        Women
+                      </span>
+                      <ChevronRight className="w-5 h-5 text-roseGold" />
+                    </button>
+
+                    <button
+                      onClick={() => setSelectedMain('kids')}
+                      className="w-full py-4 flex items-center justify-between text-left group min-h-[44px]"
+                    >
+                      <span className="text-xl font-serif font-bold text-ivory group-hover:text-roseGold transition-colors">
+                        Kids Ethnic
+                      </span>
+                      <ChevronRight className="w-5 h-5 text-roseGold" />
+                    </button>
+
+                    <Link
+                      href="/shop?isNew=true"
+                      onClick={onClose}
+                      className="block py-4 text-xl font-serif font-bold text-ivory hover:text-roseGold transition-colors min-h-[44px]"
+                    >
+                      New Arrivals
+                    </Link>
+
+                    <Link
+                      href="/shop?occasion=Festive"
+                      onClick={onClose}
+                      className="block py-4 text-xl font-serif font-bold text-ivory hover:text-roseGold transition-colors min-h-[44px]"
+                    >
+                      Festive Edit
+                    </Link>
+
+                    <Link
+                      href="/shop?isSale=true"
+                      onClick={onClose}
+                      className="block py-4 text-xl font-serif font-bold text-blush hover:text-roseGold transition-colors min-h-[44px]"
+                    >
+                      Sale
+                    </Link>
+
+                    <Link
+                      href="/#discover-brand-world"
+                      onClick={onClose}
+                      className="block py-4 text-xl font-serif font-bold text-ivory hover:text-roseGold transition-colors min-h-[44px]"
+                    >
+                      Discover Brand World
+                    </Link>
+                  </div>
+                </div>
+              ) : selectedMain === 'women' ? (
+                <div className="space-y-6 animate-fade-in">
+                  <h3 className="text-2xl font-serif font-bold text-ivory">Women&apos;s Collection</h3>
+
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.18em] text-roseGold font-medium mb-3">
+                      Traditional
+                    </p>
+                    {CATEGORY_TAXONOMY.find((c) => c.id === 'women')?.groups.find((g) => g.id === 'women-traditional')?.items.map((sub) => (
+                      <Link
+                        key={sub.id}
+                        href={`/shop?category=${sub.slug}`}
+                        onClick={onClose}
+                        className="block py-3 text-lg font-serif text-ivory/90 hover:text-roseGold border-b border-roseGold/10"
+                      >
+                        {sub.name}
+                      </Link>
+                    ))}
+                  </div>
+
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.18em] text-roseGold font-medium mb-3">
+                      Frocks &amp; Western
+                    </p>
+                    {CATEGORY_TAXONOMY.find((c) => c.id === 'women')?.groups.find((g) => g.id === 'women-frocks-western')?.items.map((sub) => (
+                      <Link
+                        key={sub.id}
+                        href={`/shop?category=${sub.slug}`}
+                        onClick={onClose}
+                        className="block py-3 text-lg font-serif text-ivory/90 hover:text-roseGold border-b border-roseGold/10"
+                      >
+                        {sub.name}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-5 animate-fade-in">
+                  <h3 className="text-2xl font-serif font-bold text-ivory">Kids Ethnic Collection</h3>
+                  {CATEGORY_TAXONOMY.find((c) => c.id === 'kids')?.groups[0]?.items.map((sub) => (
+                    <Link
+                      key={sub.id}
+                      href={`/shop?category=${sub.slug}`}
+                      onClick={onClose}
+                      className="block py-3.5 text-lg font-serif text-ivory/90 hover:text-roseGold border-b border-roseGold/10"
+                    >
+                      {sub.name}
+                    </Link>
+                  ))}
+                </div>
+              )}
             </div>
-          </div>
-        ) : (
-          <div className="space-y-4 animate-fade-in">
-            <h3 className="text-xl font-serif font-bold text-navy">Kids Ethnic Collection</h3>
-            {CATEGORY_TAXONOMY.find((c) => c.id === 'kids')?.groups[0]?.items.map((sub) => (
-              <Link
-                key={sub.id}
-                href={`/shop?category=${sub.slug}`}
-                onClick={onClose}
-                className="block py-3 text-base font-serif text-charcoal hover:text-roseGold border-b border-roseGold/10"
-              >
-                {sub.name}
-              </Link>
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
   );
 };

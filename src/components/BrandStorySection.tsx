@@ -14,8 +14,8 @@ const CYCLING_WORDS = ['DRIFTERS.', 'OUTLIERS.', 'UNBOTHERED.', 'RESTLESS.'];
 
 const MINI_COLLAGE_PHOTOS = [
   {
-    src: 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=700&q=80',
-    alt: 'Garment Heavyweight Cotton Texture',
+    src: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=700&q=80',
+    alt: 'Handwoven Pure Kanjeevaram Silk Texture',
     initialRotation: -12,
     finalRotation: -5,
     initialX: -40,
@@ -23,8 +23,8 @@ const MINI_COLLAGE_PHOTOS = [
     className: 'w-24 sm:w-36 md:w-44 aspect-[3/4] shadow-2xl rounded-none border border-white/20 z-10',
   },
   {
-    src: 'https://images.unsplash.com/photo-1576995853123-5a10305d93c0?auto=format&fit=crop&w=700&q=80',
-    alt: 'Garment Tag & Stitching Detail',
+    src: 'https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&w=700&q=80',
+    alt: 'Royal Zardosi & Moti Embroidery Detail',
     initialRotation: 14,
     finalRotation: 6,
     initialX: 40,
@@ -32,8 +32,8 @@ const MINI_COLLAGE_PHOTOS = [
     className: 'w-28 sm:w-40 md:w-48 aspect-square shadow-2xl rounded-none border border-white/20 z-20 -ml-6 -mt-4 sm:-ml-10',
   },
   {
-    src: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=700&q=80',
-    alt: 'Heavy Hoodie Cut Detail',
+    src: 'https://images.unsplash.com/photo-1621600411688-4be93cd68504?auto=format&fit=crop&q=85&w=800&q=80',
+    alt: 'Pure Silk Kids Pattu Frock Detail',
     initialRotation: -6,
     finalRotation: -2,
     initialX: 0,

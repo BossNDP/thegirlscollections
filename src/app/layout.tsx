@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import TopBanner from '@/components/TopBanner';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import PageTransition from '@/components/PageTransition';
@@ -60,9 +61,11 @@ export const metadata: Metadata = {
   },
 };
 
+const rawKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
 const publishableKey =
-  process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ||
-  'pk_test_Y2xlcmsuaW5jbHVkZWQuY2xlcmsuYWNjb3VudHMuZGV2JA';
+  rawKey && !rawKey.includes('pk_test_Y2xlcmsuaW5jbHVkZWQu')
+    ? rawKey
+    : 'pk_test_Y2xlcmsuaW5jbHVkZWQuY2xlcmsuYWNjb3VudHMuZGV2JA';
 
 export default function RootLayout({
   children,
@@ -76,6 +79,25 @@ export default function RootLayout({
         suppressHydrationWarning
         className={`${fraunces.variable} ${jakarta.variable} ${alexBrush.variable}`}
       >
+        <head>
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `
+                window.addEventListener('error', function(e) {
+                  if (e && e.message && e.message.indexOf('Clerk') !== -1) {
+                    e.stopImmediatePropagation();
+                  }
+                }, true);
+                window.addEventListener('unhandledrejection', function(e) {
+                  if (e && e.reason && (String(e.reason).indexOf('Clerk') !== -1 || String(e.reason).indexOf('failed_to_load_clerk_js') !== -1)) {
+                    e.preventDefault();
+                    e.stopImmediatePropagation();
+                  }
+                }, true);
+              `,
+            }}
+          />
+        </head>
         <body
           suppressHydrationWarning
           className="antialiased min-h-screen flex flex-col bg-ivory text-charcoal p-0 m-0 font-sans selection:bg-blush selection:text-navy"
@@ -83,7 +105,10 @@ export default function RootLayout({
           <SmoothScrollProvider>
             <AuthSessionProvider>
               <ShopProvider>
-                {/* Global Sticky Header */}
+                {/* Section 1: Top Utility Bar */}
+                <TopBanner />
+
+                {/* Section 2: Main Navbar */}
                 <Navbar />
 
                 {/* Main Page Body */}

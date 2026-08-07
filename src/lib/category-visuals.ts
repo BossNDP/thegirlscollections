@@ -7,75 +7,49 @@
  */
 export const CATEGORY_VISUALS: Record<string, { label: string; image: string }> = {
   all: {
-    label: 'All Drops',
-    image:
-      'https://res.cloudinary.com/dtj01pdog/image/upload/f_auto,q_auto,e_improve,e_sharpen:60/v1785232712/drftn-products/dgv06ev4uv746sjfdwaq.jpg',
+    label: 'All Collections',
+    image: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&q=85&w=800',
   },
-  't-shirts': {
-    label: 'Tees',
-    image:
-      'https://res.cloudinary.com/dtj01pdog/image/upload/f_auto,q_auto,e_improve,e_sharpen:60/v1785153652/drftn-products/jphnwicpbhl6wvrnxkfw.jpg',
+  sarees: {
+    label: 'Sarees',
+    image: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&q=85&w=800',
   },
-  shirts: {
-    label: 'Shirts',
-    image:
-      'https://res.cloudinary.com/dtj01pdog/image/upload/f_auto,q_auto,e_improve,e_sharpen:60/v1784830975/drftn-products/f42vst7ccgg3deqwsjcv.jpg',
+  lehengas: {
+    label: 'Lehengas',
+    image: 'https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&q=85&w=800',
   },
-  denims: {
-    label: 'Denims',
-    image:
-      'https://res.cloudinary.com/dtj01pdog/image/upload/f_auto,q_auto,e_improve,e_sharpen:60/v1785252749/drftn-products/e4flew2q0o5cdkc7qmeb.jpg',
+  'pattu-frocks': {
+    label: 'Kids Pattu Frocks',
+    image: 'https://images.unsplash.com/photo-1621600411688-4be93cd68504?auto=format&fit=crop&q=85&w=800',
   },
-  'formal-pants': {
-    label: 'Trousers',
-    image:
-      'https://res.cloudinary.com/dtj01pdog/image/upload/f_auto,q_auto,e_improve,e_sharpen:60/v1785256428/drftn-products/xjmjjgzzvl0vf6e0difo.jpg',
+  kurtis: {
+    label: 'Kurtis & Tunics',
+    image: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&q=85&w=800',
   },
-  sweatshirts: {
-    label: 'Sweats',
-    image:
-      'https://res.cloudinary.com/dtj01pdog/image/upload/f_auto,q_auto,e_improve,e_sharpen:60/v1785232919/drftn-products/tuquugai46apllc42seg.jpg',
-  },
-  sweatshirt: {
-    label: 'Sweatshirt',
-    image:
-      'https://res.cloudinary.com/dtj01pdog/image/upload/f_auto,q_auto,e_improve,e_sharpen:60/v1785232919/drftn-products/tuquugai46apllc42seg.jpg',
-  },
-  hoodies: {
-    label: 'Hoodies',
-    image:
-      'https://res.cloudinary.com/dtj01pdog/image/upload/f_auto,q_auto,e_improve,e_sharpen:60/v1785232712/drftn-products/dgv06ev4uv746sjfdwaq.jpg',
-  },
-  jackets: {
-    label: 'Jackets',
-    image:
-      'https://res.cloudinary.com/dtj01pdog/image/upload/f_auto,q_auto,e_improve,e_sharpen:60/v1785157166/drftn-products/nqukkelm6kwifrrt0umw.jpg',
+  'indo-western': {
+    label: 'Indo-Western',
+    image: 'https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&q=85&w=800',
   },
 };
 
 /** Explicit DRFTN Cloudinary image overrides for category circles */
 export const CATEGORY_IMAGE_OVERRIDES: Record<string, string> = {
-  all: 'https://res.cloudinary.com/dtj01pdog/image/upload/f_auto,q_auto,e_improve,e_sharpen:60/v1785232712/drftn-products/dgv06ev4uv746sjfdwaq.jpg',
-  't-shirts': 'https://res.cloudinary.com/dtj01pdog/image/upload/f_auto,q_auto,e_improve,e_sharpen:60/v1785153652/drftn-products/jphnwicpbhl6wvrnxkfw.jpg',
-  shirts: 'https://res.cloudinary.com/dtj01pdog/image/upload/f_auto,q_auto,e_improve,e_sharpen:60/v1784830975/drftn-products/f42vst7ccgg3deqwsjcv.jpg',
-  denims: 'https://res.cloudinary.com/dtj01pdog/image/upload/f_auto,q_auto,e_improve,e_sharpen:60/v1785252749/drftn-products/e4flew2q0o5cdkc7qmeb.jpg',
-  'formal-pants': 'https://res.cloudinary.com/dtj01pdog/image/upload/f_auto,q_auto,e_improve,e_sharpen:60/v1785256428/drftn-products/xjmjjgzzvl0vf6e0difo.jpg',
-  sweatshirts: 'https://res.cloudinary.com/dtj01pdog/image/upload/f_auto,q_auto,e_improve,e_sharpen:60/v1785232919/drftn-products/tuquugai46apllc42seg.jpg',
-  sweatshirt: 'https://res.cloudinary.com/dtj01pdog/image/upload/f_auto,q_auto,e_improve,e_sharpen:60/v1785232919/drftn-products/tuquugai46apllc42seg.jpg',
-  hoodies: 'https://res.cloudinary.com/dtj01pdog/image/upload/f_auto,q_auto,e_improve,e_sharpen:60/v1785232712/drftn-products/dgv06ev4uv746sjfdwaq.jpg',
-  jackets: 'https://res.cloudinary.com/dtj01pdog/image/upload/f_auto,q_auto,e_improve,e_sharpen:60/v1785157166/drftn-products/nqukkelm6kwifrrt0umw.jpg',
+  all: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&q=85&w=800',
+  sarees: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&q=85&w=800',
+  lehengas: 'https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&q=85&w=800',
+  'pattu-frocks': 'https://images.unsplash.com/photo-1621600411688-4be93cd68504?auto=format&fit=crop&q=85&w=800',
+  kurtis: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&q=85&w=800',
+  'indo-western': 'https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&q=85&w=800',
 };
 
 /** Ordered category list for the CategoryRail */
 export const HOME_CATEGORIES = [
   { slug: 'all', label: 'All' },
-  { slug: 't-shirts', label: 'T-Shirts' },
-  { slug: 'shirts', label: 'Shirts' },
-  { slug: 'denims', label: 'Denims' },
-  { slug: 'formal-pants', label: 'Formal Pants' },
-  { slug: 'sweatshirts', label: 'Sweatshirt' },
-  { slug: 'hoodies', label: 'Hoodies' },
-  { slug: 'jackets', label: 'Jackets' },
+  { slug: 'sarees', label: 'Sarees' },
+  { slug: 'lehengas', label: 'Lehengas' },
+  { slug: 'pattu-frocks', label: 'Kids Pattu' },
+  { slug: 'kurtis', label: 'Kurtis' },
+  { slug: 'indo-western', label: 'Indo-Western' },
 ] as const;
 
 export type HomeCategorySlug = (typeof HOME_CATEGORIES)[number]['slug'];

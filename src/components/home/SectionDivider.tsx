@@ -1,6 +1,8 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
+import { Award, Heart, ShieldCheck } from 'lucide-react';
 import { useGSAPScrollReveal } from '@/lib/useGSAPScrollReveal';
 
 interface SectionDividerProps {
@@ -10,53 +12,84 @@ interface SectionDividerProps {
 }
 
 export const SectionDivider: React.FC<SectionDividerProps> = ({
-  eyebrow = 'Signature Heritage',
+  eyebrow = 'SIGNATURE HERITAGE',
   title = 'Handcrafted Luxury & Royal Indian Weaves',
   subtitle = 'Every drape is thoughtfully curated with pure Kanjeevaram silks, Chanderi weaves, and fine Zardosi handwork.',
 }) => {
-  const containerRef = useGSAPScrollReveal<HTMLElement>({ stagger: 0.1, yOffset: 20 });
+  const containerRef = useGSAPScrollReveal<HTMLElement>({ stagger: 0.08, yOffset: 20 });
 
   return (
     <section
       ref={containerRef}
-      className="w-full bg-navy text-ivory-cream py-14 sm:py-20 relative overflow-hidden my-4 border-y border-roseGold/30"
+      className="w-full bg-navy text-ivory py-16 sm:py-24 border-y border-roseGold/15 relative overflow-hidden"
     >
-      {/* Background Subtle Radial Glow */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-roseGold/10 via-transparent to-transparent pointer-events-none" />
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-12">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-12 lg:gap-16 items-center">
+          
+          {/* Left Column: Full-Bleed Editorial Artisan Image */}
+          <div className="lg:col-span-6 relative aspect-[4/3] sm:aspect-[16/10] lg:aspect-[4/3] w-full rounded-sm overflow-hidden border border-roseGold/20 shadow-xl bg-navy-dark group">
+            <Image
+              src="https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&q=85&w=1200"
+              alt="Handcrafted Silk Weaving Detail"
+              fill
+              sizes="(max-width: 1024px) 100vw, 50vw"
+              className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-navy/80 via-transparent to-transparent" />
+            <div className="absolute bottom-4 left-4 right-4 sm:bottom-6 sm:left-6 sm:right-6 p-3.5 sm:p-4 rounded-sm bg-navy/85 backdrop-blur-md border border-roseGold/20">
+              <span className="text-[10px] uppercase tracking-[0.18em] text-roseGold font-medium block mb-0.5">
+                Kanchipuram &amp; Banaras Artisans
+              </span>
+              <p className="text-xs font-serif italic text-ivory/90">
+                &ldquo;Embellished with fine zari threads and master needlecraft.&rdquo;
+              </p>
+            </div>
+          </div>
 
-      <div className="max-w-4xl mx-auto px-6 text-center relative z-10 flex flex-col items-center">
-        {/* Original Line-Art Floral Motif SVG in Gold & Blush */}
-        <div className="mb-4 text-roseGold flex items-center gap-3">
-          <span className="w-10 h-px bg-gradient-to-r from-transparent to-roseGold/60" />
-          <svg className="w-7 h-7 fill-none stroke-current stroke-[1.2]" viewBox="0 0 40 40">
-            {/* Center Petal Flower Motif */}
-            <path d="M20 5 C22 12, 28 18, 35 20 C28 22, 22 28, 20 35 C18 28, 12 22, 5 20 C12 18, 18 12, 20 5 Z" stroke="#C9A567" fill="none" />
-            <circle cx="20" cy="20" r="3.5" fill="#D8A7A0" />
-            <circle cx="20" cy="20" r="1.5" fill="#1B1F3B" />
-          </svg>
-          <span className="w-10 h-px bg-gradient-to-l from-transparent to-roseGold/60" />
-        </div>
+          {/* Right Column: Editorial Narrative & 3-Column Pillar Feature Row */}
+          <div className="lg:col-span-6 space-y-6 sm:space-y-8">
+            <div className="space-y-3">
+              <span className="text-xs uppercase tracking-[0.2em] text-roseGold font-sans font-medium block">
+                {eyebrow}
+              </span>
+              <h2 className="text-2xl sm:text-4xl lg:text-5xl font-serif font-bold text-ivory leading-[1.05] tracking-tight">
+                Handcrafted Luxury <span className="inline-block px-1 font-sans font-normal opacity-90 text-roseGold">&amp;</span> Royal Indian Weaves
+              </h2>
+              <p className="text-xs sm:text-base font-sans font-light text-ivory/80 leading-relaxed max-w-xl">
+                {subtitle}
+              </p>
+            </div>
 
-        {/* Eyebrow */}
-        <span className="text-xs font-sans font-medium uppercase tracking-[0.25em] text-roseGold block mb-2">
-          {eyebrow}
-        </span>
+            <div className="w-full h-px bg-roseGold/20" />
 
-        {/* Serif Headline in Cream #F5F0E8 */}
-        <h2 className="text-2xl sm:text-4xl lg:text-5xl font-serif font-bold text-ivory-cream leading-tight tracking-tight max-w-2xl">
-          {title}
-        </h2>
+            {/* 3-Column Value Callout Row */}
+            <div className="grid grid-cols-3 gap-3 sm:gap-4 pt-1">
+              <div className="space-y-1.5 p-3 sm:p-4 rounded-sm bg-navy-light/40 border border-roseGold/15">
+                <Award className="w-4 h-4 text-roseGold shrink-0" />
+                <h3 className="text-xs font-serif font-bold text-ivory">Master Weavers</h3>
+                <p className="text-[10px] font-sans font-light text-ivory/70 leading-tight">
+                  Directly supporting 120+ traditional weaver families.
+                </p>
+              </div>
 
-        {/* Subtitle */}
-        <p className="text-sm sm:text-base text-ivory/80 font-sans font-light leading-relaxed max-w-xl mt-3">
-          {subtitle}
-        </p>
+              <div className="space-y-1.5 p-3 sm:p-4 rounded-sm bg-navy-light/40 border border-roseGold/15">
+                <Heart className="w-4 h-4 text-blush shrink-0" />
+                <h3 className="text-xs font-serif font-bold text-ivory">Kid-Gentle Lining</h3>
+                <p className="text-[10px] font-sans font-light text-ivory/70 leading-tight">
+                  100% breathable soft cotton lining under frocks.
+                </p>
+              </div>
 
-        {/* Bottom Small Accent Dot */}
-        <div className="mt-6 flex items-center justify-center gap-1.5">
-          <span className="w-1.5 h-1.5 rounded-full bg-roseGold/50" />
-          <span className="w-2.5 h-2.5 rounded-full bg-blush/80 shadow-sm" />
-          <span className="w-1.5 h-1.5 rounded-full bg-roseGold/50" />
+              <div className="space-y-1.5 p-3 sm:p-4 rounded-sm bg-navy-light/40 border border-roseGold/15">
+                <ShieldCheck className="w-4 h-4 text-roseGold shrink-0" />
+                <h3 className="text-xs font-serif font-bold text-ivory">Certified Pure</h3>
+                <p className="text-[10px] font-sans font-light text-ivory/70 leading-tight">
+                  Authentic Silk Mark certified pure handloom weaves.
+                </p>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
     </section>

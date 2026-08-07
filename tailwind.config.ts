@@ -10,34 +10,37 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: "#FAF5EF",
-        foreground: "#2A2620",
-        // "Midnight Boutique" extracted logo palette (#1B1F3B)
+        background: "#FAF7F2",
+        foreground: "#1C2544",
+        // Rich Royal Navy palette (sampled directly from logo.png #1C2544)
         navy: {
-          DEFAULT: "#1B1F3B",
-          dark: "#12152A",
-          light: "#262C52",
+          DEFAULT: "#1C2544",
+          dark: "#121930",
+          light: "#253158",
         },
+        // Rose Gold / Champagne palette
         roseGold: {
-          DEFAULT: "#C9A567",
-          light: "#DFBE98",
+          DEFAULT: "#C9A574",
+          light: "#D4AF87",
           dark: "#A88346",
         },
+        // Blush Rose palette
         blush: {
-          DEFAULT: "#D8A7A0",
-          light: "#EAD0CD",
+          DEFAULT: "#D89A94",
+          light: "#E0ABA6",
           dark: "#B87F78",
         },
+        // Warm Ivory palette
         ivory: {
-          DEFAULT: "#FAF6F0",
-          card: "#FFFFFF",
-          muted: "#F4EBE2",
+          DEFAULT: "#FAF7F2",
+          card: "#FAF7F2",
+          muted: "#F3EEE7",
           cream: "#F5F0E8",
         },
         charcoal: {
-          DEFAULT: "#2A2620",
-          light: "#4A453C",
-          muted: "#736C61",
+          DEFAULT: "#1C2544",
+          light: "#3A4568",
+          muted: "#6B7694",
         },
         mutedMauve: {
           DEFAULT: "#B9707D",
@@ -61,8 +64,8 @@ const config: Config = {
         wideLuxury: "0.15em",
       },
       boxShadow: {
-        luxury: "0 10px 30px -10px rgba(20, 33, 61, 0.08)",
-        floating: "0 20px 40px -15px rgba(20, 33, 61, 0.15)",
+        luxury: "0 10px 30px -10px rgba(28, 37, 68, 0.08)",
+        floating: "0 20px 40px -15px rgba(28, 37, 68, 0.15)",
         card: "0 4px 20px rgba(0, 0, 0, 0.03)",
         roseGold: "0 0 20px rgba(201, 162, 120, 0.25)",
       },

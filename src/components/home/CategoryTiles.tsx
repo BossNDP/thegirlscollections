@@ -50,7 +50,7 @@ export const CategoryTiles: React.FC = () => {
         <Link href="/shop?target=kids" className="group block space-y-4">
           <div className="relative aspect-[4/3] w-full overflow-hidden bg-ivory-muted rounded-none border border-roseGold/20">
             <Image
-              src="https://images.unsplash.com/photo-1596870230751-ebdfce98ec42?auto=format&fit=crop&q=85&w=1200"
+              src="https://images.unsplash.com/photo-1621600411688-4be93cd68504?auto=format&fit=crop&q=85&w=8000"
               alt="Kids Royal Ethnic Wear"
               fill
               className="object-cover group-hover:scale-105 transition-transform duration-700"

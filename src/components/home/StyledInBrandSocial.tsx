@@ -38,7 +38,7 @@ const STYLED_LOOKS: StyledLook[] = [
     id: 'look-3',
     influencerName: 'Priya & Baby Aadhya',
     handle: '@priya_diaries',
-    image: 'https://images.unsplash.com/photo-1596870230751-ebdfce98ec42?auto=format&fit=crop&q=85&w=800',
+    image: 'https://images.unsplash.com/photo-1621600411688-4be93cd68504?auto=format&fit=crop&q=85&w=800',
     productName: 'Aadhya Kanjeevaram Pattu Frock',
     productPrice: 3299,
     productSlug: 'aadhya-kids-pattu-frock',

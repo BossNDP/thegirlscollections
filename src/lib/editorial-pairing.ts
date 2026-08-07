@@ -14,37 +14,37 @@ const ALLOWED_CATEGORIES: Record<
   string,
   { title: string; description: string; ctaText: string; slug: string; aliases: string[] }
 > = {
-  hoodies: {
-    title: 'HOODIES',
-    description: 'Heavyweight comfort.\nBuilt for the restless.',
-    ctaText: 'Explore Hoodies',
-    slug: 'hoodies',
-    aliases: ['hoodies', 'hoodie', 'sweatshirt', 'sweatshirts', 'pullover'],
+  sarees: {
+    title: 'SAREES & DRAPES',
+    description: 'Handwoven organza, silk & zari.\nTimeless Indian elegance.',
+    ctaText: 'Explore Sarees',
+    slug: 'sarees',
+    aliases: ['sarees', 'saree', 'drapes', 'langa-davani', 'organza'],
   },
-  jackets: {
-    title: 'JACKETS',
-    description: 'Layer up.\nOwn the room.',
-    ctaText: 'Discover Jackets',
-    slug: 'jackets',
-    aliases: ['jackets', 'jacket', 'outerwear', 'bomber', 'coat', 'puffer', 'fleece'],
+  lehengas: {
+    title: 'ROYAL LEHENGAS',
+    description: 'Bespoke hand embroidery.\nCrafted for royal celebrations.',
+    ctaText: 'Discover Lehengas',
+    slug: 'lehengas',
+    aliases: ['lehengas', 'lehenga', 'choli', 'wedding-guest', 'bridesmaid-edit'],
   },
-  't-shirts': {
-    title: 'OVERSIZED TEES',
-    description: 'Relaxed cuts.\nBold silhouettes.',
-    ctaText: 'View Tees',
-    slug: 't-shirts',
-    aliases: ['t-shirts', 't-shirt', 'tshirt', 'tshirts', 'tee', 'tees', 'top'],
+  'pattu-frocks': {
+    title: 'KIDS PATTU FROCKS',
+    description: 'Pure Kanjeevaram silks.\n100% breathable cotton lining.',
+    ctaText: 'View Pattu Frocks',
+    slug: 'pattu-frocks',
+    aliases: ['pattu-frocks', 'kids-pattu', 'kids-lehenga', 'kids', 'frocks'],
   },
-  denims: {
-    title: 'DENIM & JEANS',
-    description: 'Made to wear.\nBuilt to last.',
-    ctaText: 'Browse Denim',
-    slug: 'denims',
-    aliases: ['denims', 'denim', 'jeans', 'pants', 'bottoms', 'cargos', 'cargo'],
+  kurtis: {
+    title: 'ANARKALIS & GOWNS',
+    description: 'Flowing silhouettes.\nMoti & Gota Patti embellishments.',
+    ctaText: 'Browse Anarkalis',
+    slug: 'kurtis',
+    aliases: ['kurtis', 'kurta', 'anarkali', 'indo-western', 'gowns', 'co-ords'],
   },
 };
 
-const CATEGORY_ORDER = ['hoodies', 'jackets', 't-shirts', 'denims'];
+const CATEGORY_ORDER = ['sarees', 'lehengas', 'pattu-frocks', 'kurtis'];
 
 /**
  * Builds exactly 4 editorial slides — one per allowed category.

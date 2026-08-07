@@ -29,7 +29,7 @@ import type { Product } from '@/types';
    ───────────────────────────────────────────── */
 
 const FALLBACK_IMAGE =
-  'https://res.cloudinary.com/dtj01pdog/image/upload/f_auto,q_auto/v1785252749/drftn-products/e4flew2q0o5cdkc7qmeb.jpg';
+  'https://images.unsplash.com/photo-1621600411688-4be93cd68504?auto=format&fit=crop&q=85&w=800';
 
 const ENTRANCE_BEZIER = 'cubic-bezier(.22,.61,.36,1)';
 const CARD_STAGGER = [0, 60, 120, 180]; // ms

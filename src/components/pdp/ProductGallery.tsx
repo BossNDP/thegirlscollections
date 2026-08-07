@@ -28,18 +28,18 @@ export const ProductGallery: React.FC<ProductGalleryProps> = ({ images, productN
   return (
     <div className="w-full">
       {/* Desktop Gallery: Vertical Thumbnail Rail + Main Image */}
-      <div className="hidden lg:flex gap-4 items-start">
+      <div className="hidden lg:flex gap-5 items-start">
         {/* Vertical Thumbnail Rail (Rendered ONLY when > 1 image exists) */}
         {hasMultipleImages && (
-          <div className="flex flex-col space-y-3 w-20 flex-shrink-0">
+          <div className="flex flex-col space-y-3.5 w-20 flex-shrink-0">
             {images.map((img, idx) => (
               <button
                 key={idx}
                 onClick={() => setSelectedIdx(idx)}
-                className={`relative aspect-[3/4] w-full rounded-lg overflow-hidden border-2 transition-all ${
+                className={`relative aspect-[3/4] w-full rounded-sm overflow-hidden border transition-all ${
                   idx === selectedIdx
-                    ? 'border-roseGold ring-2 ring-roseGold/30 opacity-100'
-                    : 'border-roseGold/20 opacity-60 hover:opacity-100'
+                    ? 'border-roseGold ring-1 ring-roseGold/40 opacity-100'
+                    : 'border-roseGold/20 opacity-50 hover:opacity-100'
                 }`}
               >
                 <Image src={img} alt={`${productName} thumb ${idx + 1}`} fill className="object-cover" />
@@ -48,8 +48,8 @@ export const ProductGallery: React.FC<ProductGalleryProps> = ({ images, productN
           </div>
         )}
 
-        {/* Main Display Image (max-h-[640px] for balanced desktop fold) */}
-        <div className="relative aspect-[3/4] max-h-[640px] flex-1 rounded-2xl overflow-hidden bg-ivory border border-roseGold/25 img-zoom-hover shadow-md">
+        {/* Main Display Image */}
+        <div className="relative aspect-[3/4] max-h-[660px] flex-1 rounded-sm overflow-hidden bg-ivory border border-roseGold/20 img-zoom-hover shadow-xs">
           <Image
             src={images[selectedIdx] || images[0]}
             alt={productName}

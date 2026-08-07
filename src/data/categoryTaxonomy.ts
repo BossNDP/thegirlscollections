@@ -109,7 +109,7 @@ export const SHOP_BY_CATEGORY_ITEMS = [
     id: 'pattu-frocks',
     name: 'Kids Pattu Frocks',
     slug: 'pattu-frocks',
-    image: 'https://images.unsplash.com/photo-1596870230751-ebdfce98ec42?auto=format&fit=crop&q=85&w=800',
+    image: 'https://images.unsplash.com/photo-1621600411688-4be93cd68504?auto=format&fit=crop&q=85&w=800',
   },
   {
     id: 'kids-lehenga',
@@ -146,7 +146,7 @@ export const SHOP_BY_EDIT_ITEMS = [
     id: 'handmade-details',
     title: 'Handmade Details',
     subtitle: 'Fine zardosi, moti & zari needlework',
-    image: 'https://images.unsplash.com/photo-1596870230751-ebdfce98ec42?auto=format&fit=crop&q=85&w=800',
+    image: 'https://images.unsplash.com/photo-1621600411688-4be93cd68504?auto=format&fit=crop&q=85&w=800',
     slug: 'handmade-details',
   },
   {

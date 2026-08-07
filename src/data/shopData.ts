@@ -67,7 +67,7 @@ export const NAVIGATION_CATEGORIES: CategoryMenu[] = [
     id: "kids",
     title: "Kids Ethnic",
     slug: "kids",
-    featuredImg: "https://images.unsplash.com/photo-1596870230751-ebdfce98ec42?auto=format&fit=crop&q=85&w=600",
+    featuredImg: "https://images.unsplash.com/photo-1621600411688-4be93cd68504?auto=format&fit=crop&q=85&w=800",
     promoText: "Little Royalty — Pure Silk Pattu Frocks & Soft Cotton Kurtas",
     subcategories: [
       { name: "Pattu Frocks", slug: "pattu-frocks" },
@@ -216,8 +216,8 @@ export const MOCK_PRODUCTS: Product[] = [
     isBestSeller: true,
     isSale: true,
     images: [
-      "https://images.unsplash.com/photo-1596870230751-ebdfce98ec42?auto=format&fit=crop&q=85&w=1200",
-      "https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&q=85&w=1200",
+      "https://images.unsplash.com/photo-1621600411688-4be93cd68504?auto=format&fit=crop&q=85&w=1200",
+      "https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&q=85&w=1200",
     ],
     sizes: [
       { size: "1-2Y", inStock: true },
@@ -285,7 +285,7 @@ export const MOCK_PRODUCTS: Product[] = [
     isSale: true,
     images: [
       "https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&q=85&w=1200",
-      "https://images.unsplash.com/photo-1596870230751-ebdfce98ec42?auto=format&fit=crop&q=85&w=1200",
+      "https://images.unsplash.com/photo-1621600411688-4be93cd68504?auto=format&fit=crop&q=85&w=1200",
     ],
     sizes: [
       { size: "2-3Y", inStock: true },
@@ -350,7 +350,7 @@ export const MOCK_PRODUCTS: Product[] = [
     isBestSeller: true,
     isSale: true,
     images: [
-      "https://images.unsplash.com/photo-1596870230751-ebdfce98ec42?auto=format&fit=crop&q=85&w=1200",
+      "https://images.unsplash.com/photo-1621600411688-4be93cd68504?auto=format&fit=crop&q=85&w=1200",
       "https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&q=85&w=1200",
     ],
     sizes: [
@@ -432,7 +432,7 @@ export const OCCASIONS_DATA = [
     id: "gifting",
     title: "Royal Gifting",
     subtitle: "Curated Sets & Heritage Boxes",
-    image: "https://images.unsplash.com/photo-1596870230751-ebdfce98ec42?auto=format&fit=crop&q=85&w=800",
+    image: "https://images.unsplash.com/photo-1621600411688-4be93cd68504?auto=format&fit=crop&q=85&w=800",
     count: "18 items",
   },
 ];

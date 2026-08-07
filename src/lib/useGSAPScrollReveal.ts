@@ -29,6 +29,13 @@ export function useGSAPScrollReveal<T extends HTMLElement = HTMLDivElement>(
 
       if (targetElements.length === 0) return;
 
+      // Accessibility: Respect user prefers-reduced-motion preference
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (prefersReducedMotion) {
+        gsap.set(targetElements, { opacity: 1, y: 0 });
+        return;
+      }
+
       gsap.fromTo(
         targetElements,
         {
@@ -52,7 +59,7 @@ export function useGSAPScrollReveal<T extends HTMLElement = HTMLDivElement>(
     }, containerRef);
 
     return () => {
-      ctx.revert(); // Scoped 100% clean teardown on route unmount
+      ctx.revert();
     };
   }, [stagger, yOffset, duration, selector]);
 

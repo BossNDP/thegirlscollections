@@ -12,30 +12,33 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
   className = '',
   size = 'md',
 }) => {
-  // Bold, Prominent Logo Sizing (Fully legible on both mobile & desktop)
+  // Sizing for cropped 322x353 logo image (fills header vertically with generous prominence)
   const logoHeights = {
-    sm: 'h-10 sm:h-12',
-    md: 'h-[50px] sm:h-[60px] md:h-[68px] lg:h-[76px]',
-    lg: 'h-[58px] sm:h-[68px] lg:h-[84px]',
+    sm: 'h-11 sm:h-14 lg:h-16',
+    md: 'h-[58px] sm:h-[74px] lg:h-[86px]',
+    lg: 'h-[64px] sm:h-[82px] lg:h-[92px]',
   };
 
   return (
     <Link
       href="/"
-      className={`inline-flex items-center justify-center group shrink-0 relative py-0.5 focus:outline-none ${className}`}
+      className={`inline-flex items-center justify-center sm:justify-start group shrink-0 relative py-1 focus:outline-none ${className}`}
       aria-label="The Girls Collection Home"
     >
       <span className="sr-only">The Girls Collection</span>
 
-      {/* Prominent Direct Logo Image - 477x523 Native Resolution */}
-      <div className={`relative ${logoHeights[size]} w-auto flex items-center justify-center transition-transform duration-300 group-hover:scale-105`}>
+      {/* Prominent Cropped Logo Image Container with Premium Shimmer Animation */}
+      <div className={`relative ${logoHeights[size]} w-auto shrink-0 flex items-center justify-center transition-transform duration-300 group-hover:scale-105 overflow-hidden rounded-xs`}>
+        {/* Royal Gold Shimmer Light Beam */}
+        <span className="animate-logo-shimmer" />
+
         <Image
           src="/logo.png"
           alt="The Girls Collection Logo"
-          width={477}
-          height={523}
+          width={322}
+          height={353}
           style={{ height: '100%', width: 'auto', objectFit: 'contain' }}
-          className="h-full w-auto object-contain filter drop-shadow-md"
+          className="h-full w-auto max-h-full object-contain filter drop-shadow-xs relative z-0"
           priority
         />
       </div>

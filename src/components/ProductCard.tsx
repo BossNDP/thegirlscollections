@@ -3,9 +3,9 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Heart } from 'lucide-react';
 import { Product } from '@/data/shopData';
 import { useShop } from '@/context/ShopContext';
+import { LuxuryHeartButton } from '@/components/LuxuryHeartButton';
 
 interface ProductCardProps {
   product: Product;
@@ -16,7 +16,6 @@ interface ProductCardProps {
 export const ProductCard: React.FC<ProductCardProps> = ({
   product,
   priorityImage = false,
-  dispatchType = 'ready-to-ship',
 }) => {
   const { toggleWishlist, isInWishlist } = useShop();
   const [isHovered, setIsHovered] = useState(false);
@@ -31,57 +30,56 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 
   const imageHoverSrc = product.images[1] || product.images[0];
 
-  const badgeText = product.isSale ? 'SALE' : product.isNew ? 'NEW' : null;
-  const badgeBg = product.isSale ? 'bg-mutedMauve text-ivory' : 'bg-navy text-ivory';
+  // Single Tag Logic ("NEW IN" or "SALE")
+  const tagText = product.isNew ? 'NEW IN' : product.isSale ? 'SALE' : null;
 
-  // Determine dispatch badge text
-  const dispatchBadgeText = dispatchType === 'ready-to-ship' ? 'Ready to Ship' : 'Made to Order';
+  // Filter sizes for overlay chips
+  const availableSizes = product.sizes?.filter((s) => s.inStock) || [];
+
+  // Helper to shorten verbose mobile labels
+  const formatMobileChipLabel = (sizeName: string) => {
+    if (sizeName.includes('Stitched Blouse')) {
+      return sizeName.replace('Stitched Blouse ', 'Blouse ');
+    }
+    return sizeName;
+  };
 
   return (
     <div
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className="group relative flex flex-col bg-transparent border-0 rounded-none overflow-hidden transition-all duration-300"
+      className="group relative flex flex-col bg-white rounded-none overflow-hidden transition-all duration-300"
     >
-      {/* Product Image Container */}
-      <Link href={`/shop/${product.slug}`} className="relative aspect-[3/4] w-full overflow-hidden bg-ivory-muted block rounded-sm border border-roseGold/20">
-        {/* Top Badges Layer */}
-        <div className="absolute top-2.5 left-2.5 z-10 flex flex-wrap items-center gap-1.5 max-w-[85%]">
-          {badgeText && (
-            <span className={`px-2 py-0.5 text-[8px] sm:text-[9px] font-sans font-medium uppercase tracking-[0.18em] rounded-full backdrop-blur-md shadow-sm ${
-              product.isSale
-                ? 'bg-blush/25 text-navy border border-blush/60 font-semibold'
-                : 'bg-ivory/85 text-navy border border-roseGold/40'
-            }`}>
-              {badgeText}
+      {/* Product Image Stage (90-95% Visual Weight Dominance) */}
+      <Link
+        href={`/shop/${product.slug}`}
+        className="relative aspect-[3/4] w-full overflow-hidden bg-[#F9F8F6] block border border-navy/5"
+      >
+        {/* Simple Corner Tag */}
+        {tagText && (
+          <div className="absolute top-2.5 left-2.5 z-10">
+            <span className="px-2 py-0.5 text-[8.5px] font-sans font-semibold uppercase tracking-[0.14em] bg-navy text-white shadow-xs">
+              {tagText}
             </span>
-          )}
-          {/* Dispatch Badge */}
-          <span className="px-2 py-0.5 text-[8px] sm:text-[9px] font-sans font-medium uppercase tracking-[0.16em] bg-navy/85 text-ivory border border-roseGold/30 rounded-full backdrop-blur-md shadow-sm">
-            {dispatchBadgeText}
-          </span>
+          </div>
+        )}
+
+        {/* Iconic Animated Organic Heart Button */}
+        <div className="absolute top-2.5 right-2.5 z-20">
+          <LuxuryHeartButton
+            isLiked={inWishlist}
+            onToggle={handleWishlistClick}
+            size="md"
+          />
         </div>
 
-        {/* Floating Minimal Wishlist Heart Button */}
-        <button
-          onClick={handleWishlistClick}
-          className={`absolute top-2.5 right-2.5 z-10 w-9 h-9 min-w-[36px] min-h-[36px] rounded-full backdrop-blur-md flex items-center justify-center transition-all duration-300 ${
-            inWishlist
-              ? 'bg-ivory text-blush scale-110 shadow-md border border-blush/60'
-              : 'bg-navy/40 text-ivory hover:bg-ivory hover:text-blush border border-roseGold/20'
-          }`}
-          aria-label="Add to wishlist"
-        >
-          <Heart className={`w-3.5 h-3.5 ${inWishlist ? 'fill-current text-blush' : 'text-ivory'}`} />
-        </button>
-
-        {/* Primary Image */}
+        {/* Primary Image with Subtle Scale Zoom on Hover */}
         <Image
           src={product.images[0]}
           alt={product.name}
           fill
           priority={priorityImage}
-          className={`object-cover transition-transform duration-700 ease-out group-hover:scale-105 ${
+          className={`object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04] ${
             isHovered && product.images[1] ? 'opacity-0' : 'opacity-100'
           }`}
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
@@ -91,40 +89,70 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         {product.images[1] && (
           <Image
             src={imageHoverSrc}
-            alt={`${product.name} alternate view`}
+            alt={`${product.name} hover view`}
             fill
-            className={`object-cover transition-all duration-700 ease-out group-hover:scale-105 ${
+            className={`object-cover transition-all duration-700 ease-out group-hover:scale-[1.04] ${
               isHovered ? 'opacity-100' : 'opacity-0'
             }`}
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
           />
         )}
+
+        {/* --- MOBILE SIZE CHIPS OVERLAY --- */}
+        {availableSizes.length > 0 && (
+          <div className="sm:hidden absolute bottom-2 left-1.5 right-1.5 z-10 flex items-center justify-center pointer-events-none">
+            <div className="px-2 py-0.5 rounded-full bg-white/95 backdrop-blur-md border border-navy/10 flex items-center gap-1 shadow-xs max-w-full overflow-hidden">
+              {availableSizes.slice(0, 2).map((s) => (
+                <span
+                  key={s.size}
+                  className="text-[8.5px] font-sans font-semibold text-navy tracking-tight truncate max-w-[65px]"
+                >
+                  {formatMobileChipLabel(s.size)}
+                </span>
+              ))}
+              {availableSizes.length > 2 && (
+                <span className="text-[8.5px] font-sans font-bold text-roseGold pl-0.5 shrink-0">
+                  +{availableSizes.length - 2}
+                </span>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* --- DESKTOP SIZE CHIPS OVERLAY --- */}
+        {availableSizes.length > 0 && (
+          <div className="hidden sm:flex absolute bottom-2.5 left-2 right-2 z-10 items-center justify-center transition-all duration-300 opacity-90 group-hover:opacity-100">
+            <div className="px-2.5 py-1 rounded-full bg-white/90 backdrop-blur-md border border-navy/10 flex items-center gap-1 shadow-xs">
+              {availableSizes.slice(0, 5).map((s) => (
+                <span
+                  key={s.size}
+                  className="text-[9px] font-sans font-semibold text-navy hover:text-roseGold transition-colors px-1"
+                >
+                  {s.size}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
       </Link>
 
-      {/* Editorial Caption with Tabular Numerals (No Divider Line) */}
-      <div className="pt-3 pb-1 flex-1 flex flex-col justify-between bg-transparent">
-        <div>
-          <span className="text-[9px] uppercase tracking-[0.2em] text-roseGold font-sans font-medium block mb-1">
-            {product.subcategory}
-          </span>
-          <Link href={`/shop/${product.slug}`}>
-            <h3 className="text-xs sm:text-sm font-serif font-bold text-navy hover:text-roseGold transition-colors line-clamp-2 min-h-[2.4rem] leading-[1.15]">
-              {product.name}
-            </h3>
-          </Link>
-        </div>
+      {/* Compact Info Block (Subtle & Restrained) */}
+      <div className="pt-2 pb-1.5 flex flex-col justify-between bg-white text-left">
+        <Link href={`/shop/${product.slug}`}>
+          <h3 className="text-xs sm:text-[13px] font-sans font-medium uppercase tracking-[0.05em] text-navy hover:text-roseGold transition-colors truncate">
+            {product.name}
+          </h3>
+        </Link>
 
-        <div className="mt-2 flex items-baseline justify-between">
-          <div className="flex items-baseline gap-2 font-mono tabular-nums">
-            <span className="text-sm sm:text-base font-bold text-navy tracking-tight font-tnum">
-              ₹{product.price.toLocaleString('en-IN')}
+        <div className="mt-1 flex items-baseline gap-2">
+          <span className="text-xs sm:text-sm font-sans font-semibold text-navy font-tnum">
+            ₹{product.price.toLocaleString('en-IN')}
+          </span>
+          {product.originalPrice && (
+            <span className="text-[10px] sm:text-[11px] text-navy/40 line-through font-tnum">
+              ₹{product.originalPrice.toLocaleString('en-IN')}
             </span>
-            {product.originalPrice && (
-              <span className="text-xs text-charcoal-muted/70 line-through font-normal font-tnum">
-                ₹{product.originalPrice.toLocaleString('en-IN')}
-              </span>
-            )}
-          </div>
+          )}
         </div>
       </div>
     </div>

@@ -3,40 +3,136 @@
 @tailwind utilities;
 
 :root {
-  --background: #FAF6F0;
-  --foreground: #2A2620;
-  --navy: #1B1F3B;
-  --rose-gold: #C9A567;
-  --blush: #D8A7A0;
-  --ivory: #FAF6F0;
+  --background: #FAF7F2;
+  --foreground: #1C2544;
+  --navy: #1C2544;
+  --navy-dark: #121930;
+  --navy-light: #253158;
+  --rose-gold: #C9A574;
+  --blush: #D89A94;
+  --ivory: #FAF7F2;
   --cream: #F5F0E8;
-  --charcoal: #2A2620;
+  --charcoal: #1C2544;
   --muted-mauve: #B9707D;
 }
 
 @layer base {
   * {
-    border-color: rgba(201, 162, 120, 0.2);
+    border-color: rgba(201, 165, 116, 0.2);
   }
 
   html {
     scroll-behavior: smooth;
-    background-color: #FAF5EF;
-    color: #2A2620;
+    background-color: #FAF7F2;
+    color: #1C2544;
     font-family: var(--font-jakarta), 'Plus Jakarta Sans', sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
   body {
-    background-color: #FAF5EF;
-    color: #2A2620;
+    background-color: #FAF7F2;
+    color: #1C2544;
     overflow-x: hidden;
   }
 
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-fraunces), 'Fraunces', Georgia, serif;
     letter-spacing: -0.01em;
+  }
+}
+
+/* Hero Cinematic Continuous Zoom Keyframe */
+@keyframes slowHeroZoom {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.05); }
+}
+
+.animate-hero-zoom {
+  will-change: transform;
+  animation: slowHeroZoom 18s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+/* Slow Continuous Premium Marquee Animation */
+@keyframes marqueeScroll {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-33.333%); }
+}
+
+/* Liquid Fluid Wave Animation for Glass Capsule Navbar */
+@keyframes fluidLiquidWave {
+  0% {
+    background-position: 0% 50%;
+    transform: scale(1) rotate(0deg);
+  }
+  50% {
+    background-position: 100% 50%;
+    transform: scale(1.1) rotate(3deg);
+  }
+  100% {
+    background-position: 0% 50%;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+.animate-liquid-fluid {
+  background-size: 200% 200%;
+  animation: fluidLiquidWave 10s ease-in-out infinite;
+}
+
+
+.animate-marquee {
+  will-change: transform;
+  animation: marqueeScroll 35s linear infinite;
+}
+
+/* Premium Royal Gold Logo Shimmer Sweep */
+@keyframes logoShimmerSweep {
+  0% {
+    transform: translateX(-150%) skewX(-25deg);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.8;
+  }
+  35% {
+    transform: translateX(250%) skewX(-25deg);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(250%) skewX(-25deg);
+    opacity: 0;
+  }
+}
+
+.animate-logo-shimmer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.3) 25%,
+    rgba(201, 165, 116, 0.85) 50%,
+    rgba(255, 255, 255, 0.9) 75%,
+    transparent 100%
+  );
+  pointer-events: none;
+  mix-blend-mode: overlay;
+  animation: logoShimmerSweep 4.5s infinite cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-hero-zoom,
+  .animate-marquee {
+    animation: none !important;
+    transform: none !important;
+  }
+  .animate-logo-shimmer {
+    animation: none !important;
+    display: none !important;
   }
 }
 
