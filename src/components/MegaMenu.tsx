@@ -24,21 +24,23 @@ export const DesktopMegaMenu: React.FC<MegaMenuProps> = ({ activeCategory, onClo
       return (
         <div className="max-w-7xl mx-auto grid grid-cols-12 gap-8">
           {/* Column 1: Women's Traditional */}
-          <div className="col-span-4 space-y-3 border-r border-roseGold/20 pr-6">
-            <div className="flex items-center space-x-2 text-[11px] font-sans uppercase tracking-eyebrow text-roseGold font-bold">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Women Traditional</span>
+          <div className="col-span-4 space-y-3 border-r border-navy/10 pr-6">
+            <div className="space-y-1.5 pb-1">
+              <h4 className="text-[11px] font-sans uppercase tracking-[0.18em] text-roseGold font-bold">
+                Women Traditional
+              </h4>
+              <div className="w-8 h-[1.5px] bg-roseGold/40 rounded-full" />
             </div>
-            <ul className="space-y-2">
+            <ul className="space-y-0.5 pt-1">
               {traditional?.items.map((sub) => (
                 <li key={sub.id}>
                   <Link
                     href={`/shop?category=${sub.slug}`}
                     onClick={onClose}
-                    className="group flex items-center justify-between text-sm font-serif font-medium text-navy hover:text-roseGold transition-colors"
+                    className="group flex items-center justify-between py-1.5 text-[13.5px] font-sans font-normal text-navy/90 hover:text-roseGold transition-colors leading-relaxed"
                   >
                     <span>{sub.name}</span>
-                    <ChevronRight className="w-3.5 h-3.5 text-roseGold/40 group-hover:text-roseGold group-hover:translate-x-1 transition-all" />
+                    <ChevronRight className="w-3.5 h-3.5 text-navy/25 group-hover:text-roseGold group-hover:translate-x-1 transition-all duration-200" />
                   </Link>
                 </li>
               ))}
@@ -46,28 +48,30 @@ export const DesktopMegaMenu: React.FC<MegaMenuProps> = ({ activeCategory, onClo
           </div>
 
           {/* Column 2: Women's Frocks & Western */}
-          <div className="col-span-4 space-y-3 border-r border-roseGold/20 pr-6">
-            <div className="flex items-center space-x-2 text-[11px] font-sans uppercase tracking-eyebrow text-roseGold font-bold">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Frocks &amp; Western</span>
+          <div className="col-span-4 space-y-3 border-r border-navy/10 pr-6">
+            <div className="space-y-1.5 pb-1">
+              <h4 className="text-[11px] font-sans uppercase tracking-[0.18em] text-roseGold font-bold">
+                Frocks &amp; Western
+              </h4>
+              <div className="w-8 h-[1.5px] bg-roseGold/40 rounded-full" />
             </div>
-            <ul className="space-y-1.5">
+            <ul className="space-y-0.5 pt-1">
               {frocksWestern?.items.map((sub) => (
                 <li key={sub.id}>
                   <Link
                     href={`/shop?category=${sub.slug}`}
                     onClick={onClose}
-                    className="group flex items-center justify-between text-sm font-serif font-medium text-navy hover:text-roseGold transition-colors"
+                    className="group flex items-center justify-between py-1.5 text-[13.5px] font-sans font-normal text-navy/90 hover:text-roseGold transition-colors leading-relaxed"
                   >
                     <span>{sub.name}</span>
-                    <ChevronRight className="w-3.5 h-3.5 text-roseGold/40 group-hover:text-roseGold group-hover:translate-x-1 transition-all" />
+                    <ChevronRight className="w-3.5 h-3.5 text-navy/25 group-hover:text-roseGold group-hover:translate-x-1 transition-all duration-200" />
                   </Link>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Column 3: Featured Story Banner */}
+          {/* Column 3: Featured Story Banner (Kept As-Is) */}
           <div className="col-span-4 pl-4 flex flex-col justify-between">
             <div className="relative h-56 w-full rounded-xl overflow-hidden shadow-md group">
               <Image
@@ -103,28 +107,32 @@ export const DesktopMegaMenu: React.FC<MegaMenuProps> = ({ activeCategory, onClo
 
       return (
         <div className="max-w-7xl mx-auto grid grid-cols-12 gap-8">
-          <div className="col-span-6 space-y-4 border-r border-roseGold/20 pr-6">
-            <div className="flex items-center space-x-2 text-[11px] font-sans uppercase tracking-eyebrow text-roseGold font-bold">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Kids Pure Silk Ethnic Wear</span>
+          <div className="col-span-6 space-y-3 border-r border-navy/10 pr-6">
+            <div className="space-y-1.5 pb-1">
+              <h4 className="text-[11px] font-sans uppercase tracking-[0.18em] text-roseGold font-bold">
+                Kids Pure Silk Ethnic Wear
+              </h4>
+              <div className="w-8 h-[1.5px] bg-roseGold/40 rounded-full" />
             </div>
-            <ul className="space-y-2.5">
+            <ul className="space-y-1 pt-1">
               {kidsItems.map((sub) => (
                 <li key={sub.id}>
                   <Link
                     href={`/shop?category=${sub.slug}`}
                     onClick={onClose}
-                    className="group flex items-center justify-between text-base font-serif font-medium text-navy hover:text-roseGold transition-colors"
+                    className="group flex items-center justify-between py-1.5 text-[13.5px] font-sans font-normal text-navy/90 hover:text-roseGold transition-colors leading-relaxed"
                   >
                     <div>
-                      <span className="block">{sub.name}</span>
+                      <span className="block text-[13.5px] font-sans font-normal text-navy/90 group-hover:text-roseGold transition-colors">
+                        {sub.name}
+                      </span>
                       {sub.description && (
-                        <span className="text-xs text-charcoal-muted font-sans font-normal">
+                        <span className="block text-[11.5px] text-navy/55 font-sans font-light pt-0.5">
                           {sub.description}
                         </span>
                       )}
                     </div>
-                    <ChevronRight className="w-4 h-4 text-roseGold/40 group-hover:text-roseGold group-hover:translate-x-1 transition-all" />
+                    <ChevronRight className="w-3.5 h-3.5 text-navy/25 group-hover:text-roseGold group-hover:translate-x-1 transition-all duration-200 shrink-0 ml-3" />
                   </Link>
                 </li>
               ))}
@@ -165,16 +173,10 @@ export const DesktopMegaMenu: React.FC<MegaMenuProps> = ({ activeCategory, onClo
 
   return (
     <>
-      {/* Opaque Dimming Backdrop Overlay (z-55) so background content never bleeds through */}
-      <div
-        onClick={onClose}
-        className="fixed inset-0 top-20 bg-navy/40 backdrop-blur-xs z-[55] pointer-events-auto transition-opacity duration-300"
-      />
-
-      {/* Solid Elevated Dropdown Panel (z-60) */}
+      {/* Solid Floating Dropdown Panel with Soft Elevation Shadow */}
       <div
         onMouseLeave={onClose}
-        className="absolute top-full left-0 w-full bg-ivory border-b border-roseGold/30 shadow-2xl z-[60] animate-fade-in text-charcoal py-8 px-8"
+        className="absolute top-full left-0 w-full bg-white border-b border-navy/10 shadow-[0_20px_40px_rgba(20,20,30,0.12)] z-[60] animate-fade-in text-navy py-8 px-12"
       >
         {renderContent()}
       </div>

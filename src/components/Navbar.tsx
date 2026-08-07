@@ -74,22 +74,29 @@ export default function Navbar() {
               : 'h-[76px] sm:h-[84px] lg:h-[96px] bg-[#EEF1F7] border-b border-navy/10 px-4 sm:px-8 lg:px-12 max-w-[1440px]'
           }`}
         >
-          {/* Zone 1 (Left): Mobile Menu Toggle Icon */}
-          <div className="flex items-center shrink-0 z-10 pl-0.5 sm:pl-2">
+          {/* Mobile Only: Hamburger Menu Toggle Button */}
+          <div className="flex items-center shrink-0 z-10 lg:hidden pl-0.5 sm:pl-2">
             <motion.button
               whileTap={{ scale: 0.92 }}
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden w-9 h-9 flex items-center justify-center transition-colors focus:outline-none shrink-0"
+              className="w-9 h-9 flex items-center justify-center transition-colors focus:outline-none shrink-0"
               aria-label={mobileMenuOpen ? 'Close Navigation Menu' : 'Open Navigation Menu'}
             >
               <AnimatedHamburgerIcon isOpen={mobileMenuOpen} isScrolled={isScrolled} />
             </motion.button>
           </div>
 
-          {/* Zone 2 (Center): Perfectly Centered Logo on Mobile / Left Aligned on Desktop */}
-          <div className="absolute left-1/2 -translate-x-1/2 lg:static lg:translate-x-0 flex items-center justify-center shrink-0 py-1 z-10">
-            <div className={`transition-all duration-300 ${isScrolled ? 'scale-90 lg:scale-100 drop-shadow-xs' : ''}`}>
-              <BrandLogo variant="horizontal" size="md" />
+          {/* Mobile Only: Perfectly Centered Logo Emblem */}
+          <div className="absolute left-1/2 -translate-x-1/2 flex items-center justify-center shrink-0 py-1 z-10 lg:hidden">
+            <div className={`transition-all duration-300 ${isScrolled ? 'scale-90 drop-shadow-xs' : ''}`}>
+              <BrandLogo variant="horizontal" size="sm" showText={false} />
+            </div>
+          </div>
+
+          {/* Desktop Only: Brand Logo + 'The Girls Collections' Brand Name Pushed to Far Left */}
+          <div className="hidden lg:flex items-center shrink-0 z-10 py-1">
+            <div className={`transition-all duration-300 ${isScrolled ? 'scale-95 drop-shadow-xs' : ''}`}>
+              <BrandLogo variant="horizontal" size="md" showText={true} />
             </div>
           </div>
 
@@ -103,10 +110,16 @@ export default function Navbar() {
               >
                 <Link
                   href="/shop?target=women"
-                  className="text-[13px] font-medium uppercase tracking-[0.08em] text-navy/90 hover:text-roseGold transition-colors relative py-1"
+                  className={`text-[13px] font-medium uppercase tracking-[0.08em] transition-colors relative py-1 ${
+                    activeCategory === 'women' ? 'text-roseGold' : 'text-navy/90 hover:text-roseGold'
+                  }`}
                 >
                   Women
-                  <span className="absolute bottom-0 left-0 w-full h-[1.5px] bg-roseGold origin-left scale-x-0 transition-transform duration-300 ease-out group-hover:scale-x-100" />
+                  <span
+                    className={`absolute bottom-0 left-0 w-full h-[1.5px] bg-roseGold origin-left transition-transform duration-300 ease-out ${
+                      activeCategory === 'women' ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
+                    }`}
+                  />
                 </Link>
               </div>
 
@@ -116,10 +129,16 @@ export default function Navbar() {
               >
                 <Link
                   href="/shop?target=kids"
-                  className="text-[13px] font-medium uppercase tracking-[0.08em] text-navy/90 hover:text-roseGold transition-colors relative py-1"
+                  className={`text-[13px] font-medium uppercase tracking-[0.08em] transition-colors relative py-1 ${
+                    activeCategory === 'kids' ? 'text-roseGold' : 'text-navy/90 hover:text-roseGold'
+                  }`}
                 >
                   Kids Ethnic
-                  <span className="absolute bottom-0 left-0 w-full h-[1.5px] bg-roseGold origin-left scale-x-0 transition-transform duration-300 ease-out group-hover:scale-x-100" />
+                  <span
+                    className={`absolute bottom-0 left-0 w-full h-[1.5px] bg-roseGold origin-left transition-transform duration-300 ease-out ${
+                      activeCategory === 'kids' ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
+                    }`}
+                  />
                 </Link>
               </div>
 

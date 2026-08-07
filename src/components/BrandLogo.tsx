@@ -6,35 +6,37 @@ interface BrandLogoProps {
   variant?: 'horizontal' | 'badge';
   className?: string;
   size?: 'sm' | 'md' | 'lg';
+  showText?: boolean;
 }
 
 export const BrandLogo: React.FC<BrandLogoProps> = ({
   className = '',
   size = 'md',
+  showText = true,
 }) => {
-  // Sizing for cropped 322x353 logo image (fills header vertically with generous prominence)
+  // Sizing for cropped logo image
   const logoHeights = {
-    sm: 'h-11 sm:h-14 lg:h-16',
-    md: 'h-[58px] sm:h-[74px] lg:h-[86px]',
-    lg: 'h-[64px] sm:h-[82px] lg:h-[92px]',
+    sm: 'h-[52px] sm:h-[62px] lg:h-[68px]',
+    md: 'h-[54px] sm:h-[64px] lg:h-[72px]',
+    lg: 'h-[62px] sm:h-[74px] lg:h-[82px]',
   };
 
   return (
     <Link
       href="/"
-      className={`inline-flex items-center justify-center sm:justify-start group shrink-0 relative py-1 focus:outline-none ${className}`}
-      aria-label="The Girls Collection Home"
+      className={`inline-flex items-center gap-2.5 sm:gap-3 group shrink-0 relative py-1 focus:outline-none ${className}`}
+      aria-label="The Girls Collections Home"
     >
-      <span className="sr-only">The Girls Collection</span>
+      <span className="sr-only">The Girls Collections</span>
 
-      {/* Prominent Cropped Logo Image Container with Premium Shimmer Animation */}
+      {/* Prominent Emblem Logo Image Container */}
       <div className={`relative ${logoHeights[size]} w-auto shrink-0 flex items-center justify-center transition-transform duration-300 group-hover:scale-105 overflow-hidden rounded-xs`}>
         {/* Royal Gold Shimmer Light Beam */}
         <span className="animate-logo-shimmer" />
 
         <Image
           src="/logo.png"
-          alt="The Girls Collection Logo"
+          alt="The Girls Collections Emblem"
           width={322}
           height={353}
           style={{ height: '100%', width: 'auto', objectFit: 'contain' }}
@@ -42,6 +44,17 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
           priority
         />
       </div>
+
+      {showText && (
+        <div className="flex flex-col justify-center text-left leading-none shrink-0 py-0.5">
+          <span className="font-serif text-[16px] sm:text-[18px] lg:text-[20px] font-bold tracking-[0.12em] uppercase text-navy group-hover:text-roseGold transition-colors">
+            The Girls
+          </span>
+          <span className="font-sans text-[8.5px] sm:text-[9.5px] lg:text-[10px] font-bold tracking-[0.26em] uppercase text-roseGold pt-0.5">
+            Collections
+          </span>
+        </div>
+      )}
     </Link>
   );
 };
