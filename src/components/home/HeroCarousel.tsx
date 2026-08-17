@@ -8,6 +8,7 @@ import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 interface Slide {
   id: number;
   image: string;
+  mobileImage: string;
   eyebrow: string;
   titlePrefix: string;
   titleAmp?: string;
@@ -21,6 +22,7 @@ const HERO_SLIDES: Slide[] = [
   {
     id: 1,
     image: "/hero/hero-saree-1.png",
+    mobileImage: "/bgimage1ladies.webp",
     eyebrow: "ROYAL FESTIVE COUTURE '26",
     titlePrefix: "Handcrafted Silk Sarees",
     titleAmp: "&",
@@ -32,6 +34,7 @@ const HERO_SLIDES: Slide[] = [
   {
     id: 2,
     image: "/hero/hero-kids-2.png",
+    mobileImage: "/bgimage1lkids.webp",
     eyebrow: "LITTLE ROYALTY COLLECTION",
     titlePrefix: "Kids Pattu Langa",
     titleAmp: "&",
@@ -43,6 +46,7 @@ const HERO_SLIDES: Slide[] = [
   {
     id: 3,
     image: "/hero/hero-saree-3.png",
+    mobileImage: "/bgimage2ladies.webp",
     eyebrow: "TARUNI LUXURY EDITION",
     titlePrefix: "Designer Zari Gowns",
     titleAmp: "&",
@@ -50,6 +54,18 @@ const HERO_SLIDES: Slide[] = [
     subtitle: "Exquisite blush & gold silhouettes adorned with royal palace heritage embroidery.",
     ctaText: "View Festive Edit",
     ctaLink: "/shop?occasion=Festive",
+  },
+  {
+    id: 4,
+    image: "/hero/hero-saree-1.png",
+    mobileImage: "/bgimage3ladies.webp",
+    eyebrow: "HERITAGE COUTURE EDIT",
+    titlePrefix: "Royal Silk Lehengas",
+    titleAmp: "&",
+    titleSuffix: "Bridal Weaves",
+    subtitle: "Statement royal zari motifs woven with pure 24k gold threads for timeless elegance.",
+    ctaText: "Discover Couture",
+    ctaLink: "/shop?category=lehengas",
   },
 ];
 
@@ -76,15 +92,31 @@ export const HeroCarousel: React.FC = () => {
               idx === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'
             }`}
           >
-            <Image
-              src={s.image}
-              alt={s.titlePrefix}
-              fill
-              priority={idx === 0}
-              className="object-cover object-center sm:object-[75%_center] animate-hero-zoom opacity-85"
-              sizes="100vw"
-              quality={92}
-            />
+            {/* Mobile Optimized High-Res WebP View */}
+            <div className="block sm:hidden absolute inset-0">
+              <Image
+                src={s.mobileImage}
+                alt={s.titlePrefix}
+                fill
+                priority={idx === 0}
+                className="object-cover object-center animate-hero-zoom opacity-90"
+                sizes="(max-width: 640px) 100vw, 50vw"
+                quality={90}
+              />
+            </div>
+
+            {/* Desktop View */}
+            <div className="hidden sm:block absolute inset-0">
+              <Image
+                src={s.image}
+                alt={s.titlePrefix}
+                fill
+                priority={idx === 0}
+                className="object-cover object-[75%_center] animate-hero-zoom opacity-85"
+                sizes="100vw"
+                quality={92}
+              />
+            </div>
           </div>
         ))}
         {/* Soft Radial Scrim Overlay */}

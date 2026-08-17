@@ -70,11 +70,7 @@ export const metadata: Metadata = {
   },
 };
 
-const rawKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
-const publishableKey =
-  rawKey && !rawKey.includes('pk_test_Y2xlcmsuaW5jbHVkZWQu')
-    ? rawKey
-    : 'pk_test_Y2xlcmsuaW5jbHVkZWQuY2xlcmsuYWNjb3VudHMuZGV2JA';
+const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
 
 export default function RootLayout({
   children,
