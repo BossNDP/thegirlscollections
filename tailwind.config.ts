@@ -10,47 +10,61 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: "#FAF7F2",
-        foreground: "#1C2544",
-        // Rich Royal Navy palette (sampled directly from logo.png #1C2544)
-        navy: {
-          DEFAULT: "#1C2544",
-          dark: "#121930",
-          light: "#253158",
+        background: "var(--ivory, #FAF5EA)",
+        foreground: "var(--ink-navy, #1C1F3B)",
+        inkNavy: {
+          DEFAULT: "#1C1F3B",
+          dark: "#121426",
+          light: "#282C52",
         },
-        // Rose Gold / Champagne palette
-        roseGold: {
-          DEFAULT: "#C9A574",
-          light: "#D4AF87",
-          dark: "#A88346",
-        },
-        // Blush Rose palette
-        blush: {
-          DEFAULT: "#D89A94",
-          light: "#E0ABA6",
-          dark: "#B87F78",
-        },
-        // Warm Ivory palette
+        nearBlack: "#0D0E1A",
         ivory: {
-          DEFAULT: "#FAF7F2",
-          card: "#FAF7F2",
-          muted: "#F3EEE7",
-          cream: "#F5F0E8",
+          DEFAULT: "#FAF5EA",
+          card: "#FAF5EA",
+          muted: "#F2E9D8",
+          sand: "#E8DCC8",
+        },
+        sand: {
+          DEFAULT: "#E8DCC8",
+          dark: "#D6C4A9",
+          light: "#F5EFE4",
+        },
+        zariGold: {
+          DEFAULT: "#B4863C",
+          light: "#D8BC82",
+          dark: "#8B6A2E",
+          gradientStart: "#C9A24B",
+          gradientEnd: "#8B6A2E",
+        },
+        oxblood: {
+          DEFAULT: "#7A1F2B",
+          dark: "#57141E",
+          light: "#9E2C3B",
+        },
+        navy: {
+          DEFAULT: "#1C1F3B",
+          dark: "#0D0E1A",
+          light: "#282C52",
+        },
+        roseGold: {
+          DEFAULT: "#B4863C",
+          light: "#D8BC82",
+          dark: "#8B6A2E",
+        },
+        blush: {
+          DEFAULT: "#E8DCC8",
+          light: "#FAF5EA",
+          dark: "#B4863C",
         },
         charcoal: {
-          DEFAULT: "#1C2544",
-          light: "#3A4568",
-          muted: "#6B7694",
-        },
-        mutedMauve: {
-          DEFAULT: "#B9707D",
-          light: "#CF8B97",
-          dark: "#9E5360",
+          DEFAULT: "#1C1F3B",
+          light: "#282C52",
+          muted: "#5C6080",
         },
       },
       fontFamily: {
-        serif: ["var(--font-fraunces)", "Fraunces", "Playfair Display", "Georgia", "serif"],
-        display: ["var(--font-fraunces)", "Fraunces", "Georgia", "serif"],
+        serif: ["var(--font-cormorant)", "var(--font-fraunces)", "Cormorant Garamond", "Georgia", "serif"],
+        display: ["var(--font-cormorant)", "var(--font-fraunces)", "Cormorant Garamond", "Georgia", "serif"],
         sans: ["var(--font-jakarta)", "Plus Jakarta Sans", "Inter", "system-ui", "sans-serif"],
         body: ["var(--font-jakarta)", "Plus Jakarta Sans", "Inter", "system-ui", "sans-serif"],
         script: ["var(--font-alex-brush)", "Alex Brush", "cursive"],

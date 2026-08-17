@@ -36,21 +36,21 @@ export const LuxuryHeartButton: React.FC<LuxuryHeartButtonProps> = ({
     onToggle(e);
   };
 
-  // Proportionate sizes: default 'md' is exactly 32px diameter circle
+  // Proportionate sizes: default 'md' is 28px diameter circle (1.8x ratio with 15.5px icon)
   const containerSizes = {
-    sm: 'w-[28px] h-[28px]',
-    md: 'w-[32px] h-[32px]',
-    lg: 'w-[38px] h-[38px]',
+    sm: 'w-[24px] h-[24px]',
+    md: 'w-[28px] h-[28px]',
+    lg: 'w-[32px] h-[32px]',
   };
 
   const iconSizes = {
     sm: 'w-[13px] h-[13px]',
-    md: 'w-[15px] h-[15px]',
+    md: 'w-[15.5px] h-[15.5px]',
     lg: 'w-[18px] h-[18px]',
   };
 
   return (
-    <div className={`relative inline-flex items-center justify-center shrink-0 ${className}`}>
+    <div className={`relative inline-flex items-center justify-center shrink-0 min-w-[44px] min-h-[44px] p-1.5 ${className}`}>
       {/* 4 Tiny Heart Particles Burst Outward on Wishlist Save */}
       <AnimatePresence>
         {showBurst &&

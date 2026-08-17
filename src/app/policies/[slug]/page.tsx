@@ -96,7 +96,7 @@ const POLICIES: Record<string, PolicyData> = {
       },
       {
         heading: '2. How to Initiate a Return',
-        content: 'Contact us directly at +91 7406164512 via:\n• WhatsApp (message us with your order ID and reason for return)\n• Phone call (same number, during business hours)\n\nPlease do not ship items back without confirming with us first — we\'ll guide you through the return process once your request is verified.'
+        content: 'Contact us directly at +91 7483848505 via:\n• WhatsApp (message us with your order ID and reason for return)\n• Phone call (same number, during business hours)\n\nPlease do not ship items back without confirming with us first — we\'ll guide you through the return process once your request is verified.'
       },
       {
         heading: '3. Conditions for Return',

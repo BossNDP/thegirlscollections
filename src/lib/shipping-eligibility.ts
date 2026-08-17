@@ -90,7 +90,7 @@ export async function checkDeliveryEligibility(pincode: string): Promise<Eligibi
           points: [
             {
               address: pickupAddr,
-              contact_person: { phone: '917406164512' },
+              contact_person: { phone: '917483848505' },
             },
             {
               address: `Bengaluru, Karnataka - ${cleanPincode}`,

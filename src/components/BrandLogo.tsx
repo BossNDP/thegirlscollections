@@ -14,7 +14,6 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
   size = 'md',
   showText = true,
 }) => {
-  // Sizing for cropped logo image
   const logoHeights = {
     sm: 'h-[52px] sm:h-[62px] lg:h-[68px]',
     md: 'h-[54px] sm:h-[64px] lg:h-[72px]',
@@ -29,9 +28,7 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
     >
       <span className="sr-only">The Girls Collections</span>
 
-      {/* Prominent Emblem Logo Image Container */}
       <div className={`relative ${logoHeights[size]} w-auto shrink-0 flex items-center justify-center transition-transform duration-300 group-hover:scale-105 overflow-hidden rounded-xs`}>
-        {/* Royal Gold Shimmer Light Beam */}
         <span className="animate-logo-shimmer" />
 
         <Image
@@ -47,10 +44,10 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
 
       {showText && (
         <div className="flex flex-col justify-center text-left leading-none shrink-0 py-0.5">
-          <span className="font-serif text-[16px] sm:text-[18px] lg:text-[20px] font-bold tracking-[0.12em] uppercase text-navy group-hover:text-roseGold transition-colors">
+          <span className="font-serif text-[16px] sm:text-[18px] lg:text-[20px] font-bold tracking-[0.12em] uppercase text-inkNavy group-hover:text-zariGold transition-colors">
             The Girls
           </span>
-          <span className="font-sans text-[8.5px] sm:text-[9.5px] lg:text-[10px] font-bold tracking-[0.26em] uppercase text-roseGold pt-0.5">
+          <span className="font-sans text-[8.5px] sm:text-[9.5px] lg:text-[10px] font-bold tracking-[0.26em] uppercase text-zariGold pt-0.5">
             Collections
           </span>
         </div>

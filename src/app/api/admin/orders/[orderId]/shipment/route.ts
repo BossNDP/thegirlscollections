@@ -94,8 +94,8 @@ export async function POST(
               {
                 address: borzoPickupAddress,
                 contact_person: {
-                  phone: '917406164512',
-                  name: 'DRFTN Dispatch Desk'
+                  phone: '917483848505',
+                  name: 'The Girls Collections Dispatch Desk'
                 }
               },
               {

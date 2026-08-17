@@ -128,7 +128,7 @@ export default function CheckoutPage() {
     freeShippingThreshold: 0,
     defaultShippingCharge: 0,
     codFee: 0,
-    whatsappNumber: '+917406164512',
+    whatsappNumber: '+917483848505',
     borzoCutoffStart: '11:00',
     borzoCutoffEnd: '16:00',
     blrPincodeRanges: '560001-560300',
@@ -642,7 +642,7 @@ function isGibberishText(str: string): boolean {
                     <input
                       type="tel"
                       maxLength={10}
-                      placeholder="7406164512"
+                      placeholder="7483848505"
                       value={inlinePhone}
                       onChange={(e) => setInlinePhone(e.target.value.replace(/\D/g, ''))}
                       className="w-full bg-zinc-900/60 border border-zinc-800 text-white px-4 py-3 text-xs focus:outline-none focus:border-white transition-colors font-mono tracking-widest"
@@ -880,7 +880,7 @@ function isGibberishText(str: string): boolean {
                           type="tel"
                           name="phone"
                           required
-                          placeholder="e.g. 7406164512"
+                          placeholder="e.g. 7483848505"
                           value={formData.phone}
                           onChange={handleInputChange}
                           className="w-full bg-zinc-900/50 border border-amber-500/40 text-brand-offwhite px-4 py-3 text-sm focus:outline-none focus:border-white focus:bg-zinc-900 transition-colors"

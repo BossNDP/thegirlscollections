@@ -5,8 +5,8 @@ import * as schema from '@/db/schema';
 export const dynamic = 'force-dynamic';
 
 const DEFAULT_SETTINGS = {
-  store_name: 'DRFTN CLOTHING',
-  contact_number: '+91 7406164512',
+  store_name: 'The Girls Collections',
+  contact_number: '+91 7483848505',
   instagram_handle: '@drftnclothing',
   free_shipping_threshold: 99900, // paise (₹999)
   default_shipping_charge: 9900,  // paise (₹99)

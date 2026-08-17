@@ -3,7 +3,7 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ChevronRight, ArrowLeft, Sparkles, X } from 'lucide-react';
+import { ChevronRight, ArrowLeft, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CATEGORY_TAXONOMY } from '@/data/categoryTaxonomy';
 
@@ -22,79 +22,78 @@ export const DesktopMegaMenu: React.FC<MegaMenuProps> = ({ activeCategory, onClo
       const frocksWestern = womenData?.groups.find((g) => g.id === 'women-frocks-western');
 
       return (
-        <div className="max-w-7xl mx-auto grid grid-cols-12 gap-8">
+        <div className="max-w-[1440px] mx-auto grid grid-cols-12 gap-8 px-8 py-6">
           {/* Column 1: Women's Traditional */}
-          <div className="col-span-4 space-y-3 border-r border-navy/10 pr-6">
-            <div className="space-y-1.5 pb-1">
-              <h4 className="text-[11px] font-sans uppercase tracking-[0.18em] text-roseGold font-bold">
-                Women Traditional
-              </h4>
-              <div className="w-8 h-[1.5px] bg-roseGold/40 rounded-full" />
+          <div className="col-span-4 space-y-4 border-r border-sand pr-8">
+            <div className="space-y-1">
+              <span className="eyebrow-text">Category Spotlight</span>
+              <h4 className="text-xl font-serif font-semibold text-inkNavy">Women Traditional</h4>
+              <div className="w-10 h-[1.5px] bg-gold-gradient rounded-full" />
             </div>
-            <ul className="space-y-0.5 pt-1">
+            <ul className="space-y-1 pt-2">
               {traditional?.items.map((sub) => (
                 <li key={sub.id}>
                   <Link
                     href={`/shop?category=${sub.slug}`}
                     onClick={onClose}
-                    className="group flex items-center justify-between py-1.5 text-[13.5px] font-sans font-normal text-navy/90 hover:text-roseGold transition-colors leading-relaxed"
+                    className="group flex items-center justify-between py-2 text-sm font-sans font-medium text-inkNavy/85 hover:text-zariGold transition-colors"
                   >
                     <span>{sub.name}</span>
-                    <ChevronRight className="w-3.5 h-3.5 text-navy/25 group-hover:text-roseGold group-hover:translate-x-1 transition-all duration-200" />
+                    <ChevronRight className="w-4 h-4 text-zariGold opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-200" />
                   </Link>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Column 2: Women's Frocks & Western */}
-          <div className="col-span-4 space-y-3 border-r border-navy/10 pr-6">
-            <div className="space-y-1.5 pb-1">
-              <h4 className="text-[11px] font-sans uppercase tracking-[0.18em] text-roseGold font-bold">
-                Frocks &amp; Western
-              </h4>
-              <div className="w-8 h-[1.5px] bg-roseGold/40 rounded-full" />
+          {/* Column 2: Frocks & Western */}
+          <div className="col-span-4 space-y-4 border-r border-sand pr-8">
+            <div className="space-y-1">
+              <span className="eyebrow-text">Contemporary Couture</span>
+              <h4 className="text-xl font-serif font-semibold text-inkNavy">Frocks &amp; Western</h4>
+              <div className="w-10 h-[1.5px] bg-gold-gradient rounded-full" />
             </div>
-            <ul className="space-y-0.5 pt-1">
+            <ul className="space-y-1 pt-2">
               {frocksWestern?.items.map((sub) => (
                 <li key={sub.id}>
                   <Link
                     href={`/shop?category=${sub.slug}`}
                     onClick={onClose}
-                    className="group flex items-center justify-between py-1.5 text-[13.5px] font-sans font-normal text-navy/90 hover:text-roseGold transition-colors leading-relaxed"
+                    className="group flex items-center justify-between py-2 text-sm font-sans font-medium text-inkNavy/85 hover:text-zariGold transition-colors"
                   >
                     <span>{sub.name}</span>
-                    <ChevronRight className="w-3.5 h-3.5 text-navy/25 group-hover:text-roseGold group-hover:translate-x-1 transition-all duration-200" />
+                    <ChevronRight className="w-4 h-4 text-zariGold opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-200" />
                   </Link>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Column 3: Featured Story Banner (Kept As-Is) */}
+          {/* Column 3: Lookbook Image Card + Evocative Copy */}
           <div className="col-span-4 pl-4 flex flex-col justify-between">
-            <div className="relative h-56 w-full rounded-xl overflow-hidden shadow-md group">
+            <div className="relative h-64 w-full rounded-[2px] overflow-hidden group bg-sand/50">
               <Image
                 src="https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&q=85&w=600"
-                alt="Women Couture Edit"
+                alt="Women Royal Edit"
                 fill
                 className="object-cover group-hover:scale-105 transition-transform duration-700"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-navy/90 via-navy/30 to-transparent p-5 flex flex-col justify-end">
-                <span className="inline-block px-2.5 py-0.5 rounded-full bg-roseGold text-navy text-[9px] uppercase font-bold tracking-wider mb-1.5 w-max">
-                  Handcrafted Luxury
-                </span>
-                <p className="text-sm font-serif font-semibold text-ivory leading-snug">
-                  Explore Langa Davanis, Zari Gowns &amp; Flared Shararas
+              <div className="absolute inset-0 bg-gradient-to-t from-nearBlack/85 via-nearBlack/30 to-transparent p-6 flex flex-col justify-end">
+                <span className="eyebrow-text text-zariGoldLight mb-1">Editorial Lookbook</span>
+                <p className="text-lg font-serif font-semibold text-ivory leading-snug">
+                  The Royal Heritage Pallu Edit &amp; Zari Gowns
+                </p>
+                <p className="text-xs text-ivory/70 font-sans mt-1">
+                  Intricate zari weaves designed for celebratory grand moments.
                 </p>
               </div>
             </div>
             <Link
               href="/shop?target=women"
               onClick={onClose}
-              className="mt-4 text-center py-2.5 rounded-full border border-navy text-xs uppercase font-semibold tracking-wider text-navy hover:bg-navy hover:text-ivory transition-all"
+              className="mt-4 text-center py-3 rounded-[2px] btn-gold-gradient text-xs uppercase tracking-[0.2em] font-semibold"
             >
-              Shop All Women Collections
+              Explore Women Collection
             </Link>
           </div>
         </div>
@@ -106,62 +105,61 @@ export const DesktopMegaMenu: React.FC<MegaMenuProps> = ({ activeCategory, onClo
       const kidsItems = kidsData?.groups[0]?.items || [];
 
       return (
-        <div className="max-w-7xl mx-auto grid grid-cols-12 gap-8">
-          <div className="col-span-6 space-y-3 border-r border-navy/10 pr-6">
-            <div className="space-y-1.5 pb-1">
-              <h4 className="text-[11px] font-sans uppercase tracking-[0.18em] text-roseGold font-bold">
-                Kids Pure Silk Ethnic Wear
-              </h4>
-              <div className="w-8 h-[1.5px] bg-roseGold/40 rounded-full" />
+        <div className="max-w-[1440px] mx-auto grid grid-cols-12 gap-8 px-8 py-6">
+          <div className="col-span-8 space-y-4 border-r border-sand pr-8">
+            <div className="space-y-1">
+              <span className="eyebrow-text">Little Royalty</span>
+              <h4 className="text-xl font-serif font-semibold text-inkNavy">Kids Pure Silk Ethnic Wear</h4>
+              <div className="w-10 h-[1.5px] bg-gold-gradient rounded-full" />
             </div>
-            <ul className="space-y-1 pt-1">
+            <div className="grid grid-cols-2 gap-4 pt-2">
               {kidsItems.map((sub) => (
-                <li key={sub.id}>
-                  <Link
-                    href={`/shop?category=${sub.slug}`}
-                    onClick={onClose}
-                    className="group flex items-center justify-between py-1.5 text-[13.5px] font-sans font-normal text-navy/90 hover:text-roseGold transition-colors leading-relaxed"
-                  >
-                    <div>
-                      <span className="block text-[13.5px] font-sans font-normal text-navy/90 group-hover:text-roseGold transition-colors">
-                        {sub.name}
-                      </span>
-                      {sub.description && (
-                        <span className="block text-[11.5px] text-navy/55 font-sans font-light pt-0.5">
-                          {sub.description}
-                        </span>
-                      )}
-                    </div>
-                    <ChevronRight className="w-3.5 h-3.5 text-navy/25 group-hover:text-roseGold group-hover:translate-x-1 transition-all duration-200 shrink-0 ml-3" />
-                  </Link>
-                </li>
+                <Link
+                  key={sub.id}
+                  href={`/shop?category=${sub.slug}`}
+                  onClick={onClose}
+                  className="group p-3 rounded-[2px] bg-sand/30 hover:bg-sand/60 transition-colors border border-zariGold/10"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-serif font-semibold text-inkNavy group-hover:text-zariGold transition-colors">
+                      {sub.name}
+                    </span>
+                    <ChevronRight className="w-4 h-4 text-zariGold opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </div>
+                  {sub.description && (
+                    <p className="text-xs text-inkNavy/60 font-sans mt-1 line-clamp-1">
+                      {sub.description}
+                    </p>
+                  )}
+                </Link>
               ))}
-            </ul>
+            </div>
           </div>
 
-          <div className="col-span-6 pl-4 flex flex-col justify-between">
-            <div className="relative h-56 w-full rounded-xl overflow-hidden shadow-md group">
+          <div className="col-span-4 pl-4 flex flex-col justify-between">
+            <div className="relative h-64 w-full rounded-[2px] overflow-hidden group bg-sand/50">
               <Image
                 src="https://images.unsplash.com/photo-1621600411688-4be93cd68504?auto=format&fit=crop&q=85&w=800"
                 alt="Kids Pattu Frocks"
                 fill
                 className="object-cover group-hover:scale-105 transition-transform duration-700"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-navy/90 via-navy/30 to-transparent p-5 flex flex-col justify-end">
-                <span className="inline-block px-2.5 py-0.5 rounded-full bg-roseGold text-navy text-[9px] uppercase font-bold tracking-wider mb-1.5 w-max">
-                  Little Royalty
-                </span>
-                <p className="text-sm font-serif font-semibold text-ivory leading-snug">
-                  Pure Kanjeevaram Pattu Frocks with Non-Scratchy Cotton Lining
+              <div className="absolute inset-0 bg-gradient-to-t from-nearBlack/85 via-nearBlack/30 to-transparent p-6 flex flex-col justify-end">
+                <span className="eyebrow-text text-zariGoldLight mb-1">Signature Craft</span>
+                <p className="text-lg font-serif font-semibold text-ivory leading-snug">
+                  Pure Kanjeevaram Silk Pattu Frocks
+                </p>
+                <p className="text-xs text-ivory/70 font-sans mt-1">
+                  Gentle non-scratchy pure cotton lining for delicate skin.
                 </p>
               </div>
             </div>
             <Link
               href="/shop?target=kids"
               onClick={onClose}
-              className="mt-4 text-center py-2.5 rounded-full border border-navy text-xs uppercase font-semibold tracking-wider text-navy hover:bg-navy hover:text-ivory transition-all"
+              className="mt-4 text-center py-3 rounded-[2px] btn-gold-gradient text-xs uppercase tracking-[0.2em] font-semibold"
             >
-              Shop All Kids Ethnic Wear
+              Explore Kids Collection
             </Link>
           </div>
         </div>
@@ -172,15 +170,12 @@ export const DesktopMegaMenu: React.FC<MegaMenuProps> = ({ activeCategory, onClo
   };
 
   return (
-    <>
-      {/* Solid Floating Dropdown Panel with Soft Elevation Shadow */}
-      <div
-        onMouseLeave={onClose}
-        className="absolute top-full left-0 w-full bg-white border-b border-navy/10 shadow-[0_20px_40px_rgba(20,20,30,0.12)] z-[60] animate-fade-in text-navy py-8 px-12"
-      >
-        {renderContent()}
-      </div>
-    </>
+    <div
+      onMouseLeave={onClose}
+      className="absolute top-full left-0 w-full bg-ivory border-b border-zariGold/20 shadow-[0_20px_50px_rgba(28,31,59,0.12)] z-[60] text-inkNavy"
+    >
+      {renderContent()}
+    </div>
   );
 };
 
@@ -194,82 +189,79 @@ export const MobileMegaMenu: React.FC<{ isOpen: boolean; onClose: () => void }> 
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Smooth Dimming Backdrop Overlay */}
+          {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.25 }}
             onClick={onClose}
-            className="fixed inset-0 z-[75] bg-navy/60 backdrop-blur-xs"
+            className="fixed inset-0 z-[75] bg-nearBlack/70 backdrop-blur-xs"
           />
 
-          {/* Smooth Sliding Mobile Navigation Drawer */}
+          {/* Full-Screen Drawer Navigation */}
           <motion.div
             initial={{ x: '-100%' }}
             animate={{ x: 0 }}
             exit={{ x: '-100%' }}
-            transition={{ type: 'spring', damping: 25, stiffness: 220 }}
-            className="fixed inset-y-0 left-0 w-full max-w-[340px] sm:max-w-[400px] z-[80] bg-navy text-ivory flex flex-col shadow-2xl overflow-hidden"
+            transition={{ type: 'spring', damping: 28, stiffness: 240 }}
+            className="fixed inset-y-0 left-0 w-full max-w-[380px] z-[80] bg-inkNavy text-ivory flex flex-col shadow-2xl overflow-hidden"
           >
-            {/* Top Header with Prominent Cross Mark (X) Close Button */}
-            <div className="p-4 border-b border-roseGold/20 flex items-center justify-between bg-navy shrink-0">
+            {/* Drawer Header */}
+            <div className="p-5 border-b border-zariGold/20 flex items-center justify-between bg-inkNavy shrink-0">
               {selectedMain ? (
                 <button
                   onClick={() => setSelectedMain(null)}
-                  className="flex items-center text-xs font-semibold uppercase tracking-[0.14em] text-roseGold hover:text-ivory transition-colors min-h-[44px]"
+                  className="flex items-center text-xs font-semibold uppercase tracking-[0.2em] text-zariGold hover:text-ivory transition-colors min-h-[48px]"
                 >
-                  <ArrowLeft className="w-4 h-4 mr-1.5" />
-                  Back to Categories
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Back
                 </button>
               ) : (
-                <span className="text-xs uppercase tracking-[0.18em] font-semibold text-roseGold">
-                  THE GIRLS COLLECTION
+                <span className="eyebrow-text text-zariGold">
+                  THE GIRLS COLLECTIONS
                 </span>
               )}
 
-              {/* Prominent Cross Mark (X) Button */}
               <button
                 onClick={onClose}
-                className="w-9 h-9 rounded-full bg-white/10 hover:bg-roseGold hover:text-navy text-ivory flex items-center justify-center transition-all duration-300 focus:outline-none"
-                aria-label="Close Navigation Menu"
+                className="w-10 h-10 rounded-full bg-white/10 hover:bg-zariGold hover:text-inkNavy text-ivory flex items-center justify-center transition-all focus:outline-none"
+                aria-label="Close Menu"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            {/* Scrollable Drawer Content */}
+            {/* Scrollable Categories */}
             <div className="p-6 overflow-y-auto flex-1 space-y-6">
               {!selectedMain ? (
                 <div className="space-y-4">
-                  <p className="text-[11px] uppercase tracking-[0.2em] text-roseGold font-medium">
-                    Explore Collections
-                  </p>
-                  <div className="divide-y divide-roseGold/10">
+                  <span className="eyebrow-text text-zariGoldLight">COLLECTIONS</span>
+                  <div className="space-y-2 pt-2">
                     <button
                       onClick={() => setSelectedMain('women')}
-                      className="w-full py-4 flex items-center justify-between text-left group min-h-[44px]"
+                      className="w-full py-4 border-b border-zariGold/15 flex items-center justify-between text-left group min-h-[48px]"
                     >
-                      <span className="text-xl font-serif font-bold text-ivory group-hover:text-roseGold transition-colors">
-                        Women
+                      <span className="text-2xl font-serif font-bold text-ivory group-hover:text-zariGold transition-colors">
+                        Women Ethnic
                       </span>
-                      <ChevronRight className="w-5 h-5 text-roseGold" />
+                      <ChevronRight className="w-5 h-5 text-zariGold" />
                     </button>
 
                     <button
                       onClick={() => setSelectedMain('kids')}
-                      className="w-full py-4 flex items-center justify-between text-left group min-h-[44px]"
+                      className="w-full py-4 border-b border-zariGold/15 flex items-center justify-between text-left group min-h-[48px]"
                     >
-                      <span className="text-xl font-serif font-bold text-ivory group-hover:text-roseGold transition-colors">
+                      <span className="text-2xl font-serif font-bold text-ivory group-hover:text-zariGold transition-colors">
                         Kids Ethnic
                       </span>
-                      <ChevronRight className="w-5 h-5 text-roseGold" />
+                      <ChevronRight className="w-5 h-5 text-zariGold" />
                     </button>
 
                     <Link
                       href="/shop?isNew=true"
                       onClick={onClose}
-                      className="block py-4 text-xl font-serif font-bold text-ivory hover:text-roseGold transition-colors min-h-[44px]"
+                      className="block py-4 border-b border-zariGold/15 text-2xl font-serif font-bold text-ivory hover:text-zariGold transition-colors min-h-[48px]"
                     >
                       New Arrivals
                     </Link>
@@ -277,7 +269,7 @@ export const MobileMegaMenu: React.FC<{ isOpen: boolean; onClose: () => void }> 
                     <Link
                       href="/shop?occasion=Festive"
                       onClick={onClose}
-                      className="block py-4 text-xl font-serif font-bold text-ivory hover:text-roseGold transition-colors min-h-[44px]"
+                      className="block py-4 border-b border-zariGold/15 text-2xl font-serif font-bold text-ivory hover:text-zariGold transition-colors min-h-[48px]"
                     >
                       Festive Edit
                     </Link>
@@ -285,50 +277,38 @@ export const MobileMegaMenu: React.FC<{ isOpen: boolean; onClose: () => void }> 
                     <Link
                       href="/shop?isSale=true"
                       onClick={onClose}
-                      className="block py-4 text-xl font-serif font-bold text-blush hover:text-roseGold transition-colors min-h-[44px]"
+                      className="block py-4 border-b border-zariGold/15 text-2xl font-serif font-bold text-oxblood hover:text-zariGold transition-colors min-h-[48px]"
                     >
-                      Sale
-                    </Link>
-
-                    <Link
-                      href="/#discover-brand-world"
-                      onClick={onClose}
-                      className="block py-4 text-xl font-serif font-bold text-ivory hover:text-roseGold transition-colors min-h-[44px]"
-                    >
-                      Discover Brand World
+                      Sale Spotlight
                     </Link>
                   </div>
                 </div>
               ) : selectedMain === 'women' ? (
-                <div className="space-y-6 animate-fade-in">
-                  <h3 className="text-2xl font-serif font-bold text-ivory">Women&apos;s Collection</h3>
+                <div className="space-y-6">
+                  <h3 className="text-2xl font-serif font-bold text-ivory">Women&apos;s Wear</h3>
 
-                  <div>
-                    <p className="text-xs uppercase tracking-[0.18em] text-roseGold font-medium mb-3">
-                      Traditional
-                    </p>
+                  <div className="space-y-3">
+                    <span className="eyebrow-text text-zariGold">Traditional</span>
                     {CATEGORY_TAXONOMY.find((c) => c.id === 'women')?.groups.find((g) => g.id === 'women-traditional')?.items.map((sub) => (
                       <Link
                         key={sub.id}
                         href={`/shop?category=${sub.slug}`}
                         onClick={onClose}
-                        className="block py-3 text-lg font-serif text-ivory/90 hover:text-roseGold border-b border-roseGold/10"
+                        className="block py-3 text-lg font-serif text-ivory/90 hover:text-zariGold border-b border-zariGold/10 min-h-[48px]"
                       >
                         {sub.name}
                       </Link>
                     ))}
                   </div>
 
-                  <div>
-                    <p className="text-xs uppercase tracking-[0.18em] text-roseGold font-medium mb-3">
-                      Frocks &amp; Western
-                    </p>
+                  <div className="space-y-3 pt-4">
+                    <span className="eyebrow-text text-zariGold">Frocks &amp; Western</span>
                     {CATEGORY_TAXONOMY.find((c) => c.id === 'women')?.groups.find((g) => g.id === 'women-frocks-western')?.items.map((sub) => (
                       <Link
                         key={sub.id}
                         href={`/shop?category=${sub.slug}`}
                         onClick={onClose}
-                        className="block py-3 text-lg font-serif text-ivory/90 hover:text-roseGold border-b border-roseGold/10"
+                        className="block py-3 text-lg font-serif text-ivory/90 hover:text-zariGold border-b border-zariGold/10 min-h-[48px]"
                       >
                         {sub.name}
                       </Link>
@@ -336,14 +316,14 @@ export const MobileMegaMenu: React.FC<{ isOpen: boolean; onClose: () => void }> 
                   </div>
                 </div>
               ) : (
-                <div className="space-y-5 animate-fade-in">
-                  <h3 className="text-2xl font-serif font-bold text-ivory">Kids Ethnic Collection</h3>
+                <div className="space-y-4">
+                  <h3 className="text-2xl font-serif font-bold text-ivory">Kids Ethnic</h3>
                   {CATEGORY_TAXONOMY.find((c) => c.id === 'kids')?.groups[0]?.items.map((sub) => (
                     <Link
                       key={sub.id}
                       href={`/shop?category=${sub.slug}`}
                       onClick={onClose}
-                      className="block py-3.5 text-lg font-serif text-ivory/90 hover:text-roseGold border-b border-roseGold/10"
+                      className="block py-3 text-lg font-serif text-ivory/90 hover:text-zariGold border-b border-zariGold/10 min-h-[48px]"
                     >
                       {sub.name}
                     </Link>

@@ -3,43 +3,236 @@
 @tailwind utilities;
 
 :root {
-  --background: #FAF7F2;
-  --foreground: #1C2544;
-  --navy: #1C2544;
-  --navy-dark: #121930;
-  --navy-light: #253158;
-  --rose-gold: #C9A574;
-  --blush: #D89A94;
-  --ivory: #FAF7F2;
-  --cream: #F5F0E8;
-  --charcoal: #1C2544;
-  --muted-mauve: #B9707D;
+  --ink-navy: #1C1F3B;
+  --near-black: #0D0E1A;
+  --ivory: #FAF5EA;
+  --sand: #E8DCC8;
+  --zari-gold: #B4863C;
+  --zari-gold-light: #D8BC82;
+  --oxblood: #7A1F2B;
+  --white: #FFFFFF;
+
+  --background: var(--ivory);
+  --foreground: var(--ink-navy);
 }
 
 @layer base {
   * {
-    border-color: rgba(201, 165, 116, 0.2);
+    border-color: rgba(180, 134, 60, 0.2);
   }
 
   html {
     scroll-behavior: smooth;
-    background-color: #FAF7F2;
-    color: #1C2544;
+    background-color: var(--ivory);
+    color: var(--ink-navy);
     font-family: var(--font-jakarta), 'Plus Jakarta Sans', sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
   body {
-    background-color: #FAF7F2;
-    color: #1C2544;
+    background-color: var(--ivory);
+    color: var(--ink-navy);
     overflow-x: hidden;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-fraunces), 'Fraunces', Georgia, serif;
-    letter-spacing: -0.01em;
+    font-family: var(--font-cormorant), var(--font-fraunces), Georgia, serif;
+    letter-spacing: -0.015em;
   }
+}
+
+/* Brushed Gold Gradient utilities */
+.bg-gold-gradient {
+  background: linear-gradient(135deg, #C9A24B 0%, #8B6A2E 100%);
+}
+
+.text-gold-gradient {
+  background: linear-gradient(135deg, #C9A24B 0%, #D8BC82 50%, #8B6A2E 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.border-gold-gradient {
+  border-image: linear-gradient(135deg, #C9A24B 0%, #8B6A2E 100%) 1;
+}
+
+/* Gold Button Style */
+.btn-gold-gradient {
+  background: linear-gradient(135deg, #C9A24B 0%, #8B6A2E 100%);
+  color: #FFFFFF;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  box-shadow: 0 4px 15px rgba(180, 134, 60, 0.2);
+}
+.btn-gold-gradient:hover {
+  background: linear-gradient(135deg, #D4B05B 0%, #9B783B 100%);
+  transform: scale(1.02);
+  box-shadow: 0 6px 20px rgba(180, 134, 60, 0.35);
+}
+
+/* Eyebrow Utility */
+.eyebrow-text {
+  font-family: var(--font-jakarta), 'Plus Jakarta Sans', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+  color: var(--zari-gold);
+}
+
+/* Luxurious Woven Fabric Texture Placeholder */
+.bg-woven-texture {
+  background-color: #FAF5EA;
+  background-image: 
+    radial-gradient(rgba(180, 134, 60, 0.08) 1px, transparent 1px),
+    linear-gradient(45deg, rgba(232, 220, 200, 0.4) 25%, transparent 25%, transparent 75%, rgba(232, 220, 200, 0.4) 75%),
+    linear-gradient(45deg, rgba(232, 220, 200, 0.4) 25%, transparent 25%, transparent 75%, rgba(232, 220, 200, 0.4) 75%);
+  background-size: 16px 16px, 12px 12px, 12px 12px;
+  background-position: 0 0, 0 0, 6px 6px;
+}
+
+/* Jewel-Tone Silk Two-Tone Gradients */
+.bg-oxblood-silk {
+  background: linear-gradient(160deg, #8B2635 0%, #5E1A24 100%);
+}
+
+.bg-navy-silk {
+  background: linear-gradient(160deg, #1C1F3B 0%, #0D0E1A 100%);
+}
+
+.bg-sand-silk {
+  background: linear-gradient(160deg, #E8DCC8 0%, #D6C4A9 100%);
+}
+
+/* Temple Arch Frame System (Exact 6px Ivory Mat + 1.5px Gold Hairline) */
+.arch-frame {
+  border-radius: 240px 240px 8px 8px;
+  border: 1.5px solid var(--zari-gold);
+  padding: 6px;
+  background: var(--ivory);
+}
+.arch-frame img,
+.arch-frame .arch-inner {
+  border-radius: 232px 232px 4px 4px;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Small Temple Arch Frame for Product Thumbnails */
+.arch-frame-sm {
+  border-radius: 48px 48px 4px 4px;
+  border: 1.5px solid var(--zari-gold);
+  padding: 4px;
+  background: var(--ivory);
+}
+.arch-frame-sm img,
+.arch-frame-sm .arch-inner {
+  border-radius: 42px 42px 2px 2px;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Top Temple Arch Corner Accent for Product Cards */
+.top-temple-arch {
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  border-top: 1.5px solid var(--zari-gold);
+  border-left: 1px solid rgba(180, 134, 60, 0.3);
+  border-right: 1px solid rgba(180, 134, 60, 0.3);
+}
+
+/* Notched Ribbon Badge Shape */
+.ribbon-notch {
+  clip-path: polygon(0 0, 100% 0, 92% 50%, 100% 100%, 0 100%);
+}
+
+/* Micro Animations */
+@keyframes heartPulse {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.35); }
+  100% { transform: scale(1); }
+}
+
+.animate-heart-pulse {
+  animation: heartPulse 0.25s ease-out 1 forwards;
+}
+
+@keyframes badgePop {
+  0% { transform: scale(0); }
+  60% { transform: scale(1.25); }
+  100% { transform: scale(1); }
+}
+
+.animate-badge-pop {
+  animation: badgePop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) 1 forwards;
+}
+
+@keyframes pulseGlow {
+  0%, 100% { opacity: 0.6; filter: drop-shadow(0 0 1px rgba(180, 134, 60, 0.4)); }
+  50% { opacity: 1; filter: drop-shadow(0 0 4px rgba(180, 134, 60, 0.8)); }
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 2s ease-in-out infinite;
+}
+
+/* Single-Shot Logo Foil Shimmer Sweep */
+@keyframes logoFoilOnce {
+  0% {
+    transform: translateX(-120%) skewX(-25deg);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.9;
+  }
+  75% {
+    transform: translateX(220%) skewX(-25deg);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(220%) skewX(-25deg);
+    opacity: 0;
+  }
+}
+
+.animate-foil-once {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.4) 25%,
+    rgba(216, 188, 130, 0.9) 50%,
+    rgba(255, 255, 255, 0.95) 75%,
+    transparent 100%
+  );
+  pointer-events: none;
+  mix-blend-mode: overlay;
+  animation: logoFoilOnce 1.4s cubic-bezier(0.4, 0, 0.2, 1) 0.3s 1 forwards;
+}
+
+/* Curtain-Reveal Gold Underline */
+@keyframes curtainRevealLine {
+  0% {
+    width: 0%;
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    width: 100%;
+    opacity: 1;
+  }
+}
+
+.animate-curtain-reveal {
+  animation: curtainRevealLine 0.8s ease-out 0.2s 1 forwards;
 }
 
 /* Hero Cinematic Continuous Zoom Keyframe */
@@ -59,78 +252,21 @@
   100% { transform: translateX(-33.333%); }
 }
 
-/* Liquid Fluid Wave Animation for Glass Capsule Navbar */
-@keyframes fluidLiquidWave {
-  0% {
-    background-position: 0% 50%;
-    transform: scale(1) rotate(0deg);
-  }
-  50% {
-    background-position: 100% 50%;
-    transform: scale(1.1) rotate(3deg);
-  }
-  100% {
-    background-position: 0% 50%;
-    transform: scale(1) rotate(0deg);
-  }
-}
-
-.animate-liquid-fluid {
-  background-size: 200% 200%;
-  animation: fluidLiquidWave 10s ease-in-out infinite;
-}
-
-
 .animate-marquee {
   will-change: transform;
   animation: marqueeScroll 35s linear infinite;
 }
 
-/* Premium Royal Gold Logo Shimmer Sweep */
-@keyframes logoShimmerSweep {
-  0% {
-    transform: translateX(-150%) skewX(-25deg);
-    opacity: 0;
-  }
-  15% {
-    opacity: 0.8;
-  }
-  35% {
-    transform: translateX(250%) skewX(-25deg);
-    opacity: 0;
-  }
-  100% {
-    transform: translateX(250%) skewX(-25deg);
-    opacity: 0;
-  }
-}
-
-.animate-logo-shimmer {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 60%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(255, 255, 255, 0.3) 25%,
-    rgba(201, 165, 116, 0.85) 50%,
-    rgba(255, 255, 255, 0.9) 75%,
-    transparent 100%
-  );
-  pointer-events: none;
-  mix-blend-mode: overlay;
-  animation: logoShimmerSweep 4.5s infinite cubic-bezier(0.4, 0, 0.2, 1);
-}
-
 @media (prefers-reduced-motion: reduce) {
   .animate-hero-zoom,
-  .animate-marquee {
+  .animate-marquee,
+  .animate-heart-pulse,
+  .animate-badge-pop,
+  .animate-pulse-glow {
     animation: none !important;
     transform: none !important;
   }
-  .animate-logo-shimmer {
+  .animate-foil-once {
     animation: none !important;
     display: none !important;
   }
@@ -155,15 +291,6 @@
   background: #AA8258;
 }
 
-/* Luxury Utilities */
-.hairline-gold {
-  border-bottom: 1px solid rgba(201, 162, 120, 0.3);
-}
-
-.gold-border {
-  border: 1px solid rgba(201, 162, 120, 0.35);
-}
-
 /* Scroll snap utilities */
 .no-scrollbar::-webkit-scrollbar {
   display: none;
@@ -184,23 +311,10 @@
   transform: scale(1.05);
 }
 
-/* Rose Gold Metallic Text Gradient */
-.text-gold-gradient {
-  background: linear-gradient(135deg, #C9A278 0%, #DFBE98 50%, #AA8258 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
 /* Tabular & Lining Numeral Font Feature Settings */
 .font-tnum {
   font-feature-settings: "tnum" 1, "lnum" 1;
   font-variant-numeric: tabular-nums;
-}
-
-/* Script Font Kerning & Soft Spacing */
-.font-script {
-  font-family: var(--font-alex-brush), 'Alex Brush', cursive;
-  letter-spacing: 0.02em;
 }
 
 /* Shimmer Loader */

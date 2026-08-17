@@ -2,32 +2,31 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Search, Heart, ShoppingBag, User } from 'lucide-react';
+import Image from 'next/image';
+import { Heart, ShoppingBag, User } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useShop } from '@/context/ShopContext';
 import { DesktopMegaMenu, MobileMegaMenu } from './MegaMenu';
+import FullScreenMenu from './FullScreenMenu';
 import BrandLogo from './BrandLogo';
 
-/* Smooth Animated Hamburger-to-X Icon Component */
-const AnimatedHamburgerIcon: React.FC<{ isOpen: boolean; isScrolled: boolean }> = ({
-  isOpen,
-}) => {
-  const lineBg = isOpen ? 'bg-roseGold' : 'bg-[#1C2544]';
+const AnimatedHamburgerIcon: React.FC<{ isOpen: boolean }> = ({ isOpen }) => {
+  const lineBg = isOpen ? 'bg-zariGold' : 'bg-inkNavy';
 
   return (
     <div className="w-5.5 h-5.5 flex flex-col justify-center items-center relative select-none">
       <span
-        className={`w-5 h-[2.2px] rounded-full transition-all duration-300 transform ${lineBg} ${
+        className={`w-5 h-[2px] rounded-full transition-all duration-300 transform ${lineBg} ${
           isOpen ? 'rotate-45 translate-y-[2px]' : '-translate-y-[5px]'
         }`}
       />
       <span
-        className={`w-5 h-[2.2px] rounded-full transition-all duration-300 ${lineBg} ${
+        className={`w-5 h-[2px] rounded-full transition-all duration-300 ${lineBg} ${
           isOpen ? 'opacity-0 scale-0' : 'opacity-100'
         }`}
       />
       <span
-        className={`w-5 h-[2.2px] rounded-full transition-all duration-300 transform ${lineBg} ${
+        className={`w-5 h-[2px] rounded-full transition-all duration-300 transform ${lineBg} ${
           isOpen ? '-rotate-45 -translate-y-[2px]' : 'translate-y-[5px]'
         }`}
       />
@@ -36,14 +35,15 @@ const AnimatedHamburgerIcon: React.FC<{ isOpen: boolean; isScrolled: boolean }> 
 };
 
 export default function Navbar() {
-  const { cartCount, wishlist, setIsSearchOpen, setIsCartOpen } = useShop();
+  const { cartCount, wishlist, setIsCartOpen, setIsSearchOpen } = useShop();
   const [isScrolled, setIsScrolled] = useState(false);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [heartPulsing, setHeartPulsing] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 40) {
+      if (window.scrollY > 60) {
         setIsScrolled(true);
       } else {
         setIsScrolled(false);
@@ -53,198 +53,205 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const triggerHeartPulse = () => {
+    setHeartPulsing(true);
+    setTimeout(() => setHeartPulsing(false), 250);
+  };
+
   return (
     <>
-      {/* Sticky Floating Navbar Header:
-          - Top of Page (Mobile): Soft Powder Blue #EEF1F7 background (76px)
-          - Scrolled (Mobile Round 9f): Detached Light Frosted Glass Capsule (bg-white/92 backdrop-blur-[18px] border border-white/70 shadow-[0_12px_32px_rgba(20,20,30,0.15)])
-          - Scrolled (Desktop): White/Ivory blur backdrop, shrinking to 72px with floating shadow
-      */}
       <header
-        className={`sticky top-0 z-50 transition-all duration-350 ease-out ${
+        className={`sticky top-0 z-50 transition-all duration-300 ease-out border-b border-zariGold/20 ${
           isScrolled
-            ? 'w-full lg:w-full pt-2 lg:pt-0 px-3 lg:px-0'
-            : 'w-full px-0'
+            ? 'h-[64px] sm:h-[70px] bg-ivory/95 backdrop-blur-md shadow-[0_2px_12px_rgba(0,0,0,0.06)]'
+            : 'h-[76px] sm:h-[86px] bg-ivory'
         }`}
       >
-        <div
-          className={`mx-auto w-full transition-all duration-350 ease-out flex items-center justify-between relative ${
-            isScrolled
-              ? 'h-[56px] sm:h-[64px] lg:h-[72px] rounded-full lg:rounded-none bg-white/92 backdrop-blur-[18px] lg:bg-white/95 lg:backdrop-blur-md shadow-[0_12px_32px_rgba(20,20,30,0.15)] lg:shadow-[0_10px_35px_rgba(20,20,30,0.08)] border border-white/70 lg:border-none lg:border-b lg:border-navy/10 px-4 sm:px-6 lg:px-12 max-w-[1440px]'
-              : 'h-[76px] sm:h-[84px] lg:h-[96px] bg-[#EEF1F7] border-b border-navy/10 px-4 sm:px-8 lg:px-12 max-w-[1440px]'
-          }`}
-        >
-          {/* Mobile Only: Hamburger Menu Toggle Button */}
-          <div className="flex items-center shrink-0 z-10 lg:hidden pl-0.5 sm:pl-2">
+        <div className="max-w-[1440px] mx-auto h-full px-4 sm:px-8 lg:px-12 flex items-center justify-between relative">
+          
+          {/* Mobile Left: Hamburger Icon Only */}
+          <div className="flex items-center shrink-0 lg:hidden">
             <motion.button
-              whileTap={{ scale: 0.92 }}
+              whileTap={{ scale: 0.85 }}
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="w-9 h-9 flex items-center justify-center transition-colors focus:outline-none shrink-0"
+              className="w-9 h-9 sm:w-10 sm:h-10 min-w-[24px] flex items-center justify-center focus:outline-none"
               aria-label={mobileMenuOpen ? 'Close Navigation Menu' : 'Open Navigation Menu'}
             >
-              <AnimatedHamburgerIcon isOpen={mobileMenuOpen} isScrolled={isScrolled} />
+              <AnimatedHamburgerIcon isOpen={mobileMenuOpen} />
             </motion.button>
           </div>
 
-          {/* Mobile Only: Perfectly Centered Logo Emblem */}
-          <div className="absolute left-1/2 -translate-x-1/2 flex items-center justify-center shrink-0 py-1 z-10 lg:hidden">
-            <div className={`transition-all duration-300 ${isScrolled ? 'scale-90 drop-shadow-xs' : ''}`}>
-              <BrandLogo variant="horizontal" size="sm" showText={false} />
-            </div>
+          {/* Mobile Center: Crest + Stacked Animated Wordmark Single Lockup */}
+          <div className="absolute left-1/2 -translate-x-1/2 flex items-center justify-center lg:hidden">
+            <Link href="/" className="flex items-center gap-[7px] group py-1">
+              {/* Crest / Monogram Icon */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.3, delay: 0.4, ease: [0.25, 1, 0.5, 1] }}
+                className="relative shrink-0 flex items-center justify-center"
+              >
+                <Image
+                  src="/logo.png"
+                  alt="The Girls Collections Crest"
+                  width={322}
+                  height={353}
+                  className="h-[28px] xs:h-[30px] sm:h-[32px] w-auto object-contain filter drop-shadow-xs"
+                  priority
+                />
+              </motion.div>
+
+              {/* Two-Line Wordmark */}
+              <div className="flex flex-col items-center text-center relative">
+                <div className="relative overflow-hidden inline-block px-0.5">
+                  {/* Single-Shot Foil Shimmer Sweep */}
+                  <span className="animate-foil-once" />
+
+                  <span className="font-serif text-[12.5px] xs:text-[13px] font-semibold tracking-[0.16em] uppercase leading-tight bg-gradient-to-r from-[#D8BC82] via-[#C9A24B] to-[#8B6A2E] bg-clip-text text-transparent block">
+                    THE GIRLS
+                  </span>
+                  <span className="font-serif text-[11.5px] xs:text-[12px] font-semibold tracking-[0.2em] uppercase leading-tight bg-gradient-to-r from-[#C9A24B] via-[#D8BC82] to-[#8B6A2E] bg-clip-text text-transparent block">
+                    COLLECTIONS
+                  </span>
+                </div>
+                
+                {/* Curtain Reveal Underline */}
+                <div className="w-full h-[1px] bg-zariGold mt-0.5 animate-curtain-reveal" />
+              </div>
+            </Link>
           </div>
 
-          {/* Desktop Only: Brand Logo + 'The Girls Collections' Brand Name Pushed to Far Left */}
-          <div className="hidden lg:flex items-center shrink-0 z-10 py-1">
-            <div className={`transition-all duration-300 ${isScrolled ? 'scale-95 drop-shadow-xs' : ''}`}>
+          {/* Desktop Left: Brand Logo */}
+          <div className="hidden lg:flex items-center shrink-0 py-1">
+            <Link href="/" className="flex items-center">
               <BrandLogo variant="horizontal" size="md" showText={true} />
-            </div>
+            </Link>
           </div>
 
-          {/* Zone 3 (Right): Desktop Navigation Links + Uniformly Spaced Action Icons */}
-          <div className="flex items-center justify-end space-x-5 lg:space-x-10 shrink-0 z-10 pr-0.5 sm:pr-2">
-            {/* Desktop Navigation Links */}
-            <nav className="hidden lg:flex items-center space-x-7 xl:space-x-9 text-navy font-sans">
-              <div
-                onMouseEnter={() => setActiveCategory('women')}
-                className="relative py-2 group cursor-pointer"
+          {/* Desktop Center: Navigation Links */}
+          <nav className="hidden lg:flex items-center space-x-8 xl:space-x-10 font-sans">
+            <div
+              onMouseEnter={() => setActiveCategory('women')}
+              className="relative py-2 group cursor-pointer"
+            >
+              <Link
+                href="/shop?target=women"
+                className={`text-[12.5px] font-semibold uppercase tracking-[0.15em] transition-colors relative py-1 ${
+                  activeCategory === 'women' ? 'text-zariGold' : 'text-inkNavy hover:text-zariGold'
+                }`}
               >
-                <Link
-                  href="/shop?target=women"
-                  className={`text-[13px] font-medium uppercase tracking-[0.08em] transition-colors relative py-1 ${
-                    activeCategory === 'women' ? 'text-roseGold' : 'text-navy/90 hover:text-roseGold'
+                Women
+                <span
+                  className={`absolute bottom-0 left-0 w-full h-[1.5px] bg-zariGold origin-left transition-transform duration-300 ease-out ${
+                    activeCategory === 'women' ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
                   }`}
-                >
-                  Women
-                  <span
-                    className={`absolute bottom-0 left-0 w-full h-[1.5px] bg-roseGold origin-left transition-transform duration-300 ease-out ${
-                      activeCategory === 'women' ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
-                    }`}
-                  />
-                </Link>
-              </div>
+                />
+              </Link>
+            </div>
 
-              <div
-                onMouseEnter={() => setActiveCategory('kids')}
-                className="relative py-2 group cursor-pointer"
+            <div
+              onMouseEnter={() => setActiveCategory('kids')}
+              className="relative py-2 group cursor-pointer"
+            >
+              <Link
+                href="/shop?target=kids"
+                className={`text-[12.5px] font-semibold uppercase tracking-[0.15em] transition-colors relative py-1 ${
+                  activeCategory === 'kids' ? 'text-zariGold' : 'text-inkNavy hover:text-zariGold'
+                }`}
               >
-                <Link
-                  href="/shop?target=kids"
-                  className={`text-[13px] font-medium uppercase tracking-[0.08em] transition-colors relative py-1 ${
-                    activeCategory === 'kids' ? 'text-roseGold' : 'text-navy/90 hover:text-roseGold'
+                Kids Ethnic
+                <span
+                  className={`absolute bottom-0 left-0 w-full h-[1.5px] bg-zariGold origin-left transition-transform duration-300 ease-out ${
+                    activeCategory === 'kids' ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
                   }`}
-                >
-                  Kids Ethnic
-                  <span
-                    className={`absolute bottom-0 left-0 w-full h-[1.5px] bg-roseGold origin-left transition-transform duration-300 ease-out ${
-                      activeCategory === 'kids' ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
-                    }`}
-                  />
-                </Link>
-              </div>
+                />
+              </Link>
+            </div>
 
-              <div onMouseEnter={() => setActiveCategory(null)} className="relative py-2 group">
-                <Link
-                  href="/shop?isNew=true"
-                  className="text-[13px] font-medium uppercase tracking-[0.08em] text-navy/90 hover:text-roseGold transition-colors relative py-1"
-                >
-                  New Arrivals
-                  <span className="absolute bottom-0 left-0 w-full h-[1.5px] bg-roseGold origin-left scale-x-0 transition-transform duration-300 ease-out group-hover:scale-x-100" />
-                </Link>
-              </div>
-
-              <div onMouseEnter={() => setActiveCategory(null)} className="relative py-2 group">
-                <Link
-                  href="/shop?occasion=Festive"
-                  className="text-[13px] font-medium uppercase tracking-[0.08em] text-navy/90 hover:text-roseGold transition-colors relative py-1"
-                >
-                  Festive Edit
-                  <span className="absolute bottom-0 left-0 w-full h-[1.5px] bg-roseGold origin-left scale-x-0 transition-transform duration-300 ease-out group-hover:scale-x-100" />
-                </Link>
-              </div>
-
-              <div onMouseEnter={() => setActiveCategory(null)} className="relative py-2 group">
-                <Link
-                  href="/shop?isSale=true"
-                  className="text-[13px] font-semibold uppercase tracking-[0.08em] text-roseGold hover:text-navy transition-colors relative py-1"
-                >
-                  Sale
-                  <span className="absolute bottom-0 left-0 w-full h-[1.5px] bg-roseGold origin-left scale-x-0 transition-transform duration-300 ease-out group-hover:scale-x-100" />
-                </Link>
-              </div>
-
-              <div onMouseEnter={() => setActiveCategory(null)} className="relative py-2 group">
-                <Link
-                  href="/#discover-brand-world"
-                  className="text-[13px] font-medium uppercase tracking-[0.08em] text-navy/90 hover:text-roseGold transition-colors relative py-1"
-                >
-                  Discover
-                  <span className="absolute bottom-0 left-0 w-full h-[1.5px] bg-roseGold origin-left scale-x-0 transition-transform duration-300 ease-out group-hover:scale-x-100" />
-                </Link>
-              </div>
-            </nav>
-
-            {/* Action Icons: Wishlist & Shopping Bag */}
-            <div className="flex items-center gap-3.5 sm:gap-4 lg:gap-7 shrink-0 text-navy">
-
-              <motion.div whileTap={{ scale: 0.92 }}>
-                <Link
-                  href="/account"
-                  className="w-8 h-8 sm:w-9 sm:h-9 hidden sm:flex items-center justify-center hover:text-roseGold transition-colors relative group focus:outline-none"
-                  title="Account"
-                >
-                  <User className="w-4.5 h-4.5 sm:w-5 sm:h-5 stroke-[2.2]" />
-                </Link>
-              </motion.div>
-
-              <motion.div whileTap={{ scale: 0.92 }}>
-                <Link
-                  href="/wishlist"
-                  className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center hover:text-roseGold transition-colors relative group focus:outline-none"
-                  title="Wishlist"
-                >
-                  <Heart
-                    className={`w-4.5 h-4.5 sm:w-5 sm:h-5 stroke-[2.2] transition-colors ${
-                      wishlist.length > 0
-                        ? 'text-roseGold fill-roseGold/20'
-                        : ''
-                    }`}
-                  />
-                  {wishlist.length > 0 && (
-                    <span className="absolute top-0 right-0 w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full bg-roseGold text-navy text-[8.5px] sm:text-[9px] font-bold flex items-center justify-center shadow-xs">
-                      {wishlist.length}
-                    </span>
-                  )}
-                </Link>
-              </motion.div>
-
-              <motion.button
-                whileTap={{ scale: 0.92 }}
-                onClick={() => setIsCartOpen(true)}
-                className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center hover:text-roseGold transition-colors relative group focus:outline-none"
-                title="Shopping Bag"
-                aria-label="Cart"
+            <div onMouseEnter={() => setActiveCategory(null)} className="relative py-2 group">
+              <Link
+                href="/shop?isNew=true"
+                className="text-[12.5px] font-semibold uppercase tracking-[0.15em] text-inkNavy hover:text-zariGold transition-colors relative py-1"
               >
-                <ShoppingBag className="w-4.5 h-4.5 sm:w-5 sm:h-5 stroke-[2.2]" />
-                {cartCount > 0 && (
-                  <span className="absolute top-0 right-0 w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full bg-roseGold text-navy text-[8.5px] sm:text-[9px] font-bold flex items-center justify-center shadow-xs">
-                    {cartCount}
+                New Arrivals
+                <span className="absolute bottom-0 left-0 w-full h-[1.5px] bg-zariGold origin-left scale-x-0 transition-transform duration-300 ease-out group-hover:scale-x-100" />
+              </Link>
+            </div>
+
+            <div onMouseEnter={() => setActiveCategory(null)} className="relative py-2 group">
+              <Link
+                href="/shop?occasion=Festive"
+                className="text-[12.5px] font-semibold uppercase tracking-[0.15em] text-inkNavy hover:text-zariGold transition-colors relative py-1"
+              >
+                Festive Edit
+                <span className="absolute bottom-0 left-0 w-full h-[1.5px] bg-zariGold origin-left scale-x-0 transition-transform duration-300 ease-out group-hover:scale-x-100" />
+              </Link>
+            </div>
+
+            <div onMouseEnter={() => setActiveCategory(null)} className="relative py-2 group">
+              <Link
+                href="/shop?isSale=true"
+                className="text-[12.5px] font-semibold uppercase tracking-[0.15em] text-oxblood hover:text-inkNavy transition-colors relative py-1"
+              >
+                Sale
+                <span className="absolute bottom-0 left-0 w-full h-[1.5px] bg-oxblood origin-left scale-x-0 transition-transform duration-300 ease-out group-hover:scale-x-100" />
+              </Link>
+            </div>
+          </nav>
+
+          {/* Right Action Icons (Tightly spaced icons) */}
+          <div className="flex items-center gap-2.5 sm:gap-5 text-inkNavy">
+            <motion.div whileTap={{ scale: 0.85 }}>
+              <Link
+                href="/account"
+                className="w-7.5 h-7.5 sm:w-8 sm:h-8 min-w-[24px] hidden sm:flex items-center justify-center hover:text-zariGold transition-colors"
+                title="Account"
+              >
+                <User className="w-5 h-5 stroke-[1.8]" />
+              </Link>
+            </motion.div>
+
+            <motion.div whileTap={{ scale: 0.85 }} onClick={triggerHeartPulse}>
+              <Link
+                href="/wishlist"
+                className="w-7.5 h-7.5 sm:w-8 sm:h-8 min-w-[24px] flex items-center justify-center hover:text-zariGold transition-colors relative"
+                title="Wishlist"
+              >
+                <Heart
+                  className={`w-[18px] h-[18px] sm:w-5 sm:h-5 stroke-[1.8] transition-all duration-200 ${
+                    heartPulsing ? 'animate-heart-pulse' : ''
+                  } ${
+                    wishlist.length > 0 ? 'text-oxblood fill-oxblood' : 'text-inkNavy'
+                  }`}
+                />
+                {wishlist.length > 0 && (
+                  <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-gold-gradient text-white text-[9px] font-bold flex items-center justify-center animate-badge-pop">
+                    {wishlist.length}
                   </span>
                 )}
-              </motion.button>
-            </div>
+              </Link>
+            </motion.div>
+
+            <motion.button
+              whileTap={{ scale: 0.85 }}
+              onClick={() => setIsCartOpen(true)}
+              className="w-7.5 h-7.5 sm:w-8 sm:h-8 min-w-[24px] flex items-center justify-center hover:text-zariGold transition-colors relative"
+              title="Shopping Bag"
+              aria-label="Cart"
+            >
+              <ShoppingBag className="w-[18px] h-[18px] sm:w-5 sm:h-5 stroke-[1.8]" />
+              {cartCount > 0 && (
+                <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-gold-gradient text-white text-[9px] font-bold flex items-center justify-center animate-badge-pop">
+                  {cartCount}
+                </span>
+              )}
+            </motion.button>
           </div>
-
         </div>
-
-        {/* Desktop Mega Menu Dropdown */}
-        <DesktopMegaMenu
-          activeCategory={activeCategory}
-          onClose={() => setActiveCategory(null)}
-        />
       </header>
 
-      {/* Mobile Menu Drawer */}
-      <MobileMegaMenu
+      {/* Full-Screen Navigation Takeover Menu */}
+      <FullScreenMenu
         isOpen={mobileMenuOpen}
         onClose={() => setMobileMenuOpen(false)}
       />

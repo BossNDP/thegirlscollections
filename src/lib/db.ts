@@ -1873,8 +1873,8 @@ export const dbService = {
       const rows = await db.select().from(schema.settings);
       
       const settingsObj: StoreSettings = {
-        store_name: 'DRFTN CLOTHING',
-        contact_number: '+91 7406164512',
+        store_name: 'The Girls Collections',
+        contact_number: '+91 7483848505',
         instagram_handle: '@drftnclothing',
         free_shipping_threshold: 99900,
         default_shipping_charge: 9900,

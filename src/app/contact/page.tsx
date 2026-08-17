@@ -31,9 +31,9 @@ export default function ContactPage() {
         console.warn('Database contact record warning:', err);
       });
 
-      // 2. Prepare pre-filled WhatsApp message to +91 7406164512
-      const messageText = `Hello DRFTN CLOTHING!%0A%0A*Name:* ${encodeURIComponent(formData.name.trim())}%0A*Email:* ${encodeURIComponent(formData.email.trim())}%0A*Message:* ${encodeURIComponent(formData.message.trim())}`;
-      const whatsappUrl = `https://wa.me/917406164512?text=${messageText}`;
+      // 2. Prepare pre-filled WhatsApp message to +91 7483848505
+      const messageText = `Hello The Girls Collections!%0A%0A*Name:* ${encodeURIComponent(formData.name.trim())}%0A*Email:* ${encodeURIComponent(formData.email.trim())}%0A*Message:* ${encodeURIComponent(formData.message.trim())}`;
+      const whatsappUrl = `https://wa.me/917483848505?text=${messageText}`;
 
       addToast('Opening WhatsApp to send your message...', 'success');
 
@@ -80,7 +80,7 @@ export default function ContactPage() {
               </div>
               <div>
                 <h3 className="text-sm font-bold uppercase tracking-wider text-brand-offwhite mb-1">Phone</h3>
-                <a href="tel:+917406164512" className="text-zinc-500 text-sm hover:text-brand-offwhite transition-colors">+91 7406164512</a>
+                <a href="tel:+917483848505" className="text-zinc-500 text-sm hover:text-brand-offwhite transition-colors">+91 7483848505</a>
               </div>
             </div>
 

@@ -10,9 +10,18 @@ import { AuthSessionProvider } from '@/context/AuthContext';
 import { ShopProvider } from '@/context/ShopContext';
 import { SearchOverlay } from '@/components/SearchOverlay';
 import { CartDrawer } from '@/components/CartDrawer';
+import QuickViewModal from '@/components/QuickViewModal';
 import ToastContainer from '@/components/ToastContainer';
 import WhatsAppButton from '@/components/WhatsAppButton';
-import { Fraunces, Plus_Jakarta_Sans, Alex_Brush } from 'next/font/google';
+import FloatingLuxuryDock from '@/components/FloatingLuxuryDock';
+import { Cormorant_Garamond, Plus_Jakarta_Sans, Alex_Brush, Fraunces } from 'next/font/google';
+
+const cormorant = Cormorant_Garamond({
+  subsets: ['latin'],
+  variable: '--font-cormorant',
+  weight: ['400', '500', '600', '700'],
+  display: 'swap',
+});
 
 const fraunces = Fraunces({
   subsets: ['latin'],
@@ -77,7 +86,7 @@ export default function RootLayout({
       <html
         lang="en"
         suppressHydrationWarning
-        className={`${fraunces.variable} ${jakarta.variable} ${alexBrush.variable}`}
+        className={`${cormorant.variable} ${fraunces.variable} ${jakarta.variable} ${alexBrush.variable}`}
       >
         <head>
           <script
@@ -112,7 +121,7 @@ export default function RootLayout({
                 <Navbar />
 
                 {/* Main Page Body */}
-                <main className="flex-1 flex flex-col relative w-full p-0 m-0">
+                <main className="flex-1 flex flex-col relative w-full p-0 m-0 pb-24 md:pb-0">
                   <PageTransition>{children}</PageTransition>
                 </main>
 
@@ -121,9 +130,11 @@ export default function RootLayout({
 
                 {/* Interactive Drawers, Toast & Overlays */}
                 <CartDrawer />
+                <QuickViewModal />
                 <SearchOverlay />
                 <ToastContainer />
                 <WhatsAppButton />
+                <FloatingLuxuryDock />
 
                 {/* Clerk Smart CAPTCHA anchor */}
                 <div id="clerk-captcha" />

@@ -1,80 +1,109 @@
 'use client';
 
-import React, { useRef } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import Link from 'next/link';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react';
 import { MOCK_PRODUCTS } from '@/data/shopData';
 import { ProductCard } from '../ProductCard';
 
-import { useGSAPScrollReveal } from '@/lib/useGSAPScrollReveal';
-
 export const NewArrivalsCarousel: React.FC = () => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const sectionRef = useGSAPScrollReveal<HTMLElement>({ selector: '.product-grid-item', stagger: 0.05 });
-
+  const [activeIndex, setActiveIndex] = useState(0);
   const newProducts = MOCK_PRODUCTS.filter((p) => p.isNew || p.isBestSeller).slice(0, 8);
+
+  useEffect(() => {
+    const el = scrollContainerRef.current;
+    if (!el) return;
+    const onScroll = () => {
+      const scrollPosition = el.scrollLeft;
+      const cardWidth = el.firstElementChild?.getBoundingClientRect().width || 260;
+      const newIndex = Math.round(scrollPosition / cardWidth);
+      if (newIndex >= 0 && newIndex < newProducts.length) {
+        setActiveIndex(newIndex);
+      }
+    };
+    el.addEventListener('scroll', onScroll, { passive: true });
+    return () => el.removeEventListener('scroll', onScroll);
+  }, [newProducts.length]);
 
   const scroll = (direction: 'left' | 'right') => {
     if (scrollContainerRef.current) {
-      const scrollAmount = direction === 'left' ? -340 : 340;
+      const scrollAmount = direction === 'left' ? -320 : 320;
       scrollContainerRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
     }
   };
 
   return (
     <section
-      ref={sectionRef}
       id="new-arrivals"
-      className="py-16 sm:py-24 bg-white text-navy overflow-hidden scroll-mt-24 sm:scroll-mt-28 border-b border-navy/10 relative"
+      className="py-8 sm:py-12 md:py-16 bg-ivory text-inkNavy border-b border-zariGold/15 relative overflow-hidden select-none"
     >
       <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-12">
-        {/* Left-Aligned Section Heading */}
-        <div className="flex items-center justify-between mb-8 sm:mb-12 border-b border-navy/10 pb-4">
-          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-serif font-bold text-navy tracking-tight">
-            Trending This Week
-          </h2>
+        {/* Left-Aligned Bold Editorial Header */}
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 md:mb-10 pb-4 border-b border-zariGold/20 gap-4">
+          <div>
+            <span className="eyebrow-text text-zariGold font-semibold text-xs sm:text-sm tracking-[0.25em] block mb-1">
+              WEEKLY HIGHLIGHTS
+            </span>
+            <h2 className="text-3xl sm:text-5xl lg:text-6xl font-serif font-bold text-inkNavy tracking-tight leading-none">
+              Trending This Week
+            </h2>
+          </div>
+          <p className="text-xs sm:text-sm text-inkNavy/80 font-sans font-semibold max-w-md">
+            Hand-curated festive drapes and silk ensembles selected by our lead couturier.
+          </p>
         </div>
 
-        {/* 4-Column Product Grid (Desktop) / Carousel with Vertical-Centered White Circular Arrows */}
-        <div className="relative group/grid">
-          {/* Left Circular White Navigation Arrow */}
+        {/* Carousel Container with Arrow Controls */}
+        <div className="relative group/trendingScroll">
+          {/* Desktop Slider Arrows */}
           <button
             onClick={() => scroll('left')}
-            className="absolute -left-3 sm:-left-5 top-1/2 -translate-y-1/2 z-30 w-10 h-10 rounded-full bg-white text-navy shadow-md border border-navy/15 flex items-center justify-center hover:bg-navy hover:text-white transition-all duration-300"
-            aria-label="Scroll left"
+            className="hidden md:flex absolute -left-3 lg:-left-5 top-[40%] -translate-y-1/2 z-30 w-12 h-12 rounded-full bg-inkNavy text-ivory border border-zariGold/40 shadow-2xl items-center justify-center hover:bg-zariGold hover:text-inkNavy transition-all duration-300"
+            aria-label="Scroll trending left"
           >
-            <ChevronLeft className="w-5 h-5 stroke-[2]" />
+            <ChevronLeft className="w-6 h-6" />
           </button>
 
-          {/* Right Circular White Navigation Arrow */}
           <button
             onClick={() => scroll('right')}
-            className="absolute -right-3 sm:-right-5 top-1/2 -translate-y-1/2 z-30 w-10 h-10 rounded-full bg-white text-navy shadow-md border border-navy/15 flex items-center justify-center hover:bg-navy hover:text-white transition-all duration-300"
-            aria-label="Scroll right"
+            className="hidden md:flex absolute -right-3 lg:-right-5 top-[40%] -translate-y-1/2 z-30 w-12 h-12 rounded-full bg-inkNavy text-ivory border border-zariGold/40 shadow-2xl items-center justify-center hover:bg-zariGold hover:text-inkNavy transition-all duration-300"
+            aria-label="Scroll trending right"
           >
-            <ChevronRight className="w-5 h-5 stroke-[2]" />
+            <ChevronRight className="w-6 h-6" />
           </button>
 
-          {/* Product Grid / Row */}
+          {/* Product Slider with Scroll-Snap-Center and Active Card Parallax Focus */}
           <div
             ref={scrollContainerRef}
-            className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 md:gap-8 overflow-x-auto no-scrollbar md:overflow-visible pb-4"
+            className="flex gap-3 sm:gap-4 md:gap-5 overflow-x-auto no-scrollbar snap-x snap-mandatory scroll-smooth pb-4 px-1 -mx-1"
           >
-            {newProducts.map((product, idx) => (
-              <div key={product.id} className="product-grid-item w-full shrink-0">
-                <ProductCard product={product} priorityImage={idx < 2} />
-              </div>
-            ))}
+            {newProducts.map((product, idx) => {
+              const isCentered = idx === activeIndex;
+              return (
+                <div
+                  key={product.id}
+                  className={`snap-center shrink-0 w-[78vw] sm:w-[260px] md:w-[calc((100%-36px)/3.2)] lg:w-[calc((100%-48px)/3.25)] min-w-[220px] transition-all duration-300 ease-out ${
+                    isCentered
+                      ? 'scale-100 opacity-100'
+                      : 'scale-[0.96] opacity-85 sm:scale-100 sm:opacity-100'
+                  }`}
+                >
+                  <ProductCard product={product} priorityImage={idx < 2} variant="grid" />
+                </div>
+              );
+            })}
           </div>
         </div>
 
-        {/* Centered Solid Navy Pill "VIEW ALL" CTA */}
-        <div className="mt-10 sm:mt-14 flex justify-center">
+        {/* View Complete Collection CTA Button */}
+        <div className="mt-8 sm:mt-12 flex justify-center">
           <Link
             href="/shop?sort=newest"
-            className="px-9 py-3.5 rounded-full bg-navy text-white text-xs font-semibold uppercase tracking-[0.16em] hover:bg-roseGold hover:text-navy transition-all duration-300 shadow-sm inline-flex items-center justify-center"
+            className="px-10 py-4 bg-inkNavy hover:bg-zariGold text-ivory font-sans font-bold text-xs uppercase tracking-[0.2em] shadow-md transition-all duration-300 active:scale-95 inline-flex items-center space-x-3 group rounded-[2px]"
           >
-            VIEW ALL
+            <span>View Complete Collection</span>
+            <ArrowRight className="w-4 h-4 text-ivory group-hover:translate-x-2 transition-transform duration-300" />
           </Link>
         </div>
       </div>

@@ -43,7 +43,7 @@ const nextConfig = {
               "default-src 'self'",
               // Scripts — Clerk JS, Razorpay, CDN, Cloudflare Turnstile (CAPTCHA)
               "script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: https://checkout.razorpay.com https://cdn.razorpay.com https://cdn.jsdelivr.net https://*.clerk.accounts.dev https://*.clerk.com https://clerk.drftn.in https://clerk.drftnclothing.in https://challenges.cloudflare.com",
-              "script-src-elem 'self' 'unsafe-inline' blob: https://checkout.razorpay.com https://cdn.razorpay.com https://cdn.jsdelivr.net https://*.clerk.accounts.dev https://*.clerk.com https://clerk.drftn.in https://clerk.drftnclothing.in https://challenges.cloudflare.com",
+              "script-src-elem 'self' 'unsafe-inline' 'unsafe-eval' blob: https://checkout.razorpay.com https://cdn.razorpay.com https://cdn.jsdelivr.net https://*.clerk.accounts.dev https://*.clerk.com https://clerk.drftn.in https://clerk.drftnclothing.in https://challenges.cloudflare.com",
               // Styles
               "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://clerk.drftnclothing.in https://*.clerk.com",
               // Images
