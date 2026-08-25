@@ -31,28 +31,28 @@ export default function DRFTNButton({
 }: DRFTNButtonProps) {
   const baseClasses = `
     relative group inline-flex items-center justify-center gap-2.5 sm:gap-3
-    min-h-[52px] sm:min-h-[56px] px-6 sm:px-8 py-3.5 sm:py-4 rounded-[2px]
-    font-mono font-bold text-[12px] sm:text-[13px] md:text-[14px] tracking-[0.16em] sm:tracking-[0.18em] uppercase
-    select-none overflow-hidden transition-all duration-300 ease-out
-    active:scale-[0.97] disabled:opacity-50 disabled:pointer-events-none
+    min-h-[48px] sm:min-h-[52px] px-6 sm:px-8 py-3 sm:py-3.5 rounded-[2px]
+    font-sans font-bold text-[11.5px] sm:text-[12.5px] tracking-[0.18em] uppercase
+    select-none overflow-hidden transition-all duration-200 ease-out
+    active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none
     ${fullWidth ? 'w-full' : 'w-full sm:w-auto'}
     ${className}
   `;
 
   const variantClasses = {
     primary: `
-      bg-[#F5F5F0] text-black border border-[#F5F5F0]
-      shadow-[0_4px_24px_rgba(255,255,255,0.2)]
-      hover:bg-[#EAEAE5] hover:border-[#EAEAE5]
+      bg-gold-gradient text-inkNavy border border-zariGold/40
+      shadow-[0_4px_16px_rgba(180,134,60,0.25)]
+      hover:shadow-[0_6px_22px_rgba(180,134,60,0.35)]
     `,
     secondary: `
-      bg-transparent text-[#F5F5F0] border-[1.5px] border-[#F5F5F0]/50
-      hover:border-[#F5F5F0] hover:bg-[#F5F5F0]/10
-      shadow-[inset_0_0_0_0px_rgba(255,255,255,0)] hover:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.6)]
+      bg-inkNavy text-ivory border border-zariGold/30
+      hover:bg-inkNavy/90 hover:border-zariGold
+      shadow-md
     `,
     outline: `
-      bg-transparent text-white/80 border border-zinc-800
-      hover:border-zinc-500 hover:text-white hover:bg-zinc-900/60
+      bg-transparent text-inkNavy border border-inkNavy/60
+      hover:border-inkNavy hover:bg-inkNavy hover:text-ivory
     `,
   };
 
@@ -60,13 +60,11 @@ export default function DRFTNButton({
 
   const content = (
     <>
-      {/* Primary Fill Wipe Layer (scaleX 0 -> 1 left-to-right sweep on hover) */}
-      {variant === 'primary' && (
-        <span
-          className="absolute inset-0 bg-black/10 origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out pointer-events-none"
-          aria-hidden="true"
-        />
-      )}
+      {/* Gold Foil Shimmer Sweep on Hover */}
+      <span
+        className="absolute inset-0 bg-white/20 origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out pointer-events-none"
+        aria-hidden="true"
+      />
 
       {/* Button label */}
       <span className="relative z-10 font-bold whitespace-nowrap">{children}</span>

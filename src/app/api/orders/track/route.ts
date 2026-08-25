@@ -54,8 +54,8 @@ export async function GET(request: Request) {
 
     if (!phoneMatches) {
       return NextResponse.json(
-        { error: 'Authentication failed: Phone number mismatch for this order number.' },
-        { status: 403 }
+        { error: 'No matching order found with the provided details.' },
+        { status: 404 }
       );
     }
 

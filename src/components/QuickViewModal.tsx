@@ -41,17 +41,19 @@ export const QuickViewModal: React.FC = () => {
           <X className="w-4 h-4" />
         </button>
 
-        {/* Product Image Stage */}
-        <div className="relative w-full md:w-1/2 h-[260px] md:h-auto bg-sand/30 shrink-0">
-          {product.images[0] && (
-            <Image
-              src={product.images[0]}
-              alt={product.name}
-              fill
-              className="object-cover"
-              sizes="(max-width: 768px) 100vw, 50vw"
-            />
-          )}
+        {/* Product Image Stage with Arch Frame Accent */}
+        <div className="relative w-full md:w-1/2 h-[260px] md:h-auto bg-sand/30 shrink-0 p-3 flex items-center justify-center">
+          <div className="relative w-full h-full arch-frame-sm overflow-hidden shadow-inner">
+            {product.images[0] && (
+              <Image
+                src={product.images[0]}
+                alt={product.name}
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, 50vw"
+              />
+            )}
+          </div>
         </div>
 
         {/* Product Details Section */}
@@ -90,7 +92,7 @@ export const QuickViewModal: React.FC = () => {
                     <button
                       key={s.size}
                       onClick={() => setSelectedSize(s.size)}
-                      className={`px-3 py-1.5 text-xs font-sans font-bold border rounded-md uppercase tracking-wider transition-all ${
+                      className={`px-3 py-1.5 text-xs font-sans font-bold border rounded-md uppercase tracking-wider transition-all cursor-pointer ${
                         activeSize === s.size
                           ? 'bg-zariGold text-white border-zariGold shadow-xs'
                           : 'bg-ivory text-inkNavy/80 border-zariGold/30 hover:border-zariGold'
@@ -108,9 +110,9 @@ export const QuickViewModal: React.FC = () => {
           <div className="pt-4 border-t border-zariGold/20 flex flex-col gap-3">
             <button
               onClick={handleAddToCart}
-              className="w-full flex items-center justify-center gap-2 py-3 bg-inkNavy text-white hover:bg-zariGold transition-colors rounded-md text-xs font-sans font-bold uppercase tracking-widest shadow-md"
+              className="w-full flex items-center justify-center gap-2 py-3.5 bg-gold-gradient text-inkNavy hover:shadow-lg transition-all rounded-md text-xs font-sans font-bold uppercase tracking-widest shadow-md cursor-pointer active:scale-98"
             >
-              <ShoppingBag className="w-4 h-4" />
+              <ShoppingBag className="w-4 h-4 stroke-[1.5]" />
               <span>ADD TO BAG</span>
             </button>
 

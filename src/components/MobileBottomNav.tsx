@@ -52,23 +52,30 @@ export default function MobileBottomNav() {
   return (
     <>
       <nav
-        className={`fixed bottom-4 inset-x-0 z-[95] md:hidden max-w-[375px] mx-auto transition-all duration-300 ease-out select-none px-3 ${
-          isScrolledDown ? 'h-[52px]' : 'h-[62px]'
+        className={`fixed bottom-4 inset-x-0 z-[95] md:hidden max-w-[365px] mx-auto transition-all duration-200 ease-out select-none px-3 ${
+          isScrolledDown ? 'h-[52px]' : 'h-[60px]'
         }`}
         aria-label="Mobile Navigation Bar"
       >
-        <div className="relative w-full h-full rounded-[28px] bg-ivory/95 backdrop-blur-[20px] border border-zariGold/40 shadow-[0_8px_32px_rgba(13,14,26,0.14)] p-1 flex items-center justify-between overflow-hidden">
+        <div className="relative w-full h-full rounded-[26px] bg-ivory/95 backdrop-blur-[20px] border border-zariGold/30 shadow-[0_8px_30px_rgba(28,31,59,0.12)] p-1 flex items-center justify-between overflow-hidden">
           
           {/* 1. HOME */}
           <Link
             href="/"
-            className={`flex-1 h-full flex flex-col items-center justify-center rounded-full transition-all ${
-              pathname === '/' ? 'bg-gold-gradient text-white shadow-xs' : 'text-inkNavy/70 hover:text-inkNavy'
+            className={`flex-1 h-full flex flex-col items-center justify-center rounded-2xl transition-all duration-150 relative ${
+              pathname === '/' ? 'text-zariGold font-bold' : 'text-inkNavy/70 hover:text-inkNavy'
             }`}
           >
-            <Home className="w-4 h-4" />
+            {pathname === '/' && (
+              <motion.span
+                layoutId="activeTabRing"
+                className="absolute inset-x-2 inset-y-1 rounded-xl bg-zariGold/10 border border-zariGold/30 z-0"
+                transition={{ duration: 0.15 }}
+              />
+            )}
+            <Home className={`w-4 h-4 stroke-[1.5] relative z-10 transition-transform duration-150 ${pathname === '/' ? 'scale-110' : ''}`} />
             {!isScrolledDown && (
-              <span className="text-[8.5px] font-sans font-bold uppercase tracking-wider mt-0.5">
+              <span className="text-[8.5px] font-sans font-bold uppercase tracking-wider mt-0.5 relative z-10">
                 HOME
               </span>
             )}
@@ -77,69 +84,76 @@ export default function MobileBottomNav() {
           {/* 2. SHOP */}
           <Link
             href="/shop"
-            className={`flex-1 h-full flex flex-col items-center justify-center rounded-full transition-all ${
+            className={`flex-1 h-full flex flex-col items-center justify-center rounded-2xl transition-all duration-150 relative ${
               pathname === '/shop' || pathname?.startsWith('/shop/')
-                ? 'bg-gold-gradient text-white shadow-xs'
+                ? 'text-zariGold font-bold'
                 : 'text-inkNavy/70 hover:text-inkNavy'
             }`}
           >
-            <LayoutGrid className="w-4 h-4" />
+            {(pathname === '/shop' || pathname?.startsWith('/shop/')) && (
+              <motion.span
+                layoutId="activeTabRing"
+                className="absolute inset-x-2 inset-y-1 rounded-xl bg-zariGold/10 border border-zariGold/30 z-0"
+                transition={{ duration: 0.15 }}
+              />
+            )}
+            <LayoutGrid className={`w-4 h-4 stroke-[1.5] relative z-10 transition-transform duration-150 ${pathname === '/shop' || pathname?.startsWith('/shop/') ? 'scale-110' : ''}`} />
             {!isScrolledDown && (
-              <span className="text-[8.5px] font-sans font-bold uppercase tracking-wider mt-0.5">
+              <span className="text-[8.5px] font-sans font-bold uppercase tracking-wider mt-0.5 relative z-10">
                 SHOP
               </span>
             )}
           </Link>
 
-          {/* 3. STYLE — Refined Integrated Centerpiece Action */}
-          <motion.button
-            whileTap={{ scale: 0.95 }}
+          {/* 3. DISCOVER — Integrated Interactive Personal Stylist Action */}
+          <button
             onClick={() => setIsStyleQuizOpen(true)}
-            className={`flex-1 h-full flex flex-col items-center justify-center rounded-full transition-all relative ${
-              isStyleQuizOpen
-                ? 'bg-inkNavy text-zariGoldLight shadow-xs'
-                : 'text-zariGold hover:text-inkNavy'
+            className={`flex-1 h-full flex flex-col items-center justify-center rounded-2xl transition-all duration-150 relative cursor-pointer ${
+              isStyleQuizOpen ? 'text-zariGold font-bold' : 'text-zariGold/80 hover:text-zariGold'
             }`}
-            aria-label="Open Personal Stylist Quiz"
+            aria-label="Open Personal Stylist Discover Quiz"
           >
-            <motion.div
-              animate={{
-                rotate: isStyleQuizOpen ? 12 : 0,
-                scale: isStyleQuizOpen ? 1.08 : 1,
-              }}
-              transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-              className="flex items-center justify-center"
-            >
-              <SparkleStarIcon className={`w-4 h-4 transition-colors ${isStyleQuizOpen ? 'text-zariGoldLight' : 'text-zariGold'}`} />
-            </motion.div>
+            {isStyleQuizOpen && (
+              <motion.span
+                layoutId="activeTabRing"
+                className="absolute inset-x-2 inset-y-1 rounded-xl bg-zariGold/15 border border-zariGold/40 z-0"
+                transition={{ duration: 0.15 }}
+              />
+            )}
+            <SparkleStarIcon className={`w-4 h-4 relative z-10 transition-transform duration-150 ${isStyleQuizOpen ? 'scale-110 text-zariGold' : 'text-zariGold/80'}`} />
             {!isScrolledDown && (
-              <span className={`text-[8.5px] font-sans font-bold uppercase tracking-[0.18em] mt-0.5 transition-colors ${
-                isStyleQuizOpen ? 'text-zariGoldLight font-extrabold' : 'text-zariGold'
-              }`}>
-                STYLE
+              <span className="text-[8.5px] font-sans font-bold uppercase tracking-[0.16em] mt-0.5 relative z-10">
+                DISCOVER
               </span>
             )}
-          </motion.button>
+          </button>
 
           {/* 4. WISHLIST */}
           <Link
             href="/wishlist"
-            className={`flex-1 h-full flex flex-col items-center justify-center rounded-full relative transition-all ${
+            className={`flex-1 h-full flex flex-col items-center justify-center rounded-2xl relative transition-all duration-150 ${
               pathname === '/wishlist'
-                ? 'bg-gold-gradient text-white shadow-xs'
+                ? 'text-zariGold font-bold'
                 : 'text-inkNavy/70 hover:text-inkNavy'
             }`}
           >
-            <div className="relative">
-              <Heart className="w-4 h-4" />
+            {pathname === '/wishlist' && (
+              <motion.span
+                layoutId="activeTabRing"
+                className="absolute inset-x-2 inset-y-1 rounded-xl bg-zariGold/10 border border-zariGold/30 z-0"
+                transition={{ duration: 0.15 }}
+              />
+            )}
+            <div className="relative z-10">
+              <Heart className={`w-4 h-4 stroke-[1.5] transition-transform duration-150 ${pathname === '/wishlist' ? 'scale-110' : ''}`} />
               {wishlistCount > 0 && (
-                <span className="absolute -top-1 -right-2 text-[8px] font-bold bg-oxblood text-white w-3.5 h-3.5 rounded-full flex items-center justify-center">
+                <span className="absolute -top-1 -right-2 text-[8px] font-bold bg-zariGold text-white w-3.5 h-3.5 rounded-full flex items-center justify-center animate-badge-pop shadow-xs">
                   {wishlistCount}
                 </span>
               )}
             </div>
             {!isScrolledDown && (
-              <span className="text-[8.5px] font-sans font-bold uppercase tracking-wider mt-0.5">
+              <span className="text-[8.5px] font-sans font-bold uppercase tracking-wider mt-0.5 relative z-10">
                 WISHLIST
               </span>
             )}
@@ -151,18 +165,18 @@ export default function MobileBottomNav() {
               e.preventDefault();
               setIsCartOpen(true);
             }}
-            className="flex-1 h-full flex flex-col items-center justify-center rounded-full relative text-inkNavy/70 hover:text-inkNavy transition-all"
+            className="flex-1 h-full flex flex-col items-center justify-center rounded-2xl relative text-inkNavy/70 hover:text-inkNavy transition-all duration-150 cursor-pointer"
           >
-            <div className="relative">
-              <ShoppingBag className="w-4 h-4" />
+            <div className="relative z-10">
+              <ShoppingBag className="w-4 h-4 stroke-[1.5]" />
               {cartCount > 0 && (
-                <span className="absolute -top-1 -right-2 text-[8px] font-bold bg-zariGold text-white w-3.5 h-3.5 rounded-full flex items-center justify-center">
+                <span className="absolute -top-1 -right-2 text-[8px] font-bold bg-zariGold text-white w-3.5 h-3.5 rounded-full flex items-center justify-center animate-badge-pop shadow-xs">
                   {cartCount}
                 </span>
               )}
             </div>
             {!isScrolledDown && (
-              <span className="text-[8.5px] font-sans font-bold uppercase tracking-wider mt-0.5">
+              <span className="text-[8.5px] font-sans font-bold uppercase tracking-wider mt-0.5 relative z-10">
                 BAG
               </span>
             )}

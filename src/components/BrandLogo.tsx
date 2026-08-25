@@ -43,13 +43,28 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
       </div>
 
       {showText && (
-        <div className="flex flex-col justify-center text-left leading-none shrink-0 py-0.5">
+        <div className="flex flex-col justify-center text-left leading-none shrink-0 py-0.5 relative">
           <span className="font-serif text-[16px] sm:text-[18px] lg:text-[20px] font-bold tracking-[0.12em] uppercase text-inkNavy group-hover:text-zariGold transition-colors">
             The Girls
           </span>
           <span className="font-sans text-[8.5px] sm:text-[9.5px] lg:text-[10px] font-bold tracking-[0.26em] uppercase text-zariGold pt-0.5">
             Collections
           </span>
+          {/* Temple Arch Hairline Curve Accent */}
+          <svg
+            viewBox="0 0 100 8"
+            fill="none"
+            className="w-full h-[5px] text-zariGold/70 group-hover:text-zariGold mt-0.5 transition-colors"
+            preserveAspectRatio="none"
+            aria-hidden="true"
+          >
+            <path
+              d="M 0 7 Q 50 -2 100 7"
+              stroke="currentColor"
+              strokeWidth="1.2"
+              strokeLinecap="round"
+            />
+          </svg>
         </div>
       )}
     </Link>

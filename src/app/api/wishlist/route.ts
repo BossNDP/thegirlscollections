@@ -1,13 +1,35 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { dbService } from '@/lib/db';
+import { verifyToken } from '@/lib/jwt';
+
+async function resolveAuthenticatedUserId(req: NextRequest): Promise<string | null> {
+  // 1. Check custom session token in cookies (`drftn_session`)
+  const sessionCookie = req.cookies.get('drftn_session')?.value;
+  if (sessionCookie) {
+    const payload = await verifyToken(sessionCookie);
+    if (payload && typeof payload.userId === 'string' && payload.userId) {
+      return payload.userId;
+    }
+  }
+
+  // 2. Fallback to Clerk authentication session token
+  try {
+    const { userId } = await auth();
+    if (userId) return userId;
+  } catch (err) {
+    console.warn('[Wishlist Auth] Clerk auth check warning:', err);
+  }
+
+  return null;
+}
 
 export async function GET(req: NextRequest) {
   try {
-    const { userId } = await auth();
+    const userId = await resolveAuthenticatedUserId(req);
 
     if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized: You must be signed in to view your wishlist.' }, { status: 401 });
     }
 
     const { searchParams } = new URL(req.url);
@@ -31,10 +53,10 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const { userId } = await auth();
+    const userId = await resolveAuthenticatedUserId(req);
 
     if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized: You must be signed in to add to wishlist.' }, { status: 401 });
     }
 
     const body = await req.json();
@@ -57,10 +79,10 @@ export async function POST(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
   try {
-    const { userId } = await auth();
+    const userId = await resolveAuthenticatedUserId(req);
 
     if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized: You must be signed in to modify wishlist.' }, { status: 401 });
     }
 
     const body = await req.json();

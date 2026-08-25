@@ -158,10 +158,10 @@ export const HeroCarousel: React.FC = () => {
           <div className="pt-2 sm:pt-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
             <Link
               href={slide.ctaLink}
-              className="px-8 py-4 rounded-[2px] btn-gold-gradient text-xs sm:text-sm font-semibold uppercase tracking-[0.2em] inline-flex items-center justify-center space-x-3 group shadow-xl"
+              className="px-8 py-3.5 sm:py-4 rounded-[2px] bg-gold-gradient text-inkNavy font-sans text-xs sm:text-sm font-bold uppercase tracking-[0.2em] inline-flex items-center justify-center space-x-3 group shadow-xl hover:shadow-zariGold/20 active:scale-98 transition-all duration-200"
             >
               <span>{slide.ctaText}</span>
-              <ArrowRight className="w-4 h-4 text-white group-hover:translate-x-1 transition-transform" />
+              <ArrowRight className="w-4 h-4 text-inkNavy group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
         </div>

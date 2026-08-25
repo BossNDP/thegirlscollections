@@ -404,63 +404,59 @@ export function AuthSessionProvider({ children }: { children: React.ReactNode })
               className="fixed inset-0 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 overflow-y-auto"
             >
               <motion.div
-                initial={{ scale: 0.95, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.95, opacity: 0 }}
-                transition={{ duration: 0.2, ease: 'easeOut' }}
+                initial={{ y: 40, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: 40, opacity: 0 }}
+                transition={{ duration: 0.25, ease: 'easeOut' }}
                 onClick={(e) => e.stopPropagation()}
-                className="relative w-full max-w-[420px] bg-zinc-950 border border-white/10 p-6 md:p-8 flex flex-col items-center gap-6 shadow-[0_0_80px_rgba(0,0,0,0.9)] max-h-[90vh] overflow-y-auto"
+                className="relative w-full max-w-[420px] bg-ivory border border-zariGold/40 p-6 md:p-8 flex flex-col items-center gap-6 shadow-[0_16px_48px_rgba(28,31,59,0.25)] rounded-t-[32px] md:rounded-2xl max-h-[90vh] overflow-y-auto"
               >
                 {/* Close button — hidden while verifying */}
                 {!isVerifying && (
                   <button
                     onClick={closeAuthModal}
-                    className="absolute top-2 right-2 text-zinc-500 hover:text-white transition-colors w-12 h-12 flex items-center justify-center cursor-pointer z-50"
+                    className="absolute top-4 right-4 text-inkNavy/50 hover:text-zariGold transition-colors w-9 h-9 flex items-center justify-center cursor-pointer z-50 rounded-full hover:bg-zariGold/10"
                     aria-label="Close"
                   >
                     <X className="w-5 h-5" />
                   </button>
                 )}
 
-                {/* Logo */}
-                <div className="relative w-64 md:w-72 h-14 md:h-16 select-none flex items-center justify-center">
-                  <img
-                    src="/logo.png?v=3"
-                    alt="DRFTN"
-                    className="object-contain w-full h-full grayscale brightness-[100]"
-                  />
+                {/* Logo & Brand Header */}
+                <div className="flex flex-col items-center text-center pt-2">
+                  <span className="text-[10px] font-serif font-bold text-zariGold tracking-[0.25em] uppercase mb-1">
+                    THE GIRLS COLLECTION
+                  </span>
+                  <h2 className="font-serif text-2xl font-bold text-inkNavy">
+                    Welcome to Luxury
+                  </h2>
                 </div>
 
                 {/* ── VERIFYING STATE ── */}
                 {isVerifying && (
-                  <div className="flex flex-col items-center gap-4 py-6 w-full">
-                    <Loader2 className="w-10 h-10 text-zinc-400 animate-spin" />
-                    <p className="text-xs uppercase tracking-widest text-zinc-400 font-mono">
-                      Verifying your phone…
+                  <div className="flex flex-col items-center gap-4 py-8 w-full">
+                    <Loader2 className="w-10 h-10 text-zariGold animate-spin" />
+                    <p className="text-xs font-serif font-bold tracking-widest text-inkNavy uppercase">
+                      Verifying your credentials…
                     </p>
                   </div>
                 )}
 
                 {/* ── PROFILE COMPLETION STEP (new user) ── */}
                 {!isVerifying && profileStep && (
-                  <form onSubmit={handleProfileSubmit} className="w-full space-y-4 font-body">
+                  <form onSubmit={handleProfileSubmit} className="w-full space-y-4">
                     <div className="text-center space-y-1 pb-2">
-                      <h3 className="text-sm font-black uppercase text-white tracking-widest font-mono">
+                      <h3 className="text-sm font-serif font-bold uppercase text-inkNavy tracking-widest">
                         Complete Your Profile
                       </h3>
-                      <p className="text-[10px] text-zinc-400 uppercase tracking-wider leading-relaxed">
-                        One last step to finish setting up your account
+                      <p className="text-xs text-inkNavy/70 font-sans leading-relaxed">
+                        Provide your details to complete your luxury profile.
                       </p>
                     </div>
 
-                    <style dangerouslySetInnerHTML={{
-                      __html: `.auth-input { background-color: #ffffff !important; color: #000000 !important; border: 1px solid #ffffff !important; }
-                      .auth-input::placeholder { color: #71717a !important; }`
-                    }} />
-
                     <div className="grid grid-cols-2 gap-3">
                       <div className="space-y-1">
-                        <label className="text-[10px] uppercase tracking-wider text-zinc-500 font-bold block">
+                        <label className="text-[10px] font-sans uppercase tracking-wider text-inkNavy/70 font-bold block">
                           First Name *
                         </label>
                         <input
@@ -470,11 +466,11 @@ export function AuthSessionProvider({ children }: { children: React.ReactNode })
                           placeholder="First"
                           value={profileFirstName}
                           onChange={(e) => setProfileFirstName(e.target.value)}
-                          className="w-full auth-input px-3 py-3 text-xs focus:outline-none uppercase tracking-widest font-mono"
+                          className="w-full bg-white border border-zariGold/30 px-3 py-3 text-xs text-inkNavy focus:outline-none focus:border-zariGold font-sans rounded-lg"
                         />
                       </div>
                       <div className="space-y-1">
-                        <label className="text-[10px] uppercase tracking-wider text-zinc-500 font-bold block">
+                        <label className="text-[10px] font-sans uppercase tracking-wider text-inkNavy/70 font-bold block">
                           Last Name
                         </label>
                         <input
@@ -482,13 +478,13 @@ export function AuthSessionProvider({ children }: { children: React.ReactNode })
                           placeholder="Last"
                           value={profileLastName}
                           onChange={(e) => setProfileLastName(e.target.value)}
-                          className="w-full auth-input px-3 py-3 text-xs focus:outline-none uppercase tracking-widest font-mono"
+                          className="w-full bg-white border border-zariGold/30 px-3 py-3 text-xs text-inkNavy focus:outline-none focus:border-zariGold font-sans rounded-lg"
                         />
                       </div>
                     </div>
 
                     <div className="space-y-1">
-                      <label className="text-[10px] uppercase tracking-wider text-zinc-500 font-bold block">
+                      <label className="text-[10px] font-sans uppercase tracking-wider text-inkNavy/70 font-bold block">
                         Email Address (Optional)
                       </label>
                       <input
@@ -496,7 +492,7 @@ export function AuthSessionProvider({ children }: { children: React.ReactNode })
                         placeholder="e.g. you@gmail.com"
                         value={profileEmail}
                         onChange={(e) => setProfileEmail(e.target.value)}
-                        className="w-full auth-input px-3 py-3 text-xs focus:outline-none font-mono"
+                        className="w-full bg-white border border-zariGold/30 px-3 py-3 text-xs text-inkNavy focus:outline-none focus:border-zariGold font-sans rounded-lg"
                       />
                     </div>
 
@@ -506,29 +502,18 @@ export function AuthSessionProvider({ children }: { children: React.ReactNode })
                           type="checkbox"
                           checked={termsAccepted}
                           onChange={(e) => setTermsAccepted(e.target.checked)}
-                          className="mt-0.5 accent-white shrink-0"
+                          className="mt-0.5 accent-zariGold shrink-0"
                         />
-                        <span className="text-[10px] text-zinc-400 uppercase tracking-wider leading-relaxed">
+                        <span className="text-[11px] text-inkNavy/70 font-sans leading-relaxed">
                           I accept the{' '}
-                          <a href="/policies/terms-and-conditions" target="_blank" className="text-white underline">
+                          <a href="/policies/terms-and-conditions" target="_blank" className="text-zariGold underline">
                             Terms &amp; Conditions
                           </a>{' '}
                           and{' '}
-                          <a href="/policies/privacy-policy" target="_blank" className="text-white underline">
+                          <a href="/policies/privacy-policy" target="_blank" className="text-zariGold underline">
                             Privacy Policy
                           </a>{' '}
                           *
-                        </span>
-                      </label>
-                      <label className="flex items-start gap-3 cursor-pointer select-none">
-                        <input
-                          type="checkbox"
-                          checked={notificationsOptIn}
-                          onChange={(e) => setNotificationsOptIn(e.target.checked)}
-                          className="mt-0.5 accent-white shrink-0"
-                        />
-                        <span className="text-[10px] text-zinc-400 uppercase tracking-wider leading-relaxed">
-                          Notify me about drops, restocks &amp; order updates
                         </span>
                       </label>
                     </div>
@@ -536,7 +521,7 @@ export function AuthSessionProvider({ children }: { children: React.ReactNode })
                     <button
                       type="submit"
                       disabled={isSubmittingProfile}
-                      className="w-full bg-white hover:bg-zinc-200 text-black py-3.5 font-bold uppercase tracking-widest text-xs transition-colors disabled:opacity-50 flex items-center justify-center gap-2 mt-2"
+                      className="w-full bg-zariGold hover:bg-zariGoldLight text-inkNavy py-3.5 font-bold uppercase tracking-widest text-xs transition-colors rounded-lg flex items-center justify-center gap-2 mt-2 shadow-md cursor-pointer"
                     >
                       {isSubmittingProfile ? 'Saving…' : 'Complete Setup →'}
                     </button>
@@ -547,29 +532,29 @@ export function AuthSessionProvider({ children }: { children: React.ReactNode })
                 {!isVerifying && !profileStep && (
                   <div className="w-full space-y-5">
                     <div className="text-center space-y-1">
-                      <h3 className="text-sm font-black uppercase text-white tracking-widest font-mono">
-                        Sign In
+                      <h3 className="text-sm font-serif font-bold uppercase text-inkNavy tracking-widest">
+                        Sign In / Register
                       </h3>
-                      <p className="text-[10px] text-zinc-400 uppercase tracking-wider leading-relaxed">
-                        Join the drop list &amp; secure your checkout.
+                      <p className="text-xs text-inkNavy/70 font-sans leading-relaxed">
+                        Access your order history, wishlist, and exclusive drops.
                       </p>
                     </div>
 
-                    <div className="space-y-4">
+                    <div className="space-y-3.5">
                       <button
                         onClick={startPhoneOTP}
                         disabled={isActionInProgress || isVerifying}
-                        className="w-full bg-white hover:bg-zinc-200 text-black py-4 font-bold uppercase tracking-widest text-xs transition-all flex items-center justify-center gap-2 cursor-pointer border border-white disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full bg-inkNavy hover:bg-inkNavy/90 text-ivory py-3.5 font-sans font-semibold uppercase tracking-wider text-xs transition-all flex items-center justify-center gap-2.5 cursor-pointer rounded-xl border border-inkNavy shadow-md disabled:opacity-50"
                       >
-                        <Smartphone className="w-4 h-4" />
+                        <Smartphone className="w-4 h-4 text-zariGold" />
                         {isActionInProgress ? 'Opening Secure Portal...' : 'Continue with Phone'}
                       </button>
 
-                      <div className="relative text-center">
+                      <div className="relative text-center my-2">
                         <div className="absolute inset-0 flex items-center">
-                          <div className="w-full border-t border-white/10" />
+                          <div className="w-full border-t border-zariGold/20" />
                         </div>
-                        <span className="relative bg-zinc-950 px-3 text-[9px] uppercase tracking-widest font-mono text-zinc-550">
+                        <span className="relative bg-ivory px-3 text-[10px] uppercase tracking-widest font-sans text-inkNavy/50">
                           Or
                         </span>
                       </div>
@@ -577,22 +562,28 @@ export function AuthSessionProvider({ children }: { children: React.ReactNode })
                       <button
                         onClick={handleGoogleLogin}
                         disabled={isActionInProgress || isVerifying}
-                        className="w-full bg-transparent hover:bg-white/5 text-white border border-white/10 py-3.5 font-bold uppercase tracking-widest text-xs transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full bg-white hover:bg-zariGold/10 text-inkNavy border border-zariGold/40 py-3.5 font-sans font-semibold uppercase tracking-wider text-xs transition-colors flex items-center justify-center gap-2.5 cursor-pointer rounded-xl shadow-xs disabled:opacity-50"
                       >
-                        {isActionInProgress ? 'Redirecting to Google...' : 'Google Account'}
+                        <svg className="w-4 h-4" viewBox="0 0 24 24">
+                          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
+                          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
+                        </svg>
+                        {isActionInProgress ? 'Redirecting to Google...' : 'Continue with Google'}
                       </button>
-
-                      <p className="text-center text-[9px] text-zinc-650 uppercase tracking-widest font-mono leading-relaxed">
-                        By continuing you agree to our{' '}
-                        <a href="/policies/terms-and-conditions" target="_blank" className="text-zinc-500 underline">
-                          Terms
-                        </a>{' '}
-                        &amp;{' '}
-                        <a href="/policies/privacy-policy" target="_blank" className="text-zinc-500 underline">
-                          Privacy Policy
-                        </a>
-                      </p>
                     </div>
+
+                    <p className="text-center text-[10px] text-inkNavy/60 font-sans leading-relaxed pt-1">
+                      By continuing you agree to our{' '}
+                      <a href="/policies/terms-and-conditions" target="_blank" className="text-zariGold underline font-medium">
+                        Terms
+                      </a>{' '}
+                      &amp;{' '}
+                      <a href="/policies/privacy-policy" target="_blank" className="text-zariGold underline font-medium">
+                        Privacy Policy
+                      </a>
+                    </p>
                   </div>
                 )}
               </motion.div>
