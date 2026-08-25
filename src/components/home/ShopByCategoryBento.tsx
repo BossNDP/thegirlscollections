@@ -64,8 +64,6 @@ const CATEGORY_ITEMS: CategoryItem[] = [
 
 export const ShopByCategoryBento: React.FC = () => {
   const [activeIndex, setActiveIndex] = useState(0);
-  const [touchState, setTouchState] = useState({ startX: 0, startY: 0, currentX: 0, isDragging: false });
-  const [dragOffset, setDragOffset] = useState(0);
 
   const sectionRef = useRef<HTMLElement | null>(null);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -253,6 +251,10 @@ export const ShopByCategoryBento: React.FC = () => {
     };
   }, [activeIndex, prefersReducedMotion]);
 
+  // Refs for zero-rerender smooth touch dragging
+  const dragOffsetRef = useRef(0);
+  const touchStartRef = useRef({ startX: 0, startY: 0, isDragging: false, isHorizontal: false });
+
   // Helper to calculate card step (card width + horizontal gap)
   const getCardStep = useCallback(() => {
     const activeCard = cardRefs.current[activeIndex];
@@ -267,9 +269,10 @@ export const ShopByCategoryBento: React.FC = () => {
     return 308;
   }, [activeIndex]);
 
-  // Animate Carousel depth & peek positioning on activeIndex / drag update
-  useEffect(() => {
+  // Animate Carousel cards smoothly to their target position whenever activeIndex changes
+  const animateCardsToActive = useCallback((customDuration?: number) => {
     const cardStep = getCardStep();
+    const duration = customDuration ?? 0.42;
 
     cardRefs.current.forEach((cardEl, idx) => {
       if (!cardEl) return;
@@ -281,7 +284,6 @@ export const ShopByCategoryBento: React.FC = () => {
       gsap.killTweensOf(cardEl);
 
       if (prefersReducedMotion) {
-        // Fallback simple crossfade for reduced motion
         gsap.to(cardEl, {
           opacity: rIdx === 0 ? 1 : 0,
           scale: 1,
@@ -297,75 +299,112 @@ export const ShopByCategoryBento: React.FC = () => {
         gsap.to(cardEl, {
           scale: 1,
           opacity: 1,
-          x: dragOffset,
+          x: 0,
           y: 0,
           zIndex: 30,
-          duration: 0.38,
-          ease: 'cubic-bezier(0.25, 1, 0.5, 1)',
+          duration: duration,
+          ease: 'power3.out',
+          force3D: true,
         });
       } else if (Math.abs(rIdx) === 1) {
         // 1st Adjacent Peeking Card (Left or Right)
         gsap.to(cardEl, {
           scale: 0.94,
           opacity: 0.65,
-          x: rIdx * cardStep + dragOffset,
+          x: rIdx * cardStep,
           y: 0,
           zIndex: 20,
-          duration: 0.38,
-          ease: 'cubic-bezier(0.25, 1, 0.5, 1)',
+          duration: duration,
+          ease: 'power3.out',
+          force3D: true,
         });
       } else {
         // Off-screen / Hidden cards
         gsap.to(cardEl, {
           scale: 0.88,
           opacity: 0,
-          x: rIdx * cardStep + dragOffset,
+          x: rIdx * cardStep,
           y: 0,
           zIndex: 0,
-          duration: 0.38,
-          ease: 'cubic-bezier(0.25, 1, 0.5, 1)',
+          duration: duration,
+          ease: 'power3.out',
+          force3D: true,
         });
       }
     });
-  }, [activeIndex, dragOffset, totalCards, prefersReducedMotion, getCardStep]);
+  }, [activeIndex, totalCards, prefersReducedMotion, getCardStep]);
 
-  // Mobile Touch Swipe Gesture Handlers
+  useEffect(() => {
+    animateCardsToActive();
+  }, [activeIndex, animateCardsToActive]);
+
+  // Ultra-Smooth 60fps Hardware-Accelerated Touch Drag Handlers (Zero React Re-renders during drag)
   const handleTouchStart = (e: React.TouchEvent) => {
     hasInteracted.current = true;
     const touch = e.touches[0];
-    setTouchState({
+    touchStartRef.current = {
       startX: touch.clientX,
       startY: touch.clientY,
-      currentX: touch.clientX,
       isDragging: true,
-    });
-    setDragOffset(0);
+      isHorizontal: false,
+    };
+    dragOffsetRef.current = 0;
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
-    if (!touchState.isDragging) return;
+    if (!touchStartRef.current.isDragging) return;
     const touch = e.touches[0];
-    const dx = touch.clientX - touchState.startX;
-    const dy = touch.clientY - touchState.startY;
+    const dx = touch.clientX - touchStartRef.current.startX;
+    const dy = touch.clientY - touchStartRef.current.startY;
 
-    // Apply live drag offset if horizontal movement dominates
-    if (Math.abs(dx) > Math.abs(dy)) {
-      setDragOffset(dx);
+    // Detect direction on initial movement
+    if (!touchStartRef.current.isHorizontal) {
+      if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 5) {
+        touchStartRef.current.isHorizontal = true;
+      } else if (Math.abs(dy) > 8) {
+        touchStartRef.current.isDragging = false;
+        return;
+      }
     }
+
+    if (!touchStartRef.current.isHorizontal) return;
+
+    dragOffsetRef.current = dx;
+    const cardStep = getCardStep();
+
+    // Directly mutate transform properties via GSAP set (Zero React State Overhead)
+    cardRefs.current.forEach((cardEl, idx) => {
+      if (!cardEl) return;
+      let rIdx = idx - activeIndex;
+      if (rIdx > totalCards / 2) rIdx -= totalCards;
+      if (rIdx < -totalCards / 2) rIdx += totalCards;
+
+      if (Math.abs(rIdx) <= 1) {
+        gsap.set(cardEl, {
+          x: rIdx * cardStep + dx,
+          force3D: true,
+        });
+      }
+    });
   };
 
   const handleTouchEnd = () => {
-    if (!touchState.isDragging) return;
-    const threshold = 45;
+    if (!touchStartRef.current.isDragging) return;
+    touchStartRef.current.isDragging = false;
 
-    if (dragOffset < -threshold) {
+    const dx = dragOffsetRef.current;
+    const threshold = 40;
+
+    if (dx < -threshold) {
       goToNext();
-    } else if (dragOffset > threshold) {
+    } else if (dx > threshold) {
       goToPrev();
+    } else {
+      // Snap back smoothly if threshold wasn't reached
+      animateCardsToActive(0.35);
     }
 
-    setDragOffset(0);
-    setTouchState((prev) => ({ ...prev, isDragging: false }));
+    dragOffsetRef.current = 0;
   };
 
   const formattedCounter = `0${activeIndex + 1} / 0${totalCards}`;
@@ -465,7 +504,7 @@ export const ShopByCategoryBento: React.FC = () => {
                     ref={(el) => {
                       cardRefs.current[idx] = el;
                     }}
-                    className="absolute w-[76vw] xs:w-[78vw] max-w-[330px] h-full rounded-[240px_240px_8px_8px] overflow-hidden bg-ivory shadow-xl transition-shadow duration-300 origin-center"
+                    className="absolute w-[76vw] xs:w-[78vw] max-w-[330px] h-full rounded-[240px_240px_8px_8px] overflow-hidden bg-ivory shadow-xl transition-shadow duration-300 origin-center will-change-transform transform-gpu"
                     style={{
                       zIndex: isActive ? 30 : isPeek ? 20 : 0,
                     }}
