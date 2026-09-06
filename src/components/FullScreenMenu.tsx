@@ -406,7 +406,7 @@ export const FullScreenMenu: React.FC<FullScreenMenuProps> = ({ isOpen, onClose 
                       Search Results ({searchResults.length})
                     </span>
                     {searchResults.length === 0 ? (
-                      <p className="text-xs text-inkNavy/60 py-2 italic">No categories found matching "{searchQuery}"</p>
+                      <p className="text-xs text-inkNavy/60 py-2 italic">No categories found matching &quot;{searchQuery}&quot;</p>
                     ) : (
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-60 overflow-y-auto">
                         {searchResults.map((cat) => (
