@@ -5,7 +5,7 @@ import { useEffect } from 'react';
 function getOrSetVisitorId(): string {
   if (typeof window === 'undefined') return '';
 
-  const STORAGE_KEY = 'drftn_vid';
+  const STORAGE_KEY = 'tgc_vid';
   let vid = '';
 
   // 1. Try reading from cookie

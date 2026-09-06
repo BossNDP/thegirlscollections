@@ -3,10 +3,18 @@ import { dirname, resolve } from 'path';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
+// ── Production Security Guard ──────────────────────────────────────────────
+if (process.env.NODE_ENV === 'production' && process.env.SKIP_ADMIN_AUTH === 'true') {
+  throw new Error(
+    'CRITICAL SECURITY VIOLATION: SKIP_ADMIN_AUTH=true is enabled while NODE_ENV=production. Production builds strictly prohibit bypassing admin authentication.'
+  );
+}
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  productionBrowserSourceMaps: false,
   images: {
-    unoptimized: true,
+    unoptimized: false,
     formats: ['image/avif', 'image/webp'],
     minimumCacheTTL: 31536000,
     remotePatterns: [

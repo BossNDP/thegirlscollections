@@ -50,6 +50,7 @@ const config: Config = {
           DEFAULT: "#B4863C",
           light: "#D8BC82",
           dark: "#8B6A2E",
+          tint: "rgba(180, 134, 60, 0.15)",
         },
         blush: {
           DEFAULT: "#E8DCC8",
@@ -63,10 +64,11 @@ const config: Config = {
         },
       },
       fontFamily: {
-        serif: ["var(--font-cormorant)", "var(--font-fraunces)", "Cormorant Garamond", "Georgia", "serif"],
-        display: ["var(--font-cormorant)", "var(--font-fraunces)", "Cormorant Garamond", "Georgia", "serif"],
-        sans: ["var(--font-jakarta)", "Plus Jakarta Sans", "Inter", "system-ui", "sans-serif"],
-        body: ["var(--font-jakarta)", "Plus Jakarta Sans", "Inter", "system-ui", "sans-serif"],
+        serif: ["var(--font-fraunces)", "var(--font-cormorant)", "Georgia", "serif"],
+        display: ["var(--font-fraunces)", "var(--font-cormorant)", "Georgia", "serif"],
+        fraunces: ["var(--font-fraunces)", "Georgia", "serif"],
+        sans: ["var(--font-jakarta)", "General Sans", "Plus Jakarta Sans", "Inter", "system-ui", "sans-serif"],
+        body: ["var(--font-jakarta)", "General Sans", "Plus Jakarta Sans", "Inter", "system-ui", "sans-serif"],
         script: ["var(--font-alex-brush)", "Alex Brush", "cursive"],
       },
       transitionTimingFunction: {

@@ -1,7 +1,11 @@
+export const dynamic = 'force-dynamic';
+
 import { NextResponse } from 'next/server';
 import { db } from '@/db';
 import * as schema from '@/db/schema';
 import { z } from 'zod';
+
+import { rateLimit } from '@/lib/rateLimit';
 
 const contactSchema = z.object({
   name: z.string().min(1).max(100),
@@ -10,6 +14,15 @@ const contactSchema = z.object({
 });
 
 export async function POST(request: Request) {
+  const ip = request.headers.get('x-forwarded-for') || '127.0.0.1';
+  const rl = await rateLimit(`contact:${ip}`, 5, 10 * 60 * 1000);
+  if (!rl.success) {
+    return NextResponse.json(
+      { error: `Too many contact submissions. Retry in ${rl.reset} seconds.` },
+      { status: 429, headers: { 'Retry-After': String(rl.reset) } }
+    );
+  }
+
   try {
     const body = await request.json();
 

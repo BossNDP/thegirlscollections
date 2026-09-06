@@ -4,11 +4,10 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight, ShoppingBag } from 'lucide-react';
-import { Product } from '@/data/shopData';
 import { useShop } from '@/context/ShopContext';
 
 interface EditorialProductFeatureProps {
-  product: Product;
+  product: any;
   kicker?: string;
   narrative?: string;
 }
@@ -21,9 +20,15 @@ export const EditorialProductFeature: React.FC<EditorialProductFeatureProps> = (
   const { addToCart } = useShop();
 
   const handleQuickAdd = () => {
-    const size = product.sizes?.[0]?.size || 'Free Size';
+    const size = typeof product.sizes?.[0] === 'string' ? product.sizes[0] : (product.sizes?.[0]?.size || 'Free Size');
     addToCart(product, size);
   };
+
+  const formattedPrice = typeof product.price === 'number'
+    ? (product.price > 100000 ? Math.round(product.price / 100) : product.price)
+    : 0;
+
+  const comparePriceVal = product.originalPrice || (product.compare_price ? Math.round(product.compare_price / 100) : undefined);
 
   return (
     <section className="w-full py-16 sm:py-20 md:py-28 bg-sand/20 text-inkNavy border-b border-zariGold/15 overflow-hidden">
@@ -32,7 +37,7 @@ export const EditorialProductFeature: React.FC<EditorialProductFeatureProps> = (
           
           {/* Spotlight Hero Image */}
           <div className="md:col-span-6 relative h-[450px] sm:h-[540px] w-full rounded-xl overflow-hidden shadow-md">
-            {product.images[0] && (
+            {product.images?.[0] && (
               <Image
                 src={product.images[0]}
                 alt={product.name}
@@ -68,11 +73,11 @@ export const EditorialProductFeature: React.FC<EditorialProductFeatureProps> = (
             {/* Price Tag */}
             <div className="flex items-baseline gap-3 mb-6 pb-6 border-b border-zariGold/20">
               <span className="text-2xl sm:text-3xl font-sans font-bold text-zariGold font-tnum">
-                ₹{product.price.toLocaleString('en-IN')}
+                ₹{formattedPrice.toLocaleString('en-IN')}
               </span>
-              {product.originalPrice && (
+              {comparePriceVal && comparePriceVal > formattedPrice && (
                 <span className="text-sm font-sans text-inkNavy/40 line-through font-normal font-tnum">
-                  ₹{product.originalPrice.toLocaleString('en-IN')}
+                  ₹{comparePriceVal.toLocaleString('en-IN')}
                 </span>
               )}
             </div>

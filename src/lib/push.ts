@@ -5,7 +5,7 @@ import { eq } from 'drizzle-orm';
 
 const vapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || '';
 const vapidPrivateKey = process.env.VAPID_PRIVATE_KEY || '';
-const vapidSubject = process.env.VAPID_SUBJECT || 'mailto:admin@drftn.in';
+const vapidSubject = process.env.VAPID_SUBJECT || 'mailto:support@thegirlscollections.com';
 
 if (vapidPublicKey && vapidPrivateKey) {
   webpush.setVapidDetails(vapidSubject, vapidPublicKey, vapidPrivateKey);
@@ -15,10 +15,10 @@ if (vapidPublicKey && vapidPrivateKey) {
 
 /**
  * Sends a web push notification to a subscriber, automatically formatting URLs to the production domain
- * and attaching the official DRFTN logo assets.
+ * and attaching official The Girls Collections logo assets.
  */
 export async function sendPushNotification(subscription: any, rawPayload: any) {
-  const baseUrl = 'https://www.drftnclothing.in';
+  const baseUrl = 'https://www.thegirlscollections.com';
   
   // Resolve relative URLs to the production domain
   const rawUrl = rawPayload.url || '/';
@@ -27,9 +27,8 @@ export async function sendPushNotification(subscription: any, rawPayload: any) {
   const payload = {
     ...rawPayload,
     url,
-    // Add absolute production logo paths for visual delivery in notifications
-    icon: 'https://www.drftnclothing.in/logo.png?v=3',
-    badge: 'https://www.drftnclothing.in/logo-cropped.png',
+    icon: 'https://www.thegirlscollections.com/logo.png',
+    badge: 'https://www.thegirlscollections.com/logo-cropped.png',
   };
 
   try {

@@ -24,11 +24,14 @@ export const categories = pgTable('categories', {
   id: uuid('id').primaryKey().defaultRandom(),
   name: text('name').notNull(),
   slug: text('slug').unique().notNull(),
+  parent_group: text('parent_group'), // e.g. "Kurta Sets", "Frocks", "Gowns", "Ethnic Sets", "Western/Casual", "Bottoms"
+  age_group: text('age_group').$type<'ladies' | 'kids' | 'unisex'>().notNull().default('ladies'),
   image_url: text('image_url'),
   description: text('description'),
   parent_id: uuid('parent_id').references((): any => categories.id, { onDelete: 'cascade' }),
   is_active: boolean('is_active').notNull().default(true),
   display_order: integer('display_order').notNull().default(0),
+  sort_order: integer('sort_order').notNull().default(0),
   created_at: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updated_at: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
 });
@@ -41,9 +44,10 @@ export const products = pgTable('products', {
   description: text('description').notNull(),
   price: integer('price').notNull(), // stored in paise, e.g. 129900 for ₹1299
   compare_price: integer('compare_price'), // strikethrough MRP in paise
-  category: text('category').notNull(), // main category slug, e.g. 't-shirts'
-  subcategory: text('subcategory'), // subcategory slug, e.g. 'boxy-fit-t-shirts'
-  gender: text('gender').notNull(), // 'unisex' | 'men' | 'women'
+  category: text('category').notNull(), // main category slug
+  subcategory: text('subcategory'), // subcategory slug
+  gender: text('gender').notNull(), // 'unisex' | 'women' | 'kids'
+  fit_type: text('fit_type').$type<'regular' | 'plus_size'>().notNull().default('regular'),
   images: text('images').array().notNull().default(sql`'{}'::text[]`), // Array of Cloudinary URLs
   sizes: text('sizes').array().notNull().default(sql`'{"XS", "S", "M", "L", "XL", "XXL"}'::text[]`),
   stock_quantity: jsonb('stock').$type<Record<string, number>>().notNull().default(sql`'{"XS": 0, "S": 0, "M": 0, "L": 0, "XL": 0, "XXL": 0}'::jsonb`),
@@ -84,7 +88,7 @@ export const productVariants = pgTable('product_variants', {
 export const orders = pgTable('orders', {
   id: uuid('id').primaryKey().defaultRandom(),
   user_id: text('user_id'), // Clerk User ID
-  order_number: text('order_number').unique().notNull(), // format: DRFTN-1001
+  order_number: text('order_number').unique().notNull(), // format: TGC-1001
   customer_name: text('customer_name').notNull(),
   customer_email: text('customer_email').notNull(),
   customer_phone: text('customer_phone').notNull(), // 10-digit Indian mobile
@@ -155,6 +159,8 @@ export const discountCodes = pgTable('discount_codes', {
   max_discount_amount: integer('max_discount_amount'),
   usage_limit: integer('usage_limit'),
   used_count: integer('used_count').notNull().default(0),
+  target_phone: text('target_phone'), // 10-digit Indian phone number for targeted discounts
+  is_phone_locked: boolean('is_phone_locked').notNull().default(false),
   is_active: boolean('is_active').notNull().default(true),
   expires_at: timestamp('expires_at', { withTimezone: true }),
   created_at: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
@@ -171,7 +177,7 @@ export const settings = pgTable('settings', {
 // 5b. Store Settings Table — invoice & store profile (legal name, GST, address, invoice sequence)
 export const storeSettings = pgTable('store_settings', {
   id: uuid('id').primaryKey().defaultRandom(),
-  store_name: text('store_name').notNull().default('DRFTN CLOTHING'),
+  store_name: text('store_name').notNull().default('THE GIRLS COLLECTIONS'),
   legal_name: text('legal_name'),
   gstin: text('gstin'),
   address: text('address'),
@@ -181,7 +187,7 @@ export const storeSettings = pgTable('store_settings', {
   pincode: text('pincode'),
   phone: text('phone'),
   email: text('email'),
-  invoice_prefix: text('invoice_prefix').notNull().default('DRFTN'),
+  invoice_prefix: text('invoice_prefix').notNull().default('TGC'),
   current_fy: text('current_fy').notNull().default('2025-26'),
   current_sequence: integer('current_sequence').notNull().default(1000),
   terms_footer: text('terms_footer'),
@@ -422,6 +428,18 @@ export const uniqueVisitors = pgTable("unique_visitors", {
 }, (t) => [
   index('unique_visitors_created_month_idx').on(t.created_month),
   index('unique_visitors_last_seen_at_idx').on(t.last_seen_at),
+]);
+
+// 24. System Roles Table (Admin & Staff Email Allow-List)
+export const systemRoles = pgTable('system_roles', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  email: text('email').unique().notNull(),
+  role: text('role').$type<'admin' | 'staff'>().notNull(),
+  name: text('name'),
+  created_at: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updated_at: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+}, (t) => [
+  index('system_roles_email_idx').on(t.email),
 ]);
 
 

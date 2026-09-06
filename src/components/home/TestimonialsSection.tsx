@@ -18,8 +18,8 @@ const TESTIMONIALS: Testimonial[] = [
     name: 'Ananya Rao',
     location: 'Bengaluru',
     initials: 'AR',
-    quote: 'The Kanjeevaram silk saree drape was pure perfection for my sister’s wedding. The zari finish felt custom-tailored and truly regal.',
-    product: 'Champagne Gold Zari Saree',
+    quote: 'The Kanjeevaram silk anarkali ensemble was pure perfection for my sister’s wedding. The zari finish felt custom-tailored and truly regal.',
+    product: 'Champagne Gold Zari Anarkali',
   },
   {
     id: '2',

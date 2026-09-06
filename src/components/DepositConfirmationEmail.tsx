@@ -54,7 +54,7 @@ export function DepositConfirmationEmail({
               {/* Header */}
               <tr>
                 <td style={{ padding: '36px 40px 28px', borderBottom: '1px solid #1e1e1e' }}>
-                  <img src="https://www.drftnclothing.in/logo.png?v=3" alt="DRFTN" width="130" style={{ display: 'block', border: 'none', outline: 'none' }} />
+                  <img src="https://www.thegirlscollections.com/logo.png?v=3" alt="The Girls Collections" width="130" style={{ display: 'block', border: 'none', outline: 'none' }} />
                 </td>
               </tr>
 
@@ -94,7 +94,7 @@ export function DepositConfirmationEmail({
                             <p style={{ margin: '0 0 16px', fontSize: '28px', fontWeight: 900, color: '#ffffff', letterSpacing: '4px' }}>{pickupCode}</p>
                             <p style={{ margin: 0, fontSize: '13px', lineHeight: '1.6', color: '#ccc' }}>
                               <strong>Store pickup address:</strong><br />
-                              DRFTN Store, 1st Floor, Kogilu Main Rd, Yelahanka, Bengaluru - 560064
+                              The Girls Collections Store, 1st Floor, Kogilu Main Rd, Yelahanka, Bengaluru - 560064
                             </p>
                           </div>
                         ) : (
@@ -167,10 +167,10 @@ export function DepositConfirmationEmail({
                 <td style={{ padding: '24px 40px', borderTop: '1px solid #1e1e1e' }}>
                   <p style={{ margin: 0, fontSize: '12px', color: '#444', lineHeight: 1.6 }}>
                     Questions? Reply to this email or reach us at{' '}
-                    <a href="mailto:drftnclothing@gmail.com" style={{ color: '#888', textDecoration: 'none' }}>drftnclothing@gmail.com</a>
+                    <a href="mailto:thegirlscollections@gmail.com" style={{ color: '#888', textDecoration: 'none' }}>thegirlscollections@gmail.com</a>
                   </p>
                   <p style={{ margin: '8px 0 0', fontSize: '11px', color: '#333' }}>
-                    © {new Date().getFullYear()} DRFTN Clothing. Bengaluru, India.
+                    © {new Date().getFullYear()} The Girls Collections. Bengaluru, India.
                   </p>
                 </td>
               </tr>

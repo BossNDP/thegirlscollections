@@ -6,7 +6,7 @@ import { Pool as PgPool } from 'pg';
 import * as schema from './schema';
 
 const databaseUrl =
-  process.env.DATABASE_URL || 'postgres://postgres:postgres@localhost:5432/drftn';
+  process.env.DATABASE_URL || 'postgres://postgres:postgres@localhost:5432/thegirlscollections';
 const isNeon = databaseUrl.includes('neon.tech');
 
 // Connect using Neon Serverless WebSocket pool driver to support database transactions,

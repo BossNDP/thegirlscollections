@@ -23,19 +23,19 @@ const POLICIES: Record<string, PolicyData> = {
     sections: [
       {
         heading: '1. Acceptance of Terms',
-        content: 'By accessing and purchasing from the DRFTN CLOTHING website (drftnclothing.in), you agree to comply with and be bound by these Terms & Conditions. If you do not agree, please refrain from using our platform.'
+        content: 'By accessing and purchasing from The Girls Collections website (thegirlscollections.com), you agree to comply with and be bound by these Terms & Conditions. If you do not agree, please refrain from using our platform.'
       },
       {
         heading: '2. User Accounts & Security',
-        content: 'To place orders, you may register via our third-party authentication partner (Clerk). You are solely responsible for maintaining the confidentiality of your credentials and account access. Any activities under your account remain your direct liability.'
+        content: 'To place orders, you may register via our third-party authentication provider. You are solely responsible for maintaining the confidentiality of your credentials and account access. Any activities under your account remain your direct liability.'
       },
       {
         heading: '3. Intellectual Property Rights',
-        content: 'All designs, custom brand logo typography, drop themes, photographs, copy, visual layouts, and graphics are the exclusive intellectual property of DRFTN CLOTHING. Reproduction, theft, resale, or replication without express written authorization is strictly prohibited under intellectual property laws.'
+        content: 'All designs, custom brand logo typography, drop themes, photographs, copy, visual layouts, and graphics are the exclusive intellectual property of The Girls Collections. Reproduction, theft, resale, or replication without express written authorization is strictly prohibited under intellectual property laws.'
       },
       {
         heading: '4. Limitation of Liability',
-        content: 'DRFTN CLOTHING shall not be liable for any indirect, incidental, or consequential damages resulting from website downtime, product variation, delivery delays, or payment gateway transactions. Our total liability is limited to the exact transaction amount paid for the specific order.'
+        content: 'The Girls Collections shall not be liable for any indirect, incidental, or consequential damages resulting from website downtime, product variation, delivery delays, or payment gateway transactions. Our total liability is limited to the exact transaction amount paid for the specific order.'
       },
       {
         heading: '5. Governing Law & Jurisdiction',

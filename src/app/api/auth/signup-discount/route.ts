@@ -14,10 +14,14 @@ export async function GET() {
       .where(eq(schema.settings.key, 'signup_discount_code'))
       .limit(1);
 
-    const targetCode = setting?.value || 'DRFTN10';
+    const targetCode = setting?.value || 'TGC10';
 
     const [discount] = await db
-      .select()
+      .select({
+        code: schema.discountCodes.code,
+        discount_value: schema.discountCodes.discount_value,
+        discount_type: schema.discountCodes.discount_type,
+      })
       .from(schema.discountCodes)
       .where(and(
         eq(schema.discountCodes.code, targetCode),
@@ -28,7 +32,7 @@ export async function GET() {
     if (!discount) {
       // Fallback details if code not found in DB
       return NextResponse.json({
-        code: 'DRFTN10',
+        code: 'TGC10',
         value: 10,
         type: 'percent',
       });
@@ -42,7 +46,7 @@ export async function GET() {
   } catch (error) {
     console.error('Signup Discount API Error:', error);
     return NextResponse.json({
-      code: 'DRFTN10',
+      code: 'TGC10',
       value: 10,
       type: 'percent',
     });

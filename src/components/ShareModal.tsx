@@ -32,8 +32,8 @@ export default function ShareModal({
 }: ShareModalProps) {
   const [copied, setCopied] = useState(false);
   const shareUrl = url || (typeof window !== 'undefined' ? window.location.href : '');
-  const shareTitle = `${productName} (${priceFormatted}) — DRFTN CLOTHING`;
-  const shareText = `Check out ${productName} (${priceFormatted}) on DRFTN CLOTHING!`;
+  const shareTitle = `${productName} (${priceFormatted}) — THE GIRLS COLLECTIONS`;
+  const shareText = `Check out ${productName} (${priceFormatted}) on THE GIRLS COLLECTIONS!`;
 
   const handleCopyLink = async () => {
     try {
@@ -158,7 +158,7 @@ export default function ShareModal({
                   {priceFormatted}
                 </p>
                 <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest mt-0.5">
-                  DRFTN CLOTHING
+                  THE GIRLS COLLECTIONS
                 </p>
               </div>
             </div>

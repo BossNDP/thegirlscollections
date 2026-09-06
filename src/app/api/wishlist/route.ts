@@ -1,11 +1,13 @@
+export const dynamic = 'force-dynamic';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { dbService } from '@/lib/db';
 import { verifyToken } from '@/lib/jwt';
 
 async function resolveAuthenticatedUserId(req: NextRequest): Promise<string | null> {
-  // 1. Check custom session token in cookies (`drftn_session`)
-  const sessionCookie = req.cookies.get('drftn_session')?.value;
+  // 1. Check custom session token in cookies (`tgc_session`)
+  const sessionCookie = req.cookies.get('tgc_session')?.value;
   if (sessionCookie) {
     const payload = await verifyToken(sessionCookie);
     if (payload && typeof payload.userId === 'string' && payload.userId) {

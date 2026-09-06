@@ -21,9 +21,9 @@ const STYLED_LOOKS: StyledLook[] = [
     influencerName: 'Ananya & Little Myra',
     handle: '@ananya_moments',
     image: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&q=85&w=800',
-    productName: 'Gulmohar Blush Organza Saree',
+    productName: 'Gulmohar Blush Organza Suit',
     productPrice: 4999,
-    productSlug: 'gulmohar-blush-organza-saree',
+    productSlug: 'gulmohar-blush-organza-suit',
   },
   {
     id: 'look-2',

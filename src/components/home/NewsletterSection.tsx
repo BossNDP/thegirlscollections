@@ -32,7 +32,7 @@ export const NewsletterSection: React.FC = () => {
         </h2>
 
         <p className="text-sm text-charcoal-muted max-w-lg mx-auto font-sans font-light leading-relaxed">
-          Receive exclusive early access to handloom sarees, bespoke kids ethnic releases, 
+          Receive exclusive early access to handloom suits, bespoke kids ethnic releases, 
           and complimentary styling consultations.
         </p>
 

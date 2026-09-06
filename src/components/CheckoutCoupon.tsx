@@ -56,7 +56,7 @@ export const CheckoutCoupon: React.FC<CheckoutCouponProps> = ({ subtotal }) => {
       const data = await res.json();
 
       if (res.ok && data.valid) {
-        const isDriftCouponCode = clean === 'DRFTNMODEON20' || clean.startsWith('DRIFT');
+        const isDriftCouponCode = clean === 'TGCMODEON20' || clean === 'DRFTNMODEON20' || clean.startsWith('DRIFT');
         const discountObj = {
           id: isDriftCouponCode ? 'drift-mode-coupon' : `coupon-${clean}`,
           code: clean,
@@ -100,7 +100,7 @@ export const CheckoutCoupon: React.FC<CheckoutCouponProps> = ({ subtotal }) => {
 
   // If a coupon is applied (DRIFT MODE or standard)
   if (discountCode) {
-    const isDrift = discountCode.code === 'DRFTNMODEON20' || discountCode.code.startsWith('DRIFT');
+    const isDrift = discountCode.code === 'TGCMODEON20' || discountCode.code === 'DRFTNMODEON20' || discountCode.code.startsWith('DRIFT');
     return (
       <div
         ref={appliedRowRef}

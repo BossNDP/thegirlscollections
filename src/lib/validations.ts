@@ -167,6 +167,7 @@ export const adminProductSchema = z.object({
   category: z.string().min(1, 'Category is required'),
   subcategory: optionalString,
   gender: z.string().min(1, 'Gender is required'),
+  fit_type: z.enum(['regular', 'plus_size']).default('regular'),
   images: z.array(z.string().min(1)).default([]),
   sizes: z.array(SizeEnum).default(['XS', 'S', 'M', 'L', 'XL', 'XXL']),
   stock_quantity: z.record(SizeEnum, z.number().int().nonnegative()).default({ XS: 0, S: 0, M: 0, L: 0, XL: 0, XXL: 0, '26': 0, '28': 0, '30': 0, '32': 0, '34': 0, '36': 0, '38': 0 }),

@@ -88,7 +88,7 @@ export default function CategoryForm({ initialData, mode }: CategoryFormProps) {
 
     const file = files[0];
     const timestamp = Math.round(new Date().getTime() / 1000);
-    const folder = 'drftn-categories';
+    const folder = 'tgc-categories';
 
     try {
       const signRes = await fetch('/api/admin/cloudinary-sign', {

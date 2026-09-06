@@ -47,10 +47,15 @@ export function useGSAPScrollReveal<T extends HTMLElement = HTMLDivElement>(
           y: 0,
           duration,
           stagger: targetElements.length > 1 ? stagger : 0,
-          ease: 'power3.out',
+          ease: 'power2.out',
+          force3D: true,
+          onComplete: () => {
+            // Ensure elements are locked in final clean state without active inline transform listeners
+            gsap.set(targetElements, { clearProps: 'transform,willChange' });
+          },
           scrollTrigger: {
             trigger: containerRef.current,
-            start: 'top 88%',
+            start: 'top 90%',
             toggleActions: 'play none none none',
             once: true,
           },

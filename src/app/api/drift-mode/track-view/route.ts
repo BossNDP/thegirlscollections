@@ -16,7 +16,7 @@ async function getUserId(): Promise<string | null> {
 
   try {
     const cookieStore = cookies();
-    const sessionToken = cookieStore.get('drftn_session')?.value;
+    const sessionToken = cookieStore.get('tgc_session')?.value;
     if (sessionToken) {
       const payload = await verifyToken(sessionToken);
       if (payload && payload.userId) {
@@ -54,7 +54,7 @@ export async function POST() {
       // Upsert coupon entry with popup_shown_count = 1
       await db.execute(sql`
         INSERT INTO drift_mode_coupons (user_id, code, discount_percent, popup_shown_count)
-        VALUES (${userId}, ${'DRFTNMODEON20'}, 20, 1)
+        VALUES (${userId}, ${'TGCMODEON20'}, 20, 1)
         ON CONFLICT (user_id) DO UPDATE
         SET popup_shown_count = drift_mode_coupons.popup_shown_count + 1;
       `);

@@ -195,15 +195,13 @@ export default function AdminNotificationsPage() {
     setIsSending(true);
     setResult(null);
     try {
-      const endpoint =
-        audienceType === 'general'
-          ? '/api/admin/push/announce-drop'
-          : '/api/admin/push/announce-product';
+      const endpoint = '/api/admin/push/send-custom';
 
       const payload: Record<string, string> = {
         title: title.trim(),
         body: body.trim(),
         url: targetUrl.trim() || '/',
+        audienceType,
       };
       if (audienceType === 'product') {
         payload.productId = selectedProductId;

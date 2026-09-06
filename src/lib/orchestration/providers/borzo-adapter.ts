@@ -75,11 +75,11 @@ export class BorzoAdapter {
     }
 
     const requestBody = {
-      matter: `DRFTN Apparel Order ${payload.orderNumber}`,
+      matter: `The Girls Collections Order ${payload.orderNumber}`,
       points: [
         {
-          address: 'DRFTN Store, 1st Floor, Kogilu Main Rd, Yelahanka, Bengaluru 560064',
-          contact_person: { name: 'DRFTN Fulfillment', phone: '918045678900' },
+          address: 'The Girls Collections Store, 1st Floor, Kogilu Main Rd, Yelahanka, Bengaluru 560064',
+          contact_person: { name: 'The Girls Collections Fulfillment', phone: '918045678900' },
         },
         {
           address: `${payload.shippingAddress.line1}, ${payload.shippingAddress.line2 || ''}, ${payload.shippingAddress.city} ${payload.shippingAddress.pincode}`,

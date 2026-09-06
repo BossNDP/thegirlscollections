@@ -1,22 +1,17 @@
 import { NextResponse } from 'next/server';
-import { getAuth, clerkClient } from '@clerk/nextjs/server';
+import { requireAdmin } from '@/lib/auth/admin';
 import { db } from '@/db';
 import * as schema from '@/db/schema';
 import { gte } from 'drizzle-orm';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET(request: Request) {
-  try {
-    const session = getAuth(request as any);
-    if (!session.userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+export async function GET() {
+  const authRes = await requireAdmin();
+  if (authRes instanceof NextResponse) return authRes;
 
-    const client = await clerkClient();
-    const clerkUser = await client.users.getUser(session.userId);
-    const role = (clerkUser.publicMetadata as any)?.role;
-    const isIntern = role === 'intern';
+  try {
+    const isIntern = authRes.role === 'staff' && !authRes.permissions.includes('*');
 
     // Active user criteria: active within the last 5 minutes
     const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
@@ -41,7 +36,7 @@ export async function GET(request: Request) {
       return NextResponse.json({
         success: true,
         count: totalActiveCount,
-        users: [], // Hide users list for interns to protect PII
+        users: [],
       });
     }
 

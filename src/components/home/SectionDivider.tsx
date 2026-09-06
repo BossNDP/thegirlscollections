@@ -5,6 +5,26 @@ import Image from 'next/image';
 import { Award, Heart, ShieldCheck } from 'lucide-react';
 import { useGSAPScrollReveal } from '@/lib/useGSAPScrollReveal';
 
+export function TempleArchHairlineDivider({ className = '' }: { className?: string }) {
+  return (
+    <div className={`w-full py-6 flex items-center justify-center relative select-none ${className}`} aria-hidden="true">
+      {/* Left Hairline */}
+      <div className="flex-1 h-[1px] bg-gradient-to-r from-transparent via-zariGold/30 to-zariGold/60" />
+      
+      {/* Temple Arch Central Tick Motif */}
+      <div className="mx-4 flex items-center justify-center">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" className="text-zariGold stroke-current">
+          <path d="M 10 2 C 5 2 3 7 3 14 L 3 18 L 17 18 L 17 14 C 17 7 15 2 10 2 Z" strokeWidth="1.2" fill="none" />
+          <circle cx="10" cy="10" r="1.5" fill="currentColor" />
+        </svg>
+      </div>
+
+      {/* Right Hairline */}
+      <div className="flex-1 h-[1px] bg-gradient-to-r from-zariGold/60 via-zariGold/30 to-transparent" />
+    </div>
+  );
+}
+
 interface SectionDividerProps {
   eyebrow?: string;
   title?: string;

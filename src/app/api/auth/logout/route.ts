@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic';
 
 export async function POST() {
   try {
-    cookies().delete('drftn_session');
+    cookies().delete('tgc_session');
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Logout API Route Error:', error);

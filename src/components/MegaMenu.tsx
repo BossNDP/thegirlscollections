@@ -5,7 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ChevronRight, ArrowLeft, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CATEGORY_TAXONOMY } from '@/data/categoryTaxonomy';
+import { WOMEN_BUCKETS, KIDS_BUCKETS, getCategoryHref } from '@/data/categoryTaxonomy';
 
 interface MegaMenuProps {
   activeCategory: string | null;
@@ -17,81 +17,62 @@ export const DesktopMegaMenu: React.FC<MegaMenuProps> = ({ activeCategory, onClo
 
   const renderContent = () => {
     if (activeCategory === 'women') {
-      const womenData = CATEGORY_TAXONOMY.find((c) => c.id === 'women');
-      const traditional = womenData?.groups.find((g) => g.id === 'women-traditional');
-      const frocksWestern = womenData?.groups.find((g) => g.id === 'women-frocks-western');
-
       return (
-        <div className="max-w-[1440px] mx-auto grid grid-cols-12 gap-8 px-8 py-6">
-          {/* Column 1: Women's Traditional */}
-          <div className="col-span-4 space-y-4 border-r border-sand pr-8">
-            <div className="space-y-1">
-              <span className="eyebrow-text">Category Spotlight</span>
-              <h4 className="text-xl font-serif font-semibold text-inkNavy">Women Traditional</h4>
-              <div className="w-10 h-[1.5px] bg-gold-gradient rounded-full" />
+        <div className="max-w-[1440px] mx-auto grid grid-cols-12 gap-6 px-8 py-6">
+          {WOMEN_BUCKETS.map((bucket, index) => (
+            <div
+              key={bucket.id}
+              className={`space-y-3 border-r border-sand/80 pr-6 ${
+                index === 0 ? 'col-span-3' : index === 1 ? 'col-span-2' : index === 2 ? 'col-span-2' : 'col-span-2'
+              }`}
+            >
+              <div className="space-y-1">
+                <span className="eyebrow-text text-[10px] text-zariGold uppercase tracking-widest">
+                  {bucket.slug === 'plus-size' ? 'Attribute' : 'Occasion'}
+                </span>
+                <h4 className="text-base font-serif font-semibold text-inkNavy">{bucket.title}</h4>
+                <div className="w-8 h-[1.5px] bg-gold-gradient rounded-full" />
+              </div>
+              <ul className="space-y-0.5 pt-1">
+                {bucket.items.map((sub) => (
+                  <li key={sub.id}>
+                    <Link
+                      href={getCategoryHref(sub)}
+                      onClick={onClose}
+                      className="group flex items-center justify-between py-1.5 text-xs sm:text-sm font-sans font-medium text-inkNavy/85 hover:text-zariGold transition-colors"
+                    >
+                      <span>{sub.name}</span>
+                      <ChevronRight className="w-3.5 h-3.5 text-zariGold opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-200" />
+                    </Link>
+                  </li>
+                ))}
+              </ul>
             </div>
-            <ul className="space-y-1 pt-2">
-              {traditional?.items.map((sub) => (
-                <li key={sub.id}>
-                  <Link
-                    href={`/shop?category=${sub.slug}`}
-                    onClick={onClose}
-                    className="group flex items-center justify-between py-2 text-sm font-sans font-medium text-inkNavy/85 hover:text-zariGold transition-colors"
-                  >
-                    <span>{sub.name}</span>
-                    <ChevronRight className="w-4 h-4 text-zariGold opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-200" />
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
+          ))}
 
-          {/* Column 2: Frocks & Western */}
-          <div className="col-span-4 space-y-4 border-r border-sand pr-8">
-            <div className="space-y-1">
-              <span className="eyebrow-text">Contemporary Couture</span>
-              <h4 className="text-xl font-serif font-semibold text-inkNavy">Frocks &amp; Western</h4>
-              <div className="w-10 h-[1.5px] bg-gold-gradient rounded-full" />
-            </div>
-            <ul className="space-y-1 pt-2">
-              {frocksWestern?.items.map((sub) => (
-                <li key={sub.id}>
-                  <Link
-                    href={`/shop?category=${sub.slug}`}
-                    onClick={onClose}
-                    className="group flex items-center justify-between py-2 text-sm font-sans font-medium text-inkNavy/85 hover:text-zariGold transition-colors"
-                  >
-                    <span>{sub.name}</span>
-                    <ChevronRight className="w-4 h-4 text-zariGold opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-200" />
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Column 3: Lookbook Image Card + Evocative Copy */}
-          <div className="col-span-4 pl-4 flex flex-col justify-between">
-            <div className="relative h-64 w-full rounded-[2px] overflow-hidden group bg-sand/50">
+          {/* Column 5: Editorial Lookbook Card */}
+          <div className="col-span-3 pl-2 flex flex-col justify-between">
+            <div className="relative h-60 w-full rounded-[2px] overflow-hidden group bg-sand/50 shadow-xs">
               <Image
                 src="https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&q=85&w=600"
                 alt="Women Royal Edit"
                 fill
                 className="object-cover group-hover:scale-105 transition-transform duration-700"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-nearBlack/85 via-nearBlack/30 to-transparent p-6 flex flex-col justify-end">
-                <span className="eyebrow-text text-zariGoldLight mb-1">Editorial Lookbook</span>
-                <p className="text-lg font-serif font-semibold text-ivory leading-snug">
-                  The Royal Heritage Pallu Edit &amp; Zari Gowns
+              <div className="absolute inset-0 bg-gradient-to-t from-nearBlack/85 via-nearBlack/30 to-transparent p-5 flex flex-col justify-end">
+                <span className="eyebrow-text text-zariGoldLight mb-1 text-[10px]">Editorial Lookbook</span>
+                <p className="text-base font-serif font-semibold text-ivory leading-snug">
+                  The Royal Heritage Pallu Edit
                 </p>
-                <p className="text-xs text-ivory/70 font-sans mt-1">
-                  Intricate zari weaves designed for celebratory grand moments.
+                <p className="text-[11px] text-ivory/75 font-sans mt-1">
+                  Intricate zari weaves &amp; festive ensembles.
                 </p>
               </div>
             </div>
             <Link
               href="/shop?target=women"
               onClick={onClose}
-              className="mt-4 text-center py-3 rounded-[2px] btn-gold-gradient text-xs uppercase tracking-[0.2em] font-semibold"
+              className="mt-3 text-center py-2.5 rounded-[2px] btn-gold-gradient text-[11px] uppercase tracking-[0.2em] font-semibold"
             >
               Explore Women Collection
             </Link>
@@ -101,55 +82,92 @@ export const DesktopMegaMenu: React.FC<MegaMenuProps> = ({ activeCategory, onClo
     }
 
     if (activeCategory === 'kids') {
-      const kidsData = CATEGORY_TAXONOMY.find((c) => c.id === 'kids');
-      const kidsItems = kidsData?.groups[0]?.items || [];
-
       return (
-        <div className="max-w-[1440px] mx-auto grid grid-cols-12 gap-8 px-8 py-6">
-          <div className="col-span-8 space-y-4 border-r border-sand pr-8">
+        <div className="max-w-[1440px] mx-auto grid grid-cols-12 gap-6 px-8 py-6">
+          {/* Column 1: Ethnic Wear */}
+          <div className="col-span-3 space-y-3 border-r border-sand/80 pr-6">
             <div className="space-y-1">
-              <span className="eyebrow-text">Little Royalty</span>
-              <h4 className="text-xl font-serif font-semibold text-inkNavy">Kids Pure Silk Ethnic Wear</h4>
-              <div className="w-10 h-[1.5px] bg-gold-gradient rounded-full" />
+              <span className="eyebrow-text text-[10px] text-zariGold uppercase tracking-widest">Occasion</span>
+              <h4 className="text-base font-serif font-semibold text-inkNavy">{KIDS_BUCKETS[0].title}</h4>
+              <div className="w-8 h-[1.5px] bg-gold-gradient rounded-full" />
             </div>
-            <div className="grid grid-cols-2 gap-4 pt-2">
-              {kidsItems.map((sub) => (
-                <Link
-                  key={sub.id}
-                  href={`/shop?category=${sub.slug}`}
-                  onClick={onClose}
-                  className="group p-3 rounded-[2px] bg-sand/30 hover:bg-sand/60 transition-colors border border-zariGold/10"
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-serif font-semibold text-inkNavy group-hover:text-zariGold transition-colors">
-                      {sub.name}
-                    </span>
-                    <ChevronRight className="w-4 h-4 text-zariGold opacity-0 group-hover:opacity-100 transition-opacity" />
-                  </div>
-                  {sub.description && (
-                    <p className="text-xs text-inkNavy/60 font-sans mt-1 line-clamp-1">
-                      {sub.description}
-                    </p>
-                  )}
-                </Link>
+            <ul className="space-y-0.5 pt-1">
+              {KIDS_BUCKETS[0].items.map((sub) => (
+                <li key={sub.id}>
+                  <Link
+                    href={getCategoryHref(sub)}
+                    onClick={onClose}
+                    className="group flex items-center justify-between py-1.5 text-xs sm:text-sm font-sans font-medium text-inkNavy/85 hover:text-zariGold transition-colors"
+                  >
+                    <span>{sub.name}</span>
+                    <ChevronRight className="w-3.5 h-3.5 text-zariGold opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-200" />
+                  </Link>
+                </li>
               ))}
-            </div>
+            </ul>
           </div>
 
-          <div className="col-span-4 pl-4 flex flex-col justify-between">
-            <div className="relative h-64 w-full rounded-[2px] overflow-hidden group bg-sand/50">
+          {/* Column 2: Party Wear */}
+          <div className="col-span-2 space-y-3 border-r border-sand/80 pr-6">
+            <div className="space-y-1">
+              <span className="eyebrow-text text-[10px] text-zariGold uppercase tracking-widest">Occasion</span>
+              <h4 className="text-base font-serif font-semibold text-inkNavy">{KIDS_BUCKETS[1].title}</h4>
+              <div className="w-8 h-[1.5px] bg-gold-gradient rounded-full" />
+            </div>
+            <ul className="space-y-0.5 pt-1">
+              {KIDS_BUCKETS[1].items.map((sub) => (
+                <li key={sub.id}>
+                  <Link
+                    href={getCategoryHref(sub)}
+                    onClick={onClose}
+                    className="group flex items-center justify-between py-1.5 text-xs sm:text-sm font-sans font-medium text-inkNavy/85 hover:text-zariGold transition-colors"
+                  >
+                    <span>{sub.name}</span>
+                    <ChevronRight className="w-3.5 h-3.5 text-zariGold opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-200" />
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Column 3: Casual / Western */}
+          <div className="col-span-4 space-y-3 border-r border-sand/80 pr-6">
+            <div className="space-y-1">
+              <span className="eyebrow-text text-[10px] text-zariGold uppercase tracking-widest">Occasion</span>
+              <h4 className="text-base font-serif font-semibold text-inkNavy">{KIDS_BUCKETS[2].title}</h4>
+              <div className="w-8 h-[1.5px] bg-gold-gradient rounded-full" />
+            </div>
+            <ul className="space-y-0.5 pt-1 grid grid-cols-1 sm:grid-cols-2 gap-x-4">
+              {KIDS_BUCKETS[2].items.map((sub) => (
+                <li key={sub.id}>
+                  <Link
+                    href={getCategoryHref(sub)}
+                    onClick={onClose}
+                    className="group flex items-center justify-between py-1.5 text-xs sm:text-sm font-sans font-medium text-inkNavy/85 hover:text-zariGold transition-colors"
+                  >
+                    <span>{sub.name}</span>
+                    <ChevronRight className="w-3.5 h-3.5 text-zariGold opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-200" />
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Column 4: Kids Lookbook */}
+          <div className="col-span-3 pl-2 flex flex-col justify-between">
+            <div className="relative h-60 w-full rounded-[2px] overflow-hidden group bg-sand/50 shadow-xs">
               <Image
                 src="https://images.unsplash.com/photo-1621600411688-4be93cd68504?auto=format&fit=crop&q=85&w=800"
                 alt="Kids Pattu Frocks"
                 fill
                 className="object-cover group-hover:scale-105 transition-transform duration-700"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-nearBlack/85 via-nearBlack/30 to-transparent p-6 flex flex-col justify-end">
-                <span className="eyebrow-text text-zariGoldLight mb-1">Signature Craft</span>
-                <p className="text-lg font-serif font-semibold text-ivory leading-snug">
+              <div className="absolute inset-0 bg-gradient-to-t from-nearBlack/85 via-nearBlack/30 to-transparent p-5 flex flex-col justify-end">
+                <span className="eyebrow-text text-zariGoldLight mb-1 text-[10px]">Signature Craft</span>
+                <p className="text-base font-serif font-semibold text-ivory leading-snug">
                   Pure Kanjeevaram Silk Pattu Frocks
                 </p>
-                <p className="text-xs text-ivory/70 font-sans mt-1">
+                <p className="text-[11px] text-ivory/75 font-sans mt-1">
                   Gentle non-scratchy pure cotton lining for delicate skin.
                 </p>
               </div>
@@ -157,7 +175,7 @@ export const DesktopMegaMenu: React.FC<MegaMenuProps> = ({ activeCategory, onClo
             <Link
               href="/shop?target=kids"
               onClick={onClose}
-              className="mt-4 text-center py-3 rounded-[2px] btn-gold-gradient text-xs uppercase tracking-[0.2em] font-semibold"
+              className="mt-3 text-center py-2.5 rounded-[2px] btn-gold-gradient text-[11px] uppercase tracking-[0.2em] font-semibold"
             >
               Explore Kids Collection
             </Link>
@@ -243,7 +261,7 @@ export const MobileMegaMenu: React.FC<{ isOpen: boolean; onClose: () => void }> 
                       className="w-full py-4 border-b border-zariGold/15 flex items-center justify-between text-left group min-h-[48px]"
                     >
                       <span className="text-2xl font-serif font-bold text-ivory group-hover:text-zariGold transition-colors">
-                        Women Ethnic
+                        Ladies Wear
                       </span>
                       <ChevronRight className="w-5 h-5 text-zariGold" />
                     </button>
@@ -253,7 +271,7 @@ export const MobileMegaMenu: React.FC<{ isOpen: boolean; onClose: () => void }> 
                       className="w-full py-4 border-b border-zariGold/15 flex items-center justify-between text-left group min-h-[48px]"
                     >
                       <span className="text-2xl font-serif font-bold text-ivory group-hover:text-zariGold transition-colors">
-                        Kids Ethnic
+                        Kids Wear
                       </span>
                       <ChevronRight className="w-5 h-5 text-zariGold" />
                     </button>
@@ -285,48 +303,44 @@ export const MobileMegaMenu: React.FC<{ isOpen: boolean; onClose: () => void }> 
                 </div>
               ) : selectedMain === 'women' ? (
                 <div className="space-y-6">
-                  <h3 className="text-2xl font-serif font-bold text-ivory">Women&apos;s Wear</h3>
-
-                  <div className="space-y-3">
-                    <span className="eyebrow-text text-zariGold">Traditional</span>
-                    {CATEGORY_TAXONOMY.find((c) => c.id === 'women')?.groups.find((g) => g.id === 'women-traditional')?.items.map((sub) => (
-                      <Link
-                        key={sub.id}
-                        href={`/shop?category=${sub.slug}`}
-                        onClick={onClose}
-                        className="block py-3 text-lg font-serif text-ivory/90 hover:text-zariGold border-b border-zariGold/10 min-h-[48px]"
-                      >
-                        {sub.name}
-                      </Link>
-                    ))}
-                  </div>
-
-                  <div className="space-y-3 pt-4">
-                    <span className="eyebrow-text text-zariGold">Frocks &amp; Western</span>
-                    {CATEGORY_TAXONOMY.find((c) => c.id === 'women')?.groups.find((g) => g.id === 'women-frocks-western')?.items.map((sub) => (
-                      <Link
-                        key={sub.id}
-                        href={`/shop?category=${sub.slug}`}
-                        onClick={onClose}
-                        className="block py-3 text-lg font-serif text-ivory/90 hover:text-zariGold border-b border-zariGold/10 min-h-[48px]"
-                      >
-                        {sub.name}
-                      </Link>
-                    ))}
-                  </div>
+                  <h3 className="text-2xl font-serif font-bold text-ivory">Ladies Collection</h3>
+                  {WOMEN_BUCKETS.map((bucket) => (
+                    <div key={bucket.id} className="space-y-2">
+                      <span className="eyebrow-text text-zariGold">{bucket.title}</span>
+                      <div className="space-y-1 pl-2">
+                        {bucket.items.map((sub) => (
+                          <Link
+                            key={sub.id}
+                            href={getCategoryHref(sub)}
+                            onClick={onClose}
+                            className="block py-2.5 text-base font-serif text-ivory/90 hover:text-zariGold border-b border-zariGold/10 min-h-[44px]"
+                          >
+                            {sub.name}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
                 </div>
               ) : (
-                <div className="space-y-4">
-                  <h3 className="text-2xl font-serif font-bold text-ivory">Kids Ethnic</h3>
-                  {CATEGORY_TAXONOMY.find((c) => c.id === 'kids')?.groups[0]?.items.map((sub) => (
-                    <Link
-                      key={sub.id}
-                      href={`/shop?category=${sub.slug}`}
-                      onClick={onClose}
-                      className="block py-3 text-lg font-serif text-ivory/90 hover:text-zariGold border-b border-zariGold/10 min-h-[48px]"
-                    >
-                      {sub.name}
-                    </Link>
+                <div className="space-y-6">
+                  <h3 className="text-2xl font-serif font-bold text-ivory">Kids Collection</h3>
+                  {KIDS_BUCKETS.map((bucket) => (
+                    <div key={bucket.id} className="space-y-2">
+                      <span className="eyebrow-text text-zariGold">{bucket.title}</span>
+                      <div className="space-y-1 pl-2">
+                        {bucket.items.map((sub) => (
+                          <Link
+                            key={sub.id}
+                            href={getCategoryHref(sub)}
+                            onClick={onClose}
+                            className="block py-2.5 text-base font-serif text-ivory/90 hover:text-zariGold border-b border-zariGold/10 min-h-[44px]"
+                          >
+                            {sub.name}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
                   ))}
                 </div>
               )}

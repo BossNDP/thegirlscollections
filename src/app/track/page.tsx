@@ -88,7 +88,7 @@ export default function TrackOrderPage() {
               <label className="text-xs uppercase tracking-wider text-zinc-500 font-bold block">Order Number</label>
               <input
                 type="text"
-                placeholder="e.g. DRFTN-7K9M2P"
+                placeholder="e.g. TGC-7K9M2P"
                 value={orderNumber}
                 onChange={(e) => setOrderNumber(e.target.value)}
                 className="w-full bg-zinc-900/80 border border-zinc-800 text-brand-offwhite px-4 py-3 focus:outline-none focus:border-white transition-colors"

@@ -32,7 +32,7 @@ function formatEmailPrice(val: number | null | undefined): string | null {
 export const WishlistReminderEmail: React.FC<WishlistReminderEmailProps> = ({
   customerName = 'Valued Customer',
   items,
-  siteUrl = 'https://www.drftnclothing.in',
+  siteUrl = 'https://www.thegirlscollections.com',
 }) => {
   const isMultiItem = items.length > 1;
   const headline = isMultiItem
@@ -44,7 +44,7 @@ export const WishlistReminderEmail: React.FC<WishlistReminderEmailProps> = ({
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>{headline} | DRFTN</title>
+        <title>{headline} | The Girls Collections</title>
       </head>
       <body
         style={{
@@ -100,7 +100,7 @@ export const WishlistReminderEmail: React.FC<WishlistReminderEmailProps> = ({
                         textTransform: 'uppercase',
                       }}
                     >
-                      DRFTN™
+                      THE GIRLS COLLECTIONS
                     </div>
                     <div
                       style={{
@@ -394,7 +394,7 @@ export const WishlistReminderEmail: React.FC<WishlistReminderEmailProps> = ({
                         marginBottom: '8px',
                       }}
                     >
-                      DRFTN CLOTHING • BENGALURU, INDIA
+                      THE GIRLS COLLECTIONS • BENGALURU, INDIA
                     </div>
                     <div
                       style={{
@@ -403,9 +403,9 @@ export const WishlistReminderEmail: React.FC<WishlistReminderEmailProps> = ({
                         lineHeight: '1.5',
                       }}
                     >
-                      You received this email because you saved items to your DRFTN Wishlist.
+                      You received this email because you saved items to your The Girls Collections Wishlist.
                       <br />
-                      © {new Date().getFullYear()} DRFTN. All rights reserved.
+                      © {new Date().getFullYear()} The Girls Collections. All rights reserved.
                     </div>
                   </td>
                 </tr>

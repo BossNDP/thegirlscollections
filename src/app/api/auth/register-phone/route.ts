@@ -34,7 +34,7 @@ export async function POST(request: Request) {
     // 2. Check if user is ALREADY logged in via session cookie or Clerk
     let currentUserId: string | null = null;
     const cookieStore = cookies();
-    const sessionToken = cookieStore.get('drftn_session')?.value;
+    const sessionToken = cookieStore.get('tgc_session')?.value;
     if (sessionToken) {
       const payload = await verifyToken(sessionToken);
       if (payload && payload.userId) {
@@ -127,7 +127,7 @@ export async function POST(request: Request) {
             .returning();
 
           const token = await signToken({ userId: linkedUser.id });
-          cookies().set('drftn_session', token, {
+          cookies().set('tgc_session', token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'strict',
@@ -162,7 +162,7 @@ export async function POST(request: Request) {
 
     if (existingPhoneUser) {
       const token = await signToken({ userId: existingPhoneUser.id });
-      cookies().set('drftn_session', token, {
+      cookies().set('tgc_session', token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'strict',
@@ -210,7 +210,7 @@ export async function POST(request: Request) {
 
     // 6. Sign custom session cookie
     const token = await signToken({ userId: newUser.id });
-    cookies().set('drftn_session', token, {
+    cookies().set('tgc_session', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',

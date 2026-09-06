@@ -1,20 +1,18 @@
+export const dynamic = 'force-dynamic';
+
 import { NextResponse } from 'next/server';
 
 // ⚠️  SECURITY: GEMINI_API_KEY is a server-only env var.
 // It is read exclusively inside this Route Handler and never serialised
 // into any client bundle or API response.
 
-const DRFTN_SYSTEM_PROMPT = `You are the head copywriter for DRFTN — an Indian luxury streetwear brand built on the philosophy of "Controlled Chaos". DRFTN pieces are heavy, oversized, minimal-but-intense, and carry a raw premium identity.
-
-Your job: analyse the uploaded garment photo and produce strictly a JSON object with three keys:
-
-"title"       – A bold 2–5 word product name in DRFTN's voice. Format: adjective + garment type (e.g. "Raw Boxy Hoodie", "Washed Cargo Pant", "Distressed Oversized Tee", "Stitch Drop Shoulder"). No brand name prefix. No emoji.
-
-"description" – 2–3 sentences. Lead with the silhouette + construction detail. Follow with fabric feel / weight (estimate GSM if visible). Close with the DRFTN aesthetic signature — controlled, minimal, intentional. Tone: direct, confident, zero filler. Do NOT use words like "elevate", "perfect for", "versatile", or "effortlessly".
-
-"tags"        – Array of 6–10 lowercase SEO tags. Mix garment type, fabric, fit, aesthetic, occasion (e.g. ["oversized hoodie", "heavyweight fleece", "boxy fit", "drop shoulder", "streetwear", "240 gsm", "dark aesthetic", "unisex"]).
-
-Return ONLY the raw JSON. No markdown fences. No commentary. No extra keys.`;
+const TGC_SYSTEM_PROMPT = `Analyse the uploaded garment photo and return strictly raw JSON:
+{
+  "title": "Concise 2–4 word garment name (e.g. 'Boxy Washed Cotton Tee')",
+  "description": "Short 1–2 sentence description of style and fit.",
+  "tags": ["5–8 lowercase search tags"]
+}
+No markdown. No extra text.`;
 
 export async function POST(request: Request) {
   try {
@@ -70,7 +68,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${apiKey}`;
 
     const geminiRes = await fetch(geminiUrl, {
       method: 'POST',
@@ -79,7 +77,7 @@ export async function POST(request: Request) {
         contents: [
           {
             parts: [
-              { text: DRFTN_SYSTEM_PROMPT },
+              { text: TGC_SYSTEM_PROMPT },
               {
                 inlineData: {
                   mimeType: finalMimeType,
@@ -91,7 +89,7 @@ export async function POST(request: Request) {
         ],
         generationConfig: {
           responseMimeType: 'application/json',
-          temperature: 0.7,
+          temperature: 0.2,
           maxOutputTokens: 1024,
           thinkingConfig: {
             thinkingBudget: 0,
@@ -120,19 +118,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Gemini returned an empty response.' }, { status: 502 });
     }
 
-    let parsed: { title?: string; description?: string; tags?: string[] };
-    try {
-      let cleanText = rawText.trim();
-      // Clean up markdown block wraps if present
-      if (cleanText.startsWith('```')) {
-        cleanText = cleanText.replace(/^```(?:json)?\s*/i, '');
-        cleanText = cleanText.replace(/\s*```$/, '');
+    let parsed: { title?: string; description?: string; tags?: string[] } = {};
+    const match = rawText.match(/\{[\s\S]*\}/);
+    if (match) {
+      try {
+        parsed = JSON.parse(match[0]);
+      } catch (err: any) {
+        console.error('[Gemini] Failed to parse JSON from matched text:', match[0]);
       }
-      parsed = JSON.parse(cleanText);
-    } catch (err: any) {
-      console.error('[Gemini] Failed to parse JSON from model output:', rawText);
-      console.error('[Gemini] Parse error:', err?.message ?? err);
-      return NextResponse.json({ error: 'Gemini response was not valid JSON.' }, { status: 502 });
     }
 
     return NextResponse.json({

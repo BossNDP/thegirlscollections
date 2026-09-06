@@ -36,15 +36,20 @@
     overflow-x: hidden;
   }
 
-  h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-cormorant), var(--font-fraunces), Georgia, serif;
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-fraunces), var(--font-cormorant), Georgia, serif;
     letter-spacing: -0.015em;
   }
 }
 
-/* Brushed Gold Gradient utilities */
-.bg-gold-gradient {
-  background: linear-gradient(135deg, #C9A24B 0%, #8B6A2E 100%);
+/* Zari Shimmer & Gold Gradient Utilities */
+.bg-zari-shimmer {
+  background: linear-gradient(90deg, #B4863C 0%, #D8BC82 50%, #B4863C 100%);
 }
 
 .text-gold-gradient {
@@ -53,21 +58,63 @@
   -webkit-text-fill-color: transparent;
 }
 
+.font-swash {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-weight: 500;
+}
+
+@keyframes zariSheenSweep {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  30% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+.animate-zari-sheen {
+  animation: zariSheenSweep 850ms ease-out 1 forwards;
+}
+
 .border-gold-gradient {
   border-image: linear-gradient(135deg, #C9A24B 0%, #8B6A2E 100%) 1;
 }
 
-/* Gold Button Style */
+/* Gold Button Style — Tactile Spring Press */
 .btn-gold-gradient {
   background: linear-gradient(135deg, #C9A24B 0%, #8B6A2E 100%);
   color: #FFFFFF;
-  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transition: all 0.12s cubic-bezier(0.34, 1.56, 0.64, 1);
   box-shadow: 0 4px 15px rgba(180, 134, 60, 0.2);
 }
+
 .btn-gold-gradient:hover {
   background: linear-gradient(135deg, #D4B05B 0%, #9B783B 100%);
-  transform: scale(1.02);
+  transform: translateY(-1px);
   box-shadow: 0 6px 20px rgba(180, 134, 60, 0.35);
+}
+
+.btn-gold-gradient:active {
+  transform: scale(0.97);
+  box-shadow: 0 2px 8px rgba(180, 134, 60, 0.4);
+}
+
+/* Brand Ivory/Blush Skeleton Shimmer */
+.skeleton-shimmer {
+  background: linear-gradient(90deg, #FAF5EA 25%, #F5EFE4 50%, #FAF5EA 75%);
+  background-size: 200% 100%;
+  animation: skeletonShimmer 1.8s ease-in-out infinite;
+}
+
+@keyframes skeletonShimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
 }
 
 /* Eyebrow Utility */
@@ -83,7 +130,7 @@
 /* Luxurious Woven Fabric Texture Placeholder */
 .bg-woven-texture {
   background-color: #FAF5EA;
-  background-image: 
+  background-image:
     radial-gradient(rgba(180, 134, 60, 0.08) 1px, transparent 1px),
     linear-gradient(45deg, rgba(232, 220, 200, 0.4) 25%, transparent 25%, transparent 75%, rgba(232, 220, 200, 0.4) 75%),
     linear-gradient(45deg, rgba(232, 220, 200, 0.4) 25%, transparent 25%, transparent 75%, rgba(232, 220, 200, 0.4) 75%);
@@ -111,6 +158,7 @@
   padding: 6px;
   background: var(--ivory);
 }
+
 .arch-frame img,
 .arch-frame .arch-inner {
   border-radius: 232px 232px 4px 4px;
@@ -126,6 +174,7 @@
   padding: 4px;
   background: var(--ivory);
 }
+
 .arch-frame-sm img,
 .arch-frame-sm .arch-inner {
   border-radius: 42px 42px 2px 2px;
@@ -150,9 +199,17 @@
 
 /* Micro Animations */
 @keyframes heartPulse {
-  0% { transform: scale(1); }
-  40% { transform: scale(1.35); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+
+  40% {
+    transform: scale(1.35);
+  }
+
+  100% {
+    transform: scale(1);
+  }
 }
 
 .animate-heart-pulse {
@@ -160,9 +217,17 @@
 }
 
 @keyframes badgePop {
-  0% { transform: scale(0); }
-  60% { transform: scale(1.25); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(0);
+  }
+
+  60% {
+    transform: scale(1.25);
+  }
+
+  100% {
+    transform: scale(1);
+  }
 }
 
 .animate-badge-pop {
@@ -170,8 +235,17 @@
 }
 
 @keyframes pulseGlow {
-  0%, 100% { opacity: 0.6; filter: drop-shadow(0 0 1px rgba(180, 134, 60, 0.4)); }
-  50% { opacity: 1; filter: drop-shadow(0 0 4px rgba(180, 134, 60, 0.8)); }
+
+  0%,
+  100% {
+    opacity: 0.6;
+    filter: drop-shadow(0 0 1px rgba(180, 134, 60, 0.4));
+  }
+
+  50% {
+    opacity: 1;
+    filter: drop-shadow(0 0 4px rgba(180, 134, 60, 0.8));
+  }
 }
 
 .animate-pulse-glow {
@@ -184,13 +258,16 @@
     transform: translateX(-120%) skewX(-25deg);
     opacity: 0;
   }
+
   20% {
     opacity: 0.9;
   }
+
   75% {
     transform: translateX(220%) skewX(-25deg);
     opacity: 0;
   }
+
   100% {
     transform: translateX(220%) skewX(-25deg);
     opacity: 0;
@@ -203,14 +280,12 @@
   left: 0;
   width: 60%;
   height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(255, 255, 255, 0.4) 25%,
-    rgba(216, 188, 130, 0.9) 50%,
-    rgba(255, 255, 255, 0.95) 75%,
-    transparent 100%
-  );
+  background: linear-gradient(90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.4) 25%,
+      rgba(216, 188, 130, 0.9) 50%,
+      rgba(255, 255, 255, 0.95) 75%,
+      transparent 100%);
   pointer-events: none;
   mix-blend-mode: overlay;
   animation: logoFoilOnce 1.4s cubic-bezier(0.4, 0, 0.2, 1) 0.3s 1 forwards;
@@ -222,9 +297,11 @@
     width: 0%;
     opacity: 0;
   }
+
   30% {
     opacity: 1;
   }
+
   100% {
     width: 100%;
     opacity: 1;
@@ -237,8 +314,13 @@
 
 /* Hero Cinematic Continuous Zoom Keyframe */
 @keyframes slowHeroZoom {
-  0% { transform: scale(1); }
-  100% { transform: scale(1.05); }
+  0% {
+    transform: scale(1);
+  }
+
+  100% {
+    transform: scale(1.05);
+  }
 }
 
 .animate-hero-zoom {
@@ -248,8 +330,13 @@
 
 /* Slow Continuous Premium Marquee Animation */
 @keyframes marqueeScroll {
-  0% { transform: translateX(0%); }
-  100% { transform: translateX(-33.333%); }
+  0% {
+    transform: translateX(0%);
+  }
+
+  100% {
+    transform: translateX(-33.333%);
+  }
 }
 
 .animate-marquee {
@@ -257,15 +344,46 @@
   animation: marqueeScroll 35s linear infinite;
 }
 
+/* Petal Sway Keyframes for Photoreal Floral Dividers */
+@keyframes petalSwayLeft {
+  0%, 100% {
+    transform: rotate(0deg) translateY(0px) scale(1);
+  }
+  50% {
+    transform: rotate(-2.5deg) translateY(-4px) scale(1.02);
+  }
+}
+
+@keyframes petalSwayRight {
+  0%, 100% {
+    transform: rotate(0deg) translateY(0px) scale(1);
+  }
+  50% {
+    transform: rotate(2.5deg) translateY(-4px) scale(1.02);
+  }
+}
+
+.animate-petal-sway-left {
+  animation: petalSwayLeft 5s ease-in-out infinite;
+}
+
+.animate-petal-sway-right {
+  animation: petalSwayRight 5.5s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
+
   .animate-hero-zoom,
   .animate-marquee,
   .animate-heart-pulse,
   .animate-badge-pop,
-  .animate-pulse-glow {
+  .animate-pulse-glow,
+  .animate-petal-sway-left,
+  .animate-petal-sway-right {
     animation: none !important;
     transform: none !important;
   }
+
   .animate-foil-once {
     animation: none !important;
     display: none !important;
@@ -295,6 +413,7 @@
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
@@ -304,9 +423,11 @@
 .img-zoom-hover {
   overflow: hidden;
 }
+
 .img-zoom-hover img {
   transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
+
 .img-zoom-hover:hover img {
   transform: scale(1.05);
 }
@@ -325,6 +446,58 @@
 }
 
 @keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+  0% {
+    background-position: -200% 0;
+  }
+
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* GPU Hardware Acceleration & Smooth Rendering Helpers */
+.gpu-layer {
+  transform: translateZ(0);
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+.contain-paint {
+  contain: paint layout;
+}
+
+/* 100% Off-Main-Thread GPU Butterfly Flight Animation */
+.animate-butterfly-orbit {
+  animation: butterflyOrbit 14s ease-in-out infinite;
+  will-change: transform;
+}
+
+.animate-left-wing-flap {
+  animation: leftWingFlap 0.32s ease-in-out infinite;
+  will-change: transform;
+}
+
+.animate-right-wing-flap {
+  animation: rightWingFlap 0.32s ease-in-out infinite;
+  will-change: transform;
+}
+
+@keyframes butterflyOrbit {
+  0% { transform: translate(-54px, -16px) rotate(-10deg) scale(0.85); }
+  16.6% { transform: translate(-18px, -26px) rotate(6deg) scale(1.02); }
+  33.3% { transform: translate(40px, -14px) rotate(12deg) scale(0.92); }
+  50% { transform: translate(58px, -2px) rotate(-4deg) scale(1.1); }
+  66.6% { transform: translate(26px, -10px) rotate(-12deg) scale(0.94); }
+  83.3% { transform: translate(-30px, -4px) rotate(3deg) scale(1.0); }
+  100% { transform: translate(-54px, -16px) rotate(-10deg) scale(0.85); }
+}
+
+@keyframes leftWingFlap {
+  0%, 100% { transform: scaleX(1) skewY(0deg); }
+  50% { transform: scaleX(0.25) skewY(-6deg); }
+}
+
+@keyframes rightWingFlap {
+  0%, 100% { transform: scaleX(1) skewY(0deg); }
+  50% { transform: scaleX(0.25) skewY(6deg); }
 }

@@ -557,7 +557,7 @@ export default function ProductGallery({
             </motion.div>
           </AnimatePresence>
 
-          {/* DRFTN Signature Gallery Indicator — Desktop */}
+          {/* TGC Signature Gallery Indicator — Desktop */}
           <DrftnGalleryIndicator
             total={totalSlides}
             activeIndex={activeIndex}
@@ -645,7 +645,7 @@ export default function ProductGallery({
             )}
           </AnimatePresence>
 
-          {/* DRFTN Signature Gallery Indicator — Mobile */}
+          {/* TGC Signature Gallery Indicator — Mobile */}
           <DrftnGalleryIndicator
             total={totalSlides}
             activeIndex={activeIndex}

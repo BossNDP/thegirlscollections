@@ -14,21 +14,42 @@ export interface ProductVariant {
   updated_at?: string;
 }
 
+export type CategorySection = 'women' | 'kids';
+
+export interface CloudinaryAsset {
+  url: string;
+  publicId: string;
+  width?: number;
+  height?: number;
+  uploadedAt?: string;
+}
+
+export interface ProductImageItem extends CloudinaryAsset {
+  id: string;
+  order: number;
+  isPrimary: boolean;
+  altText?: string;
+}
+
 export interface Product {
   id: string;
   name: string;
   slug: string;
   description: string;
-  price: number; // base price in paise (aliased to base_price)
+  price: number; // base price in paise
   base_price?: number;
   compare_price?: number;
-  category: string; // tees, hoodies, joggers, accessories
+  category: string; // primary category slug
   subcategory?: string;
-  gender: string; // unisex, men, women
+  primaryCategoryId?: string;
+  categoryIds?: string[];
+  gender: string; // 'women' | 'kids' | 'unisex'
+  fit_type?: 'regular' | 'plus_size';
   images: string[];
+  imageItems?: ProductImageItem[];
   hidden_detail_image?: string;
   sizes: string[];
-  stock_quantity: Record<string, number>; // e.g., { XS: 10, S: 5 }
+  stock_quantity: Record<string, number>;
   is_featured: boolean;
   paired_with?: string | null;
   is_active: boolean;
@@ -38,19 +59,45 @@ export interface Product {
   height_cm?: number | null;
   units_sold?: number;
   created_at?: string;
+  updated_at?: string;
   variants?: ProductVariant[];
 }
 
 export interface Category {
   id: string;
-  name: string;
+  name: string; // label / display name
+  label?: string;
   slug: string;
-  image_url: string;
-  description?: string | null;
+  parent_group?: string | null;
+  age_group?: 'ladies' | 'kids' | 'unisex';
+  section?: CategorySection;
+  parentId?: string | null;
   parent_id?: string | null;
+  level?: 1 | 2 | 3;
+  order?: number;
+  display_order?: number;
+  sort_order?: number;
   is_active: boolean;
-  display_order: number;
+  isActive?: boolean;
+  deletedAt?: string | null;
+  deletedBy?: string | null;
+  bannerImage?: CloudinaryAsset | null;
+  image_url?: string;
+  description?: string | null;
+  productCount?: number;
   created_at?: string;
+  updated_at?: string;
+}
+
+export interface StaffMember {
+  id: string;
+  email: string;
+  name?: string;
+  role: 'admin' | 'staff';
+  status: 'active' | 'invited';
+  permissions: string[];
+  invitedAt?: string;
+  lastActiveAt?: string;
 }
 
 export interface Order {

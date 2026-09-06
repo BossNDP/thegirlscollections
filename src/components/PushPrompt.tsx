@@ -31,10 +31,10 @@ export default function PushPrompt() {
       }
     }
 
-    // Delay prompt appearance by 15 seconds
+    // Delay prompt appearance by 5 seconds
     const timer = setTimeout(() => {
       setIsVisible(true);
-    }, 15000);
+    }, 5000);
 
     return () => clearTimeout(timer);
   }, []);

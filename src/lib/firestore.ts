@@ -53,11 +53,18 @@ export const firestoreService = {
     }
   },
 
-  async setDoc(collectionName: string, docId: string, data: any): Promise<void> {
+  async setDoc(collectionName: string, docId: string, data: any, options?: { merge?: boolean }): Promise<void> {
     if (db) {
-      await db.collection(collectionName).doc(docId).set(data);
+      await db.collection(collectionName).doc(docId).set(data, options || {});
     } else {
-      await redis.set(`mock_firestore:${collectionName}:${docId}`, JSON.stringify(data));
+      if (options?.merge) {
+        const existingRaw = await redis.get(`mock_firestore:${collectionName}:${docId}`);
+        const existing = existingRaw ? JSON.parse(existingRaw as string) : {};
+        const merged = { ...existing, ...data };
+        await redis.set(`mock_firestore:${collectionName}:${docId}`, JSON.stringify(merged));
+      } else {
+        await redis.set(`mock_firestore:${collectionName}:${docId}`, JSON.stringify(data));
+      }
       await redis.sadd(`mock_firestore_index:${collectionName}`, docId);
     }
   },

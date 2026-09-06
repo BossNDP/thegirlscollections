@@ -3,15 +3,18 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import NextImage from 'next/image';
-import { Plus, Minus, Trash2, Tag, ShoppingBag, ArrowRight, ArrowLeft } from 'lucide-react';
+import { Plus, Minus, Trash2, Tag, ShoppingBag, ArrowRight, ArrowLeft, Truck, ShieldCheck, Sparkles, Check } from 'lucide-react';
 import { useCartStore } from '@/lib/cartStore';
 import { dbService } from '@/lib/db';
 import { getOptimizedImageUrl } from '@/lib/cloudinary';
 import { toast } from '@/lib/toast';
 import { StoreSettings } from '@/types';
+import { MOCK_PRODUCTS } from '@/data/shopData';
+import { ButterflyMotif } from '@/components/ui/Motifs';
 
 export default function CartPage() {
   const items = useCartStore((state) => state.items);
+  const addItem = useCartStore((state) => state.addItem);
   const updateQuantity = useCartStore((state) => state.updateQuantity);
   const removeItem = useCartStore((state) => state.removeItem);
   const getCartTotal = useCartStore((state) => state.getCartTotal);
@@ -38,7 +41,7 @@ export default function CartPage() {
   }, []);
 
   const subtotal = getCartTotal();
-  const freeShippingThreshold = storeSettings?.free_shipping_threshold ?? 0;
+  const freeShippingThreshold = storeSettings?.free_shipping_threshold ?? 199900; // ₹1,999 in paise
   const defaultShippingCharge = storeSettings?.default_shipping_charge ?? 0;
 
   // Calculate shipping
@@ -100,115 +103,136 @@ export default function CartPage() {
   const amountToFreeShipping = Math.max(0, freeShippingThreshold - subtotal);
   const hasEarnedFreeShipping = subtotal >= freeShippingThreshold;
 
+  // Complementary Cross-Sell Recommendations (excluding items already in bag)
+  const cartItemIds = new Set(items.map((i) => i.id));
+  const crossSellProducts = MOCK_PRODUCTS.filter((p) => !cartItemIds.has(p.id)).slice(0, 6);
+
   if (items.length === 0) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center text-center py-32 px-6 space-y-8 bg-brand-black" role="status" aria-live="polite">
-        <div className="w-20 h-20 border border-brand-graphite flex items-center justify-center">
-          <ShoppingBag className="w-8 h-8 text-brand-muted stroke-[1]" aria-hidden="true" />
+      <div className="flex-1 flex flex-col items-center justify-center text-center py-28 px-6 space-y-8 bg-ivory text-navy" role="status" aria-live="polite">
+        <div className="w-20 h-20 rounded-full border-2 border-zariGold/30 bg-blush/20 flex items-center justify-center shadow-md">
+          <ShoppingBag className="w-8 h-8 text-zariGold stroke-[1.5]" aria-hidden="true" />
         </div>
         <div className="space-y-3">
-          <h1 className="text-2xl font-display uppercase tracking-widest text-brand-offwhite">NO DROPS IN BAG.</h1>
-          <p className="text-brand-stone text-xs tracking-wider uppercase max-w-xs mx-auto font-body">
-            You haven&apos;t added any items to your shopping bag yet. Explore the drop to get driftin.
+          <span className="text-xs uppercase font-mono tracking-[0.25em] text-zariGold font-bold">Your Shopping Bag</span>
+          <h1 className="text-2xl sm:text-3xl font-serif font-bold uppercase tracking-wider text-navy">Your Bag is Empty</h1>
+          <p className="text-charcoal-muted text-xs sm:text-sm tracking-wider max-w-sm mx-auto font-sans leading-relaxed">
+            Discover our curated handcrafted sarees, lehengas, and kids pure silk collections.
           </p>
         </div>
         <Link
           href="/shop"
-          className="btn-primary"
+          className="bg-navy hover:bg-navy/90 text-ivory px-8 py-4 rounded-xl font-bold uppercase tracking-widest text-xs shadow-lg transition-all flex items-center gap-2"
         >
           <span>Explore Collection</span>
-          <ArrowRight className="w-3.5 h-3.5 relative z-10" aria-hidden="true" />
+          <ArrowRight className="w-4 h-4 text-zariGold" aria-hidden="true" />
         </Link>
       </div>
     );
   }
 
   return (
-    <div className="py-16 px-6 md:px-12 max-w-screen-2xl mx-auto w-full flex-1 flex flex-col bg-brand-black">
-      {/* Page Title */}
-      <div className="border-b border-brand-graphite pb-8 mb-10 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+    <div className="py-10 sm:py-16 px-4 sm:px-8 md:px-12 max-w-7xl mx-auto w-full flex-1 flex flex-col bg-ivory text-navy">
+      {/* Page Title & Breadcrumb Header */}
+      <div className="border-b border-zariGold/20 pb-6 mb-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
-          <span className="eyebrow mb-3 block">Your Checkout Selection</span>
-          <h1 className="text-brand-offwhite leading-none font-display uppercase" style={{ fontSize: 'clamp(2.4rem, 6vw, 4.5rem)' }}>
-            Your Bag
+          <div className="flex items-center gap-2 text-zariGold text-xs uppercase tracking-widest font-mono font-bold mb-2">
+            <ButterflyMotif className="w-4 h-4 text-zariGold" />
+            <span>Luxury Handcrafted Fashion</span>
+          </div>
+          <h1 className="text-3xl sm:text-5xl font-serif font-bold text-navy tracking-tight">
+            Your Shopping Bag
           </h1>
         </div>
-        <p className="text-brand-stone text-[10px] tracking-[0.2em] uppercase font-body font-semibold mb-1">
-          {items.reduce((acc, item) => acc + item.quantity, 0)} Items Added
-        </p>
+        <div className="flex items-center gap-4">
+          <span className="text-xs font-mono font-bold tracking-widest text-navy bg-blush/40 border border-zariGold/30 px-3.5 py-1.5 rounded-full">
+            {items.reduce((acc, item) => acc + item.quantity, 0)} ITEMS IN BAG
+          </span>
+          <Link
+            href="/shop"
+            className="hidden sm:inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-zariGold hover:text-navy transition-colors"
+          >
+            <ArrowLeft className="w-3.5 h-3.5" /> Continue Shopping
+          </Link>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 lg:gap-14">
-        {/* Left Column: Cart Items List */}
-        <div className="lg:col-span-2 space-y-8">
-          <div className="border border-brand-graphite bg-brand-charcoal/30 divide-y divide-brand-graphite" role="list" aria-label="Shopping bag items">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
+        {/* Left Column: Cart Items + Cross-Sell Row */}
+        <div className="lg:col-span-7 space-y-8">
+          {/* Cart Item Cards */}
+          <div className="space-y-4" role="list" aria-label="Shopping bag items">
             {items.map((item) => (
-              <div key={`${item.id}-${item.size}`} className="p-6 flex flex-col sm:flex-row gap-6" role="listitem">
-                {/* Image */}
-                <div className="relative w-24 h-32 bg-brand-graphite overflow-hidden flex-shrink-0">
+              <div
+                key={`${item.id}-${item.size}`}
+                className="p-4 sm:p-5 rounded-2xl border border-zariGold/30 bg-white shadow-md flex gap-4 sm:gap-6 items-start"
+                role="listitem"
+              >
+                {/* Product Thumbnail */}
+                <div className="relative w-20 h-28 sm:w-24 sm:h-32 rounded-xl overflow-hidden bg-sand/20 border border-zariGold/20 shrink-0">
                   <NextImage
                     src={getOptimizedImageUrl(item.image, 200) || 'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?w=300'}
                     alt={`${item.name} — size ${item.size}`}
                     fill
                     sizes="96px"
-                    className="object-cover"
+                    className="object-cover object-top"
                   />
                 </div>
 
-                {/* Details */}
-                <div className="flex-1 flex flex-col justify-between min-w-0">
+                {/* Product Details */}
+                <div className="flex-1 flex flex-col justify-between min-w-0 h-full">
                   <div>
-                    <div className="flex justify-between items-start gap-4">
+                    <div className="flex justify-between items-start gap-2">
                       <div>
-                        <span className="text-[9px] text-brand-amber font-semibold uppercase tracking-[0.2em] font-body">
-                          DRFTN STAPLE
+                        <span className="text-[9.5px] text-zariGold font-bold uppercase tracking-[0.2em] font-mono block">
+                          THE GIRLS COLLECTIONS
                         </span>
-                        <h3 className="text-sm font-semibold text-brand-offwhite uppercase tracking-wide mt-1 font-body leading-snug">
+                        <h3 className="text-sm sm:text-base font-serif font-bold text-navy mt-1 leading-snug truncate">
                           {item.name}
                         </h3>
-                        <p className="text-[10px] text-brand-stone font-semibold uppercase tracking-wider mt-1.5 font-body">
-                          Size: {item.size}
+                        <p className="text-xs text-charcoal-muted font-medium mt-1">
+                          Size: <span className="font-bold text-navy">{item.size}</span>
                         </p>
                       </div>
-                      <span className="text-sm font-bold text-brand-offwhite shrink-0 font-body">
+                      <span className="text-base font-bold text-navy shrink-0 font-sans">
                         ₹{((item.price * item.quantity) / 100).toLocaleString('en-IN', { minimumFractionDigits: 0 })}
                       </span>
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between mt-6">
-                    {/* Quantity Controls */}
-                    <div className="flex items-center border border-brand-muted bg-brand-graphite" role="group" aria-label="Quantity controls">
+                  <div className="flex items-center justify-between mt-4 pt-3 border-t border-zariGold/10">
+                    {/* Quantity Selector */}
+                    <div className="flex items-center border border-zariGold/30 rounded-lg bg-ivory/60" role="group" aria-label="Quantity controls">
                       <button
                         onClick={() => updateQuantity(item.id, item.size, item.quantity - 1)}
-                        className="w-8 h-8 flex items-center justify-center text-brand-stone hover:text-brand-offwhite transition-colors"
+                        className="w-7 h-7 flex items-center justify-center text-navy hover:text-zariGold transition-colors"
                         aria-label={`Decrease quantity of ${item.name}`}
                       >
-                        <Minus className="w-3.5 h-3.5" />
+                        <Minus className="w-3 h-3" />
                       </button>
-                      <span className="text-xs px-3 text-brand-offwhite font-bold w-8 text-center select-none font-body">
+                      <span className="text-xs px-2 text-navy font-bold w-7 text-center select-none font-sans">
                         {item.quantity}
                       </span>
                       <button
                         onClick={() => updateQuantity(item.id, item.size, item.quantity + 1)}
-                        className="w-8 h-8 flex items-center justify-center text-brand-stone hover:text-brand-offwhite transition-colors"
+                        className="w-7 h-7 flex items-center justify-center text-navy hover:text-zariGold transition-colors"
                         aria-label={`Increase quantity of ${item.name}`}
                       >
-                        <Plus className="w-3.5 h-3.5" />
+                        <Plus className="w-3 h-3" />
                       </button>
                     </div>
 
-                    {/* Delete button */}
+                    {/* Remove item button */}
                     <button
                       onClick={() => {
                         removeItem(item.id, item.size);
                         toast.info(`Removed ${item.name} from bag.`);
                       }}
-                      className="text-brand-stone hover:text-white transition-colors flex items-center gap-1.5 text-[10px] uppercase tracking-widest font-bold"
+                      className="text-rose-700 hover:text-rose-900 transition-colors flex items-center gap-1 text-xs font-semibold"
                       aria-label={`Remove ${item.name} from bag`}
                     >
-                      <Trash2 className="w-4 h-4" />
-                      <span className="hidden sm:inline">Remove</span>
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>Remove</span>
                     </button>
                   </div>
                 </div>
@@ -216,74 +240,135 @@ export default function CartPage() {
             ))}
           </div>
 
-          {/* Continue shopping link */}
-          <div className="text-left">
+          {/* Continue Shopping low-friction link */}
+          <div className="flex items-center justify-between pt-2">
             <Link
               href="/shop"
-              className="inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] text-brand-stone hover:text-brand-offwhite font-bold transition-colors border-animate pb-0.5"
+              className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-navy hover:text-zariGold transition-colors"
             >
-              <ArrowLeft className="w-3.5 h-3.5" aria-hidden="true" />
+              <ArrowLeft className="w-4 h-4 text-zariGold" />
               Continue Shopping
             </Link>
+            <span className="text-xs text-charcoal-muted font-medium">
+              Need help? WhatsApp us at <a href="https://wa.me/917483848505" target="_blank" className="underline font-bold text-navy">+91 74838 48505</a>
+            </span>
           </div>
+
+          {/* Cross-sell / "You Might Also Like" Horizontal Scroll Strip */}
+          {crossSellProducts.length > 0 && (
+            <div className="pt-6 border-t border-zariGold/20 space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-base font-serif font-bold text-navy">Complete Your Look</h3>
+                  <p className="text-xs text-charcoal-muted">Frequently bought together with your selection</p>
+                </div>
+                <span className="text-[10px] font-mono uppercase tracking-widest text-zariGold font-bold">
+                  Curated Pairings
+                </span>
+              </div>
+
+              <div className="flex gap-4 overflow-x-auto pb-4 no-scrollbar scroll-smooth">
+                {crossSellProducts.map((prod) => (
+                  <div
+                    key={prod.id}
+                    className="w-40 sm:w-44 shrink-0 rounded-xl border border-zariGold/30 bg-white p-3 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between"
+                  >
+                    <div className="relative w-full aspect-[3/4] rounded-lg overflow-hidden bg-sand/20 mb-2">
+                      <NextImage
+                        src={getOptimizedImageUrl(prod.images[0], 300)}
+                        alt={prod.name}
+                        fill
+                        sizes="160px"
+                        className="object-cover object-top"
+                      />
+                    </div>
+                    <div>
+                      <h4 className="text-xs font-serif font-bold text-navy truncate">{prod.name}</h4>
+                      <p className="text-xs font-sans font-bold text-zariGold mt-0.5">
+                        ₹{(prod.price / 100).toLocaleString('en-IN')}
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => {
+                        addItem({
+                          id: prod.id,
+                          name: prod.name,
+                          slug: prod.slug,
+                          price: prod.price,
+                          image: prod.images[0] || '',
+                          size: prod.sizes[0]?.size || 'Free Size',
+                        });
+                        toast.success(`Added ${prod.name} to bag!`);
+                      }}
+                      className="mt-2.5 w-full bg-ivory hover:bg-blush/40 border border-zariGold/40 text-navy py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-colors flex items-center justify-center gap-1"
+                    >
+                      <Plus className="w-3 h-3 text-zariGold" /> Add to Bag
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* Right Column: Order Summary & Discount Code */}
-        <div className="space-y-8">
-          <div className="border border-brand-graphite bg-brand-charcoal/30 p-6 space-y-6">
-            <h2 className="text-xs font-bold uppercase tracking-[0.2em] text-brand-offwhite border-b border-brand-graphite pb-4 font-display">
-              Order Summary
+        {/* Right Column: Order Summary, Delivery Estimate & Promo Code */}
+        <div className="lg:col-span-5 space-y-6">
+          {/* Order Summary Box */}
+          <div className="rounded-2xl border border-zariGold/30 bg-white p-6 shadow-xl space-y-5">
+            <h2 className="text-lg font-serif font-bold text-navy border-b border-zariGold/20 pb-3 flex items-center justify-between">
+              <span>Order Summary</span>
+              <ShieldCheck className="w-5 h-5 text-zariGold" />
             </h2>
 
-            {/* Free Shipping Progress bar in Order Summary */}
-            {!loadingSettings && (
-              <div className="space-y-2 pb-2">
+            {/* Free Shipping Progress & Delivery Estimate */}
+            <div className="space-y-3 bg-blush/15 p-3.5 rounded-xl border border-zariGold/20">
+              <div className="space-y-1.5">
                 {hasEarnedFreeShipping ? (
-                  <p className="text-[10px] tracking-[0.2em] uppercase font-bold text-brand-amber font-body">
-                    ✓ Free Shipping Unlocked!
+                  <p className="text-xs font-bold text-emerald-700 flex items-center gap-1.5">
+                    <Check className="w-4 h-4 text-emerald-600" /> Free Shipping Unlocked!
                   </p>
                 ) : (
-                  <p className="text-[10px] tracking-[0.15em] uppercase font-body font-medium text-brand-stone">
-                    Add <span className="text-brand-offwhite font-bold">
+                  <p className="text-xs font-medium text-navy">
+                    Add <span className="font-bold text-zariGold">
                       ₹{(amountToFreeShipping / 100).toLocaleString('en-IN', { minimumFractionDigits: 0 })}
-                    </span> more for free shipping
+                    </span> more for FREE insured delivery
                   </p>
                 )}
-                <div className="shipping-progress-bar">
+                <div className="w-full bg-sand/40 h-2 rounded-full overflow-hidden">
                   <div
-                    className="shipping-progress-fill"
+                    className="bg-zariGold h-full transition-all duration-500 rounded-full"
                     style={{ width: `${shippingProgress}%` }}
-                    role="progressbar"
-                    aria-valuenow={shippingProgress}
-                    aria-valuemin={0}
-                    aria-valuemax={100}
                   />
                 </div>
               </div>
-            )}
 
-            {/* Calculations lines */}
-            <div className="space-y-4 text-xs font-body">
-              <div className="flex justify-between items-center text-brand-stone">
+              <div className="flex items-center gap-2 text-[11px] text-navy/80 pt-1 border-t border-zariGold/10">
+                <Truck className="w-4 h-4 text-zariGold shrink-0" />
+                <span>Express Air Delivery: <strong>5–7 Business Days</strong> across India</span>
+              </div>
+            </div>
+
+            {/* Line items */}
+            <div className="space-y-3 text-xs font-sans">
+              <div className="flex justify-between items-center text-charcoal-muted">
                 <span>Bag Subtotal</span>
-                <span className="font-semibold text-brand-offwhite">
+                <span className="font-bold text-navy text-sm">
                   ₹{(subtotal / 100).toLocaleString('en-IN', { minimumFractionDigits: 0 })}
                 </span>
               </div>
 
               {/* Promo code line */}
               {discountCode && (
-                <div className="flex justify-between items-center text-emerald-400">
+                <div className="flex justify-between items-center text-emerald-700 bg-emerald-50 px-3 py-2 rounded-lg border border-emerald-200">
                   <div className="flex items-center gap-1.5">
-                    <Tag className="w-3.5 h-3.5" aria-hidden="true" />
+                    <Tag className="w-3.5 h-3.5 text-emerald-600" />
                     <span className="uppercase font-bold tracking-wider">{discountCode.code}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="font-bold">−₹{(discountAmount / 100).toLocaleString('en-IN', { minimumFractionDigits: 0 })}</span>
                     <button
                       onClick={handleRemovePromo}
-                      className="text-brand-stone hover:text-white text-[9px] uppercase font-bold tracking-widest transition-colors"
-                      aria-label="Remove promo code"
+                      className="text-rose-700 hover:underline text-[10px] font-bold"
                     >
                       Remove
                     </button>
@@ -291,64 +376,63 @@ export default function CartPage() {
                 </div>
               )}
 
-              <div className="flex justify-between items-center text-brand-stone">
+              <div className="flex justify-between items-center text-charcoal-muted">
                 <span>Shipping Fee</span>
                 {shippingCharge === 0 ? (
-                  <span className="font-extrabold text-emerald-400 uppercase tracking-widest text-[10px]">
+                  <span className="font-bold text-emerald-700 uppercase tracking-wider text-[11px]">
                     FREE
                   </span>
                 ) : (
-                  <span className="font-semibold text-brand-offwhite">
+                  <span className="font-bold text-navy">
                     ₹{(shippingCharge / 100).toLocaleString('en-IN', { minimumFractionDigits: 0 })}
                   </span>
                 )}
               </div>
             </div>
 
-            <div className="border-t border-brand-graphite"></div>
-
-            {/* Total line */}
-            <div className="flex justify-between items-center">
-              <span className="text-xs uppercase tracking-[0.2em] text-brand-stone font-body font-semibold">Estimated Total</span>
-              <span className="text-lg font-extrabold text-brand-offwhite font-display">
-                ₹{(finalTotal / 100).toLocaleString('en-IN', { minimumFractionDigits: 0 })}
-              </span>
+            <div className="border-t border-zariGold/20 pt-3">
+              <div className="flex justify-between items-center">
+                <span className="text-xs uppercase font-mono font-bold tracking-widest text-navy">Estimated Total</span>
+                <span className="text-2xl font-serif font-bold text-navy">
+                  ₹{(finalTotal / 100).toLocaleString('en-IN', { minimumFractionDigits: 0 })}
+                </span>
+              </div>
+              <p className="text-[10px] text-charcoal-muted mt-1">Inclusive of all taxes &amp; transit insurance</p>
             </div>
 
-            {/* Proceed CTA */}
+            {/* Checkout CTA */}
             <Link
               href="/checkout"
-              className="btn-electric w-full text-center bg-brand-offwhite text-brand-black hover:bg-white transition-all duration-300 relative border border-transparent font-bold text-xs uppercase tracking-widest py-4 px-6"
+              className="w-full bg-navy hover:bg-navy/90 text-ivory text-center py-4 rounded-xl font-bold uppercase tracking-widest text-xs transition-all shadow-lg flex items-center justify-center gap-2 group"
             >
               <span>Proceed to Checkout</span>
+              <ArrowRight className="w-4 h-4 text-zariGold group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
 
-          {/* Promo code box */}
-          <div className="border border-brand-graphite bg-brand-charcoal/20 p-6 space-y-4">
-            <h3 className="text-[10px] font-bold uppercase tracking-[0.25em] text-brand-stone flex items-center gap-2">
-              <Tag className="w-3.5 h-3.5 text-brand-stone" aria-hidden="true" />
-              Apply Promo Code
+          {/* Expandable Promo Code Box */}
+          <div className="rounded-2xl border border-zariGold/30 bg-white p-5 shadow-sm space-y-3">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-navy flex items-center gap-2">
+              <Tag className="w-4 h-4 text-zariGold" />
+              Have a Promo Code?
             </h3>
-            <form onSubmit={handleApplyPromo} className="flex gap-2" aria-label="Apply promo code">
-              <label htmlFor="cart-promo-input" className="sr-only">Promo code</label>
+            <form onSubmit={handleApplyPromo} className="flex gap-2">
               <input
-                id="cart-promo-input"
                 type="text"
                 value={promoInput}
                 onChange={(e) => setPromoInput(e.target.value)}
-                placeholder="DRFTN10 / BLRSTREET"
-                className="flex-1 bg-brand-graphite border border-brand-muted text-brand-offwhite py-2.5 px-4 text-xs uppercase font-bold tracking-wider"
+                placeholder="Enter FESTIVE10 / WELCOME10"
+                className="flex-1 bg-ivory border border-zariGold/30 rounded-xl px-3.5 py-2.5 text-xs font-mono font-bold uppercase text-navy placeholder:text-charcoal-muted/60 focus:outline-none focus:border-zariGold"
               />
               <button
                 type="submit"
-                className="bg-brand-graphite border border-brand-muted text-brand-offwhite hover:border-brand-amber hover:text-brand-amber font-bold text-xs uppercase tracking-wider py-2.5 px-4 transition-colors"
+                className="bg-zariGold hover:bg-zariGold/90 text-white font-bold text-xs uppercase tracking-wider py-2.5 px-4 rounded-xl transition-colors shadow-sm"
               >
                 Apply
               </button>
             </form>
-            <p className="text-[10px] text-brand-stone leading-relaxed font-body font-light">
-              * Promo codes cannot be combined. Min order values apply. Try codes: <strong className="text-brand-stone font-semibold">DRFTN10</strong> (10% off) or <strong className="text-brand-stone font-semibold">BLRSTREET</strong> (₹250 off on orders &gt; ₹1499).
+            <p className="text-[11px] text-charcoal-muted leading-relaxed">
+              Use code <strong className="text-navy">FESTIVE10</strong> for 10% off your first order!
             </p>
           </div>
         </div>

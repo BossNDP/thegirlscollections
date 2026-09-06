@@ -32,7 +32,7 @@ async function ensureTables() {
   } catch {}
 }
 
-const STATIC_DRIFT_CODE = 'DRFTNMODEON20';
+const STATIC_DRIFT_CODE = 'TGCMODEON20';
 
 async function getUserId(): Promise<string | null> {
   try {
@@ -42,7 +42,7 @@ async function getUserId(): Promise<string | null> {
 
   try {
     const cookieStore = cookies();
-    const sessionToken = cookieStore.get('drftn_session')?.value;
+    const sessionToken = cookieStore.get('tgc_session')?.value;
     if (sessionToken) {
       const payload = await verifyToken(sessionToken);
       if (payload && payload.userId) {

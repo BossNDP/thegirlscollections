@@ -3,9 +3,10 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useToast } from '@/components/ToastContainer';
-import { useSignIn, useClerk, useAuth as useClerkAuth } from '@clerk/nextjs';
-import { X, Loader2, Smartphone } from 'lucide-react';
+import { useSignIn, useClerk, useAuth as useClerkAuth, useUser as useClerkUser } from '@clerk/nextjs';
+import { X, Loader2, Smartphone, Sparkles, ShieldCheck, Check } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import TermsAndConditionsBox from '@/components/TermsAndConditionsBox';
 
 interface User {
   id: string;
@@ -73,11 +74,26 @@ export function AuthSessionProvider({ children }: { children: React.ReactNode })
   const { signOut } = useClerk();
   const { signIn, isLoaded: clerkSignInLoaded } = useSignIn();
   const { isSignedIn: clerkIsSignedIn, isLoaded: clerkAuthLoaded } = useClerkAuth();
+  const { user: clerkUser } = useClerkUser();
 
   // ── Core session state ──────────────────────────────────────────
   const [user, setUser] = useState<User | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [mounted, setMounted] = useState(false);
+
+  // Derive effective user from DB session or Clerk active session
+  const effectiveUser = user || (clerkUser ? {
+    id: clerkUser.id,
+    name: clerkUser.fullName || `${clerkUser.firstName || ''} ${clerkUser.lastName || ''}`.trim() || clerkUser.primaryEmailAddress?.emailAddress || 'Google User',
+    email: clerkUser.primaryEmailAddress?.emailAddress || null,
+    emailVerified: true,
+    phone: clerkUser.primaryPhoneNumber?.phoneNumber || null,
+    phoneVerified: !!clerkUser.primaryPhoneNumber,
+    authProvider: 'google' as const,
+    notificationsOptIn: true,
+    termsAcceptedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
+  } : null);
 
   // ── Modal state ─────────────────────────────────────────────────
   const [modalOpen, setModalOpen] = useState(false);
@@ -92,6 +108,7 @@ export function AuthSessionProvider({ children }: { children: React.ReactNode })
   const [profileFirstName, setProfileFirstName] = useState('');
   const [profileLastName, setProfileLastName] = useState('');
   const [profileEmail, setProfileEmail] = useState('');
+  const [profilePhone, setProfilePhone] = useState('');
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [notificationsOptIn, setNotificationsOptIn] = useState(true);
   const [isSubmittingProfile, setIsSubmittingProfile] = useState(false);
@@ -104,6 +121,31 @@ export function AuthSessionProvider({ children }: { children: React.ReactNode })
       if (res.ok) {
         const data = await res.json();
         setUser(data.user);
+
+        // Check if user just completed Google Sign-In
+        const justSignedInGoogle = sessionStorage.getItem('just_signed_in_google');
+        if (justSignedInGoogle) {
+          sessionStorage.removeItem('just_signed_in_google');
+          addToast('Signed in successfully with Google! 👋', 'success');
+        }
+
+        // Check if new user needing name confirmation/entry modal
+        const pendingNewGoogle = sessionStorage.getItem('pending_new_google_user');
+        if (pendingNewGoogle || data.isNewUser || (data.user && (data.user.name === 'Google User' || !data.user.name))) {
+          sessionStorage.removeItem('pending_new_google_user');
+          const emailToUse = clerkUser?.primaryEmailAddress?.emailAddress || data.user?.email || '';
+          const firstNameToUse = clerkUser?.firstName || (data.user?.name && data.user.name !== 'Google User' ? data.user.name.split(' ')[0] : '');
+          const lastNameToUse = clerkUser?.lastName || (data.user?.name && data.user.name !== 'Google User' ? data.user.name.split(' ').slice(1).join(' ') : '');
+
+          if (emailToUse) setProfileEmail(emailToUse);
+          if (firstNameToUse) setProfileFirstName(firstNameToUse);
+          if (lastNameToUse) setProfileLastName(lastNameToUse);
+          if (data.user?.phone) setProfilePhone(data.user.phone.replace(/\D/g, '').slice(-10));
+
+          setModalMode('google');
+          setProfileStep(true);
+          setModalOpen(true);
+        }
       }
     } catch (err) {
       console.error('Failed to fetch auth session:', err);
@@ -127,6 +169,20 @@ export function AuthSessionProvider({ children }: { children: React.ReactNode })
     });
   }, []);
 
+  // ── Auto-sync profile fields from clerkUser / user ───────────────
+  useEffect(() => {
+    const emailToUse = clerkUser?.primaryEmailAddress?.emailAddress || user?.email;
+    if (emailToUse) {
+      setProfileEmail(emailToUse);
+    }
+    if (clerkUser?.firstName) {
+      setProfileFirstName(prev => prev || clerkUser.firstName || '');
+    }
+    if (clerkUser?.lastName) {
+      setProfileLastName(prev => prev || clerkUser.lastName || '');
+    }
+  }, [clerkUser, user]);
+
   // ── Detect Clerk Google session and sync with custom auth ────────
   useEffect(() => {
     if (clerkAuthLoaded && clerkIsSignedIn && !user && isLoaded) {
@@ -139,9 +195,9 @@ export function AuthSessionProvider({ children }: { children: React.ReactNode })
   // ── Heartbeat (active users) ─────────────────────────────────────
   useEffect(() => {
     if (!user) return;
-    fetch('/api/auth/heartbeat', { method: 'POST' }).catch(() => {});
+    fetch('/api/auth/heartbeat', { method: 'POST' }).catch(() => { });
     const interval = setInterval(() => {
-      fetch('/api/auth/heartbeat', { method: 'POST' }).catch(() => {});
+      fetch('/api/auth/heartbeat', { method: 'POST' }).catch(() => { });
     }, 2 * 60 * 1000);
     return () => clearInterval(interval);
   }, [user]);
@@ -161,6 +217,7 @@ export function AuthSessionProvider({ children }: { children: React.ReactNode })
     setProfileFirstName('');
     setProfileLastName('');
     setProfileEmail('');
+    setProfilePhone('');
     setTermsAccepted(false);
     setNotificationsOptIn(true);
     setIsActionInProgress(false);
@@ -213,7 +270,7 @@ export function AuthSessionProvider({ children }: { children: React.ReactNode })
       await signIn.authenticateWithRedirect({
         strategy: 'oauth_google',
         redirectUrl: '/sso-callback',
-        redirectUrlComplete: window.location.origin,
+        redirectUrlComplete: '/',
       });
     } catch (err: any) {
       // Handle "session_exists" — Clerk already has a session, just sync
@@ -326,7 +383,7 @@ export function AuthSessionProvider({ children }: { children: React.ReactNode })
 
     setIsSubmittingProfile(true);
     try {
-      if (tokenToUse || !user) {
+      if (modalMode === 'phone' && tokenToUse) {
         // Phone signup registration flow
         const res = await fetch('/api/auth/register-phone', {
           method: 'POST',
@@ -343,25 +400,35 @@ export function AuthSessionProvider({ children }: { children: React.ReactNode })
           sessionStorage.removeItem('pending_new_user_temp_token');
           setTempToken(null);
           setUser(data.user);
-          addToast('Welcome to DRFTN! 🎉', 'success');
+          addToast('Welcome to The Girls Collections! 🎉', 'success');
           if (data.triggerPush) subscribeToWebPush(addToast);
           closeAuthModal();
         } else {
           addToast(data.error || 'Failed to save profile. Please try again.', 'error');
         }
       } else {
-        // Existing user (e.g. Google sign-in) updating profile
+        // Existing user (e.g. Google sign-in) or new user completing profile
+        const effectiveEmail = profileEmail.trim() || clerkUser?.primaryEmailAddress?.emailAddress || user?.email || undefined;
+        const effectiveUserId = user?.id || clerkUser?.id || undefined;
+
         const res = await fetch('/api/auth/update-profile', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             name: fullName,
+            phone: profilePhone.trim() || undefined,
+            email: effectiveEmail,
+            userId: effectiveUserId,
+            tempToken: tokenToUse || undefined,
           }),
         });
         const data = await res.json();
         if (res.ok && data.success) {
+          sessionStorage.removeItem('pending_new_user_temp_token');
+          sessionStorage.removeItem('pending_new_google_user');
           setUser(data.user);
-          addToast('Profile updated! 🎉', 'success');
+          await refreshUser();
+          addToast('Welcome to The Girls Collections! 🎉', 'success');
           closeAuthModal();
         } else {
           addToast(data.error || 'Failed to update profile', 'error');
@@ -387,7 +454,7 @@ export function AuthSessionProvider({ children }: { children: React.ReactNode })
   }, [modalOpen, isVerifying, profileStep]);
 
   return (
-    <AuthContext.Provider value={{ user, isSignedIn: !!user, isLoaded, openAuthModal, closeAuthModal, logout, refreshUser }}>
+    <AuthContext.Provider value={{ user: effectiveUser, isSignedIn: !!effectiveUser, isLoaded, openAuthModal, closeAuthModal, logout, refreshUser }}>
       {children}
 
       {/* ── Auth Modal Portal ── */}
@@ -401,170 +468,206 @@ export function AuthSessionProvider({ children }: { children: React.ReactNode })
               transition={{ duration: 0.2 }}
               onClick={() => { if (!isVerifying && !profileStep) closeAuthModal(); }}
               style={{ zIndex: 99999 }}
-              className="fixed inset-0 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 overflow-y-auto"
+              className="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-md p-4 overflow-y-auto"
             >
               <motion.div
-                initial={{ y: 40, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                exit={{ y: 40, opacity: 0 }}
-                transition={{ duration: 0.25, ease: 'easeOut' }}
+                initial={{ scale: 0.94, opacity: 0, y: 15 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                exit={{ scale: 0.94, opacity: 0, y: 15 }}
+                transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
                 onClick={(e) => e.stopPropagation()}
-                className="relative w-full max-w-[420px] bg-ivory border border-zariGold/40 p-6 md:p-8 flex flex-col items-center gap-6 shadow-[0_16px_48px_rgba(28,31,59,0.25)] rounded-t-[32px] md:rounded-2xl max-h-[90vh] overflow-y-auto"
+                className="relative w-full max-w-[420px] bg-[#FFF0F3] border border-[#F4C2CE] rounded-3xl flex flex-col items-center shadow-[0_20px_70px_rgba(220,130,150,0.35)] overflow-hidden max-h-[92vh]"
               >
                 {/* Close button — hidden while verifying */}
                 {!isVerifying && (
                   <button
                     onClick={closeAuthModal}
-                    className="absolute top-4 right-4 text-inkNavy/50 hover:text-zariGold transition-colors w-9 h-9 flex items-center justify-center cursor-pointer z-50 rounded-full hover:bg-zariGold/10"
+                    className="absolute top-3.5 right-3.5 text-[#581825] bg-white/80 hover:bg-white p-2 rounded-full border border-[#F4C2CE] shadow-md transition-all cursor-pointer z-50 flex items-center justify-center"
                     aria-label="Close"
                   >
-                    <X className="w-5 h-5" />
+                    <X className="w-4 h-4 text-[#581825] stroke-[2.5]" />
                   </button>
                 )}
 
-                {/* Logo & Brand Header */}
-                <div className="flex flex-col items-center text-center pt-2">
-                  <span className="text-[10px] font-serif font-bold text-zariGold tracking-[0.25em] uppercase mb-1">
-                    THE GIRLS COLLECTION
-                  </span>
-                  <h2 className="font-serif text-2xl font-bold text-inkNavy">
-                    Welcome to Luxury
-                  </h2>
+                {/* Top Banner Image (login.webp) */}
+                <div className="relative w-full h-44 sm:h-48 overflow-hidden bg-[#FDE2E8] select-none">
+                  <img
+                    src="/login.webp"
+                    alt="The Girls Collections Luxury Auth"
+                    className="w-full h-full object-cover object-center"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#FFF0F3] via-[#FFF0F3]/30 to-transparent" />
+
+                  {/* Floating Brand Badge */}
+                  {/* <div className="absolute top-4 left-4 bg-white/85 backdrop-blur-md px-3 py-1 rounded-full border border-[#F4C2CE] flex items-center gap-1.5 shadow-sm">
+                    <Sparkles className="w-3.5 h-3.5 text-rose-600 animate-pulse" />
+                    <span className="text-[10px] font-bold tracking-widest uppercase text-[#581825] font-mono">
+                      THE GIRLS COLLECTIONS
+                    </span>
+                  </div> */}
                 </div>
 
-                {/* ── VERIFYING STATE ── */}
-                {isVerifying && (
-                  <div className="flex flex-col items-center gap-4 py-8 w-full">
-                    <Loader2 className="w-10 h-10 text-zariGold animate-spin" />
-                    <p className="text-xs font-serif font-bold tracking-widest text-inkNavy uppercase">
-                      Verifying your credentials…
+                {/* Content Container */}
+                <div className="w-full p-6 sm:p-7 flex flex-col items-center text-center gap-5 -mt-3 relative z-10">
+                  {/* Header copy */}
+                  <div className="space-y-1">
+                    <span className="text-[10px] uppercase font-bold tracking-[0.25em] text-rose-600 font-mono">
+                      Welcome to Luxury
+                    </span>
+                    <h2 className="text-xl sm:text-2xl font-black uppercase text-[#4A111E] tracking-widest leading-tight">
+                      Sign In / Register
+                    </h2>
+                    <p className="text-xs text-[#7A3E4D] tracking-wider leading-relaxed font-medium">
+                      Access your order history, wishlist, and exclusive member perks.
                     </p>
                   </div>
-                )}
 
-                {/* ── PROFILE COMPLETION STEP (new user) ── */}
-                {!isVerifying && profileStep && (
-                  <form onSubmit={handleProfileSubmit} className="w-full space-y-4">
-                    <div className="text-center space-y-1 pb-2">
-                      <h3 className="text-sm font-serif font-bold uppercase text-inkNavy tracking-widest">
-                        Complete Your Profile
-                      </h3>
-                      <p className="text-xs text-inkNavy/70 font-sans leading-relaxed">
-                        Provide your details to complete your luxury profile.
+                  {/* ── VERIFYING STATE ── */}
+                  {isVerifying && (
+                    <div className="flex flex-col items-center gap-4 py-6 w-full">
+                      <Loader2 className="w-10 h-10 text-rose-600 animate-spin" />
+                      <p className="text-xs font-mono font-bold tracking-widest text-[#4A111E] uppercase">
+                        Verifying your credentials…
                       </p>
                     </div>
+                  )}
 
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="space-y-1">
-                        <label className="text-[10px] font-sans uppercase tracking-wider text-inkNavy/70 font-bold block">
-                          First Name *
-                        </label>
-                        <input
-                          type="text"
-                          required
-                          autoFocus
-                          placeholder="First"
-                          value={profileFirstName}
-                          onChange={(e) => setProfileFirstName(e.target.value)}
-                          className="w-full bg-white border border-zariGold/30 px-3 py-3 text-xs text-inkNavy focus:outline-none focus:border-zariGold font-sans rounded-lg"
-                        />
+                  {/* ── PROFILE COMPLETION STEP (new user) ── */}
+                  {!isVerifying && profileStep && (
+                    <form onSubmit={handleProfileSubmit} className="w-full space-y-4 text-left">
+                      <div className="text-center space-y-1 pb-1">
+                        <h3 className="text-xs font-mono font-bold uppercase text-[#4A111E] tracking-widest">
+                          Complete Your Profile
+                        </h3>
+                        <p className="text-xs text-[#7A3E4D] leading-relaxed">
+                          Provide your name &amp; mobile number to set up your account.
+                        </p>
                       </div>
-                      <div className="space-y-1">
-                        <label className="text-[10px] font-sans uppercase tracking-wider text-inkNavy/70 font-bold block">
-                          Last Name
-                        </label>
-                        <input
-                          type="text"
-                          placeholder="Last"
-                          value={profileLastName}
-                          onChange={(e) => setProfileLastName(e.target.value)}
-                          className="w-full bg-white border border-zariGold/30 px-3 py-3 text-xs text-inkNavy focus:outline-none focus:border-zariGold font-sans rounded-lg"
-                        />
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="space-y-1">
+                          <label className="text-[10px] font-mono uppercase tracking-wider text-[#581825] block font-bold">
+                            First Name *
+                          </label>
+                          <input
+                            type="text"
+                            required
+                            autoFocus
+                            placeholder="First"
+                            value={profileFirstName}
+                            onChange={(e) => setProfileFirstName(e.target.value)}
+                            className="w-full bg-white border border-[#E8BAC5] px-3 py-2.5 text-xs text-[#4A111E] placeholder-[#A87280] focus:outline-none focus:border-rose-500 font-sans rounded-xl shadow-xs"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-[10px] font-mono uppercase tracking-wider text-[#581825] block font-bold">
+                            Last Name
+                          </label>
+                          <input
+                            type="text"
+                            placeholder="Last"
+                            value={profileLastName}
+                            onChange={(e) => setProfileLastName(e.target.value)}
+                            className="w-full bg-white border border-[#E8BAC5] px-3 py-2.5 text-xs text-[#4A111E] placeholder-[#A87280] focus:outline-none focus:border-rose-500 font-sans rounded-xl shadow-xs"
+                          />
+                        </div>
                       </div>
-                    </div>
 
-                    <div className="space-y-1">
-                      <label className="text-[10px] font-sans uppercase tracking-wider text-inkNavy/70 font-bold block">
-                        Email Address (Optional)
-                      </label>
-                      <input
-                        type="email"
-                        placeholder="e.g. you@gmail.com"
-                        value={profileEmail}
-                        onChange={(e) => setProfileEmail(e.target.value)}
-                        className="w-full bg-white border border-zariGold/30 px-3 py-3 text-xs text-inkNavy focus:outline-none focus:border-zariGold font-sans rounded-lg"
-                      />
-                    </div>
+                      {/* Email Field: Verified Badge for Google Users */}
+                      {modalMode === 'google' || profileEmail || user?.email ? (
+                        <div className="space-y-1">
+                          <label className="text-[10px] font-mono uppercase tracking-wider text-[#581825] block font-bold flex items-center justify-between">
+                            <span>Email Address</span>
+                            <span className="text-[9.5px] text-emerald-700 font-mono font-bold flex items-center gap-1 bg-emerald-100/90 border border-emerald-300 px-2 py-0.5 rounded-md">
+                              <Check className="w-3 h-3 text-emerald-600" /> Verified via Google
+                            </span>
+                          </label>
+                          <div className="w-full bg-[#FCE8EC] border border-[#E8BAC5] px-3.5 py-2.5 text-xs text-[#4A111E] font-bold font-mono rounded-xl flex items-center justify-between shadow-xs">
+                            <span className="truncate">{profileEmail || user?.email || clerkUser?.primaryEmailAddress?.emailAddress || 'Gmail User'}</span>
+                            <ShieldCheck className="w-4.5 h-4.5 text-emerald-600 shrink-0 ml-2" />
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="space-y-1">
+                          <label className="text-[10px] font-mono uppercase tracking-wider text-[#581825] block font-bold">
+                            Email Address (Optional)
+                          </label>
+                          <input
+                            type="email"
+                            placeholder="e.g. you@gmail.com"
+                            value={profileEmail}
+                            onChange={(e) => setProfileEmail(e.target.value)}
+                            className="w-full bg-white border border-[#E8BAC5] px-3 py-2.5 text-xs text-[#4A111E] placeholder-[#A87280] focus:outline-none focus:border-rose-500 font-sans rounded-xl shadow-xs"
+                          />
+                        </div>
+                      )}
 
-                    <div className="space-y-3 pt-1">
-                      <label className="flex items-start gap-3 cursor-pointer select-none">
-                        <input
-                          type="checkbox"
-                          checked={termsAccepted}
-                          onChange={(e) => setTermsAccepted(e.target.checked)}
-                          className="mt-0.5 accent-zariGold shrink-0"
-                        />
-                        <span className="text-[11px] text-inkNavy/70 font-sans leading-relaxed">
-                          I accept the{' '}
-                          <a href="/policies/terms-and-conditions" target="_blank" className="text-zariGold underline">
-                            Terms &amp; Conditions
-                          </a>{' '}
-                          and{' '}
-                          <a href="/policies/privacy-policy" target="_blank" className="text-zariGold underline">
-                            Privacy Policy
-                          </a>{' '}
-                          *
-                        </span>
-                      </label>
-                    </div>
+                      {/* Mobile Number Field (No OTP required during sign-up) */}
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-mono uppercase tracking-wider text-[#581825] block font-bold">
+                          Mobile Number (For Delivery Updates)
+                        </label>
+                        <div className="relative flex">
+                          <span className="bg-[#F8D5DE] border border-r-0 border-[#E8BAC5] text-[#4A111E] font-bold px-3 py-2.5 text-xs flex items-center font-mono rounded-l-xl select-none">
+                            +91
+                          </span>
+                          <input
+                            type="tel"
+                            placeholder="Enter 10-digit mobile number"
+                            maxLength={10}
+                            value={profilePhone}
+                            onChange={(e) => setProfilePhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                            className="w-full bg-white border border-[#E8BAC5] px-3 py-2.5 text-xs text-[#4A111E] placeholder-[#A87280] focus:outline-none focus:border-rose-500 font-mono rounded-r-xl shadow-xs"
+                          />
+                        </div>
+                        <p className="text-[9.5px] text-[#7A3E4D] font-mono">
+                          No OTP required now. Used for order status &amp; delivery updates.
+                        </p>
+                      </div>
 
-                    <button
-                      type="submit"
-                      disabled={isSubmittingProfile}
-                      className="w-full bg-zariGold hover:bg-zariGoldLight text-inkNavy py-3.5 font-bold uppercase tracking-widest text-xs transition-colors rounded-lg flex items-center justify-center gap-2 mt-2 shadow-md cursor-pointer"
-                    >
-                      {isSubmittingProfile ? 'Saving…' : 'Complete Setup →'}
-                    </button>
-                  </form>
-                )}
+                      <div className="pt-2">
+                        <TermsAndConditionsBox compact accepted={termsAccepted} onAcceptChange={setTermsAccepted} />
+                      </div>
 
-                {/* ── UNIFIED SINGLE SIGN-IN SELECTION STEP ── */}
-                {!isVerifying && !profileStep && (
-                  <div className="w-full space-y-5">
-                    <div className="text-center space-y-1">
-                      <h3 className="text-sm font-serif font-bold uppercase text-inkNavy tracking-widest">
-                        Sign In / Register
-                      </h3>
-                      <p className="text-xs text-inkNavy/70 font-sans leading-relaxed">
-                        Access your order history, wishlist, and exclusive drops.
-                      </p>
-                    </div>
+                      <button
+                        type="submit"
+                        disabled={isSubmittingProfile}
+                        className="w-full bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-500 hover:to-rose-600 text-white py-3.5 font-bold uppercase tracking-widest text-xs transition-all rounded-xl flex items-center justify-center gap-2 mt-2 shadow-md cursor-pointer disabled:opacity-50"
+                      >
+                        {isSubmittingProfile ? 'Saving…' : 'Complete Setup →'}
+                      </button>
+                    </form>
+                  )}
 
-                    <div className="space-y-3.5">
+                  {/* ── UNIFIED SIGN-IN OPTIONS STEP ── */}
+                  {!isVerifying && !profileStep && (
+                    <div className="w-full space-y-3 pt-1">
+                      {/* Phone Sign-In Button */}
                       <button
                         onClick={startPhoneOTP}
                         disabled={isActionInProgress || isVerifying}
-                        className="w-full bg-inkNavy hover:bg-inkNavy/90 text-ivory py-3.5 font-sans font-semibold uppercase tracking-wider text-xs transition-all flex items-center justify-center gap-2.5 cursor-pointer rounded-xl border border-inkNavy shadow-md disabled:opacity-50"
+                        className="w-full bg-[#4A111E] hover:bg-[#380C16] text-white py-3.5 sm:py-4 rounded-xl font-bold uppercase tracking-widest text-xs shadow-md transition-all flex items-center justify-center gap-2.5 cursor-pointer disabled:opacity-50"
                       >
-                        <Smartphone className="w-4 h-4 text-zariGold" />
+                        <Smartphone className="w-4 h-4 text-white" />
                         {isActionInProgress ? 'Opening Secure Portal...' : 'Continue with Phone'}
                       </button>
 
-                      <div className="relative text-center my-2">
+                      <div className="relative text-center py-0.5">
                         <div className="absolute inset-0 flex items-center">
-                          <div className="w-full border-t border-zariGold/20" />
+                          <div className="w-full border-t border-[#E8BAC5]" />
                         </div>
-                        <span className="relative bg-ivory px-3 text-[10px] uppercase tracking-widest font-sans text-inkNavy/50">
+                        <span className="relative bg-[#FFF0F3] px-3 text-[9px] uppercase tracking-widest font-mono text-[#7A3E4D] font-bold">
                           Or
                         </span>
                       </div>
 
+                      {/* Google Sign-In Button */}
                       <button
                         onClick={handleGoogleLogin}
                         disabled={isActionInProgress || isVerifying}
-                        className="w-full bg-white hover:bg-zariGold/10 text-inkNavy border border-zariGold/40 py-3.5 font-sans font-semibold uppercase tracking-wider text-xs transition-colors flex items-center justify-center gap-2.5 cursor-pointer rounded-xl shadow-xs disabled:opacity-50"
+                        className="w-full bg-white hover:bg-[#FFF0F3] text-[#4A111E] border border-[#E8BAC5] py-3.5 rounded-xl font-bold uppercase tracking-widest text-xs transition-colors flex items-center justify-center gap-2.5 cursor-pointer shadow-xs disabled:opacity-50"
                       >
-                        <svg className="w-4 h-4" viewBox="0 0 24 24">
+                        <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
                           <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
                           <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
                           <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
@@ -572,20 +675,20 @@ export function AuthSessionProvider({ children }: { children: React.ReactNode })
                         </svg>
                         {isActionInProgress ? 'Redirecting to Google...' : 'Continue with Google'}
                       </button>
-                    </div>
 
-                    <p className="text-center text-[10px] text-inkNavy/60 font-sans leading-relaxed pt-1">
-                      By continuing you agree to our{' '}
-                      <a href="/policies/terms-and-conditions" target="_blank" className="text-zariGold underline font-medium">
-                        Terms
-                      </a>{' '}
-                      &amp;{' '}
-                      <a href="/policies/privacy-policy" target="_blank" className="text-zariGold underline font-medium">
-                        Privacy Policy
-                      </a>
-                    </p>
-                  </div>
-                )}
+                      <p className="text-center text-[9px] text-[#7A3E4D] uppercase tracking-widest font-mono leading-relaxed pt-1">
+                        By continuing you agree to our{' '}
+                        <a href="/policies/terms-and-conditions" target="_blank" className="text-[#4A111E] underline font-bold">
+                          Terms
+                        </a>{' '}
+                        &amp;{' '}
+                        <a href="/policies/privacy-policy" target="_blank" className="text-[#4A111E] underline font-bold">
+                          Privacy Policy
+                        </a>
+                      </p>
+                    </div>
+                  )}
+                </div>
               </motion.div>
             </motion.div>
           )}

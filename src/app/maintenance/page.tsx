@@ -2,7 +2,7 @@ import React from 'react';
 import Image from 'next/image';
 
 export const metadata = {
-  title: 'Under Construction | DRFTN CLOTHING',
+  title: 'Under Construction | THE GIRLS COLLECTIONS',
   description: "We'll be back shortly.",
 };
 
@@ -13,7 +13,7 @@ export default function MaintenancePage() {
         {/* DRFTN Branding / Logo */}
         <div className="flex flex-col items-center justify-center space-y-4">
           <div className="text-4xl md:text-5xl font-black uppercase tracking-[0.4em] pl-[0.4em] text-white">
-            DRFTN
+            THE GIRLS COLLECTIONS
           </div>
           <div className="text-[10px] uppercase tracking-[0.3em] text-zinc-500 font-bold border-b border-zinc-850 pb-4 w-full">
             Clothing &middot; High Streetwear
@@ -40,7 +40,7 @@ export default function MaintenancePage() {
 
         {/* Footer */}
         <p className="text-[10px] text-zinc-650 tracking-wider uppercase">
-          &copy; {new Date().getFullYear()} DRFTN CLOTHING. All rights reserved.
+          &copy; {new Date().getFullYear()} THE GIRLS COLLECTIONS. All rights reserved.
         </p>
       </div>
     </main>

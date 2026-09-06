@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { verifyToken } from '@/lib/jwt';
@@ -17,7 +19,7 @@ export async function POST(
     const sessionToken = rawCookie
       .split(';')
       .map((c) => c.trim())
-      .find((c) => c.startsWith('drftn_session='))
+      .find((c) => c.startsWith('tgc_session='))
       ?.split('=')?.[1];
 
     if (sessionToken) {

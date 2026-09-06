@@ -12,10 +12,10 @@ import { WishlistReminderEmail, WishlistEmailItem } from '@/components/WishlistR
 const resend = new Resend(process.env.RESEND_API_KEY || 're_dummy_for_build');
 
 // The verified "from" address must match a domain you've added in Resend.
-// e.g. RESEND_FROM_EMAIL="DRFTN <orders@drftnclothing.in>"
-const FROM_ADDRESS = process.env.RESEND_FROM_EMAIL || 'DRFTN <onboarding@resend.dev>';
-const REPLY_TO_EMAIL = 'drftnclothing@gmail.com';
-const ADMIN_CC_EMAIL = 'drftnclothing@gmail.com';
+// e.g. RESEND_FROM_EMAIL="The Girls Collections <orders@thegirlscollections.com>"
+const FROM_ADDRESS = process.env.RESEND_FROM_EMAIL || 'The Girls Collections <onboarding@resend.dev>';
+const REPLY_TO_EMAIL = 'thegirlscollections@gmail.com';
+const ADMIN_CC_EMAIL = 'thegirlscollections@gmail.com';
 
 /**
  * Sends a refund notification email to the customer by rendering a React component to static HTML.
@@ -60,7 +60,7 @@ export async function sendRefundEmail({
       to: [customerEmail],
       cc: [ADMIN_CC_EMAIL],
       replyTo: REPLY_TO_EMAIL,
-      subject: `Refund Issued – Order ${orderNumber} | DRFTN`,
+      subject: `Refund Issued – Order ${orderNumber} | The Girls Collections`,
       html: htmlString,
     });
 
@@ -148,7 +148,7 @@ export async function sendOrderSuccessEmail({
       to: [customerEmail],
       cc: [ADMIN_CC_EMAIL],
       replyTo: REPLY_TO_EMAIL,
-      subject: `Order Confirmed – Order ${orderNumber} | DRFTN`,
+      subject: `Order Confirmed – Order ${orderNumber} | The Girls Collections`,
       html: htmlString,
     });
 
@@ -207,7 +207,7 @@ export async function sendPickupSuccessEmail({
       to: [customerEmail],
       cc: [ADMIN_CC_EMAIL],
       replyTo: REPLY_TO_EMAIL,
-      subject: `Collected: Order ${orderNumber} | DRFTN`,
+      subject: `Collected: Order ${orderNumber} | The Girls Collections`,
       html: htmlString,
     });
 
@@ -279,7 +279,7 @@ export async function sendDeliverySuccessEmail({
       to: [customerEmail],
       cc: [ADMIN_CC_EMAIL],
       replyTo: REPLY_TO_EMAIL,
-      subject: `Delivered: Order ${orderNumber} | DRFTN`,
+      subject: `Delivered: Order ${orderNumber} | The Girls Collections`,
       html: htmlString,
     });
 
@@ -367,7 +367,7 @@ export async function sendDepositConfirmationEmail({
       to: [customerEmail],
       cc: [ADMIN_CC_EMAIL],
       replyTo: REPLY_TO_EMAIL,
-      subject: `COD Order Confirmed – Order ${orderNumber} | DRFTN`,
+      subject: `COD Order Confirmed – Order ${orderNumber} | The Girls Collections`,
       html: htmlString,
     });
 
@@ -428,7 +428,7 @@ export async function sendPaymentPendingReminderEmail({
       from: FROM_ADDRESS,
       to: [customerEmail],
       replyTo: REPLY_TO_EMAIL,
-      subject: `Action Required: Complete your order ${orderNumber} | DRFTN`,
+      subject: `Action Required: Complete your order ${orderNumber} | The Girls Collections`,
       html: htmlString,
     });
 
@@ -489,11 +489,11 @@ export async function sendAbandonedCartEmail({
         <p style="font-weight: bold; font-size: 18px;">Total: ₹${(totalPaise / 100).toFixed(2)}</p>
 
         <div style="margin: 30px 0; text-align: center;">
-          <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://drftn.in'}/checkout" style="background-color: black; color: white; padding: 15px 30px; text-decoration: none; font-weight: bold; text-transform: uppercase; letter-spacing: 0.1em;">Complete Your Purchase</a>
+          <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://thegirlscollections.com'}/checkout" style="background-color: black; color: white; padding: 15px 30px; text-decoration: none; font-weight: bold; text-transform: uppercase; letter-spacing: 0.1em;">Complete Your Purchase</a>
         </div>
 
-        <p style="color: #888; font-size: 12px; margin-top: 40px; border-top: 1px solid #eaeaea; padding-top: 20px;">
-          This is an automated shopping cart reminder from DRFTN. Order Ref: ${orderNumber}
+        <p style="font-size: 11px; color: #888; text-align: center; margin-top: 20px;">
+          This is an automated shopping cart reminder from The Girls Collections. Order Ref: ${orderNumber}
         </p>
       </div>
     `;
@@ -502,7 +502,7 @@ export async function sendAbandonedCartEmail({
       from: FROM_ADDRESS,
       to: [customerEmail],
       replyTo: REPLY_TO_EMAIL,
-      subject: `Complete your purchase at DRFTN | Order Ref: ${orderNumber}`,
+      subject: `Complete your purchase at The Girls Collections | Order Ref: ${orderNumber}`,
       html: htmlString,
     });
 
@@ -551,19 +551,19 @@ export async function sendAdminFallbackAlertEmail({
         <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
           <tr>
             <td style="padding: 8px; border-bottom: 1px solid #eaeaea; font-weight: bold; width: 180px;">Order Number:</td>
-            <td style="padding: 8px; border-bottom: 1px solid #eaeaea;">\${orderNumber}</td>
+            <td style="padding: 8px; border-bottom: 1px solid #eaeaea;">${orderNumber}</td>
           </tr>
           <tr>
             <td style="padding: 8px; border-bottom: 1px solid #eaeaea; font-weight: bold;">Customer:</td>
-            <td style="padding: 8px; border-bottom: 1px solid #eaeaea;">\${customerName}</td>
+            <td style="padding: 8px; border-bottom: 1px solid #eaeaea;">${customerName}</td>
           </tr>
           <tr>
             <td style="padding: 8px; border-bottom: 1px solid #eaeaea; font-weight: bold;">Failed Provider:</td>
-            <td style="padding: 8px; border-bottom: 1px solid #eaeaea;">\${deliveryProvider}</td>
+            <td style="padding: 8px; border-bottom: 1px solid #eaeaea;">${deliveryProvider}</td>
           </tr>
           <tr>
             <td style="padding: 8px; border-bottom: 1px solid #eaeaea; font-weight: bold;">Failure Reason:</td>
-            <td style="padding: 8px; border-bottom: 1px solid #eaeaea; color: #e63329;">\${failureReason}</td>
+            <td style="padding: 8px; border-bottom: 1px solid #eaeaea; color: #e63329;">${failureReason}</td>
           </tr>
           <tr>
             <td style="padding: 8px; border-bottom: 1px solid #eaeaea; font-weight: bold;">Action Taken:</td>
@@ -571,16 +571,16 @@ export async function sendAdminFallbackAlertEmail({
           </tr>
           <tr>
             <td style="padding: 8px; border-bottom: 1px solid #eaeaea; font-weight: bold;">Refund Amount:</td>
-            <td style="padding: 8px; border-bottom: 1px solid #eaeaea; font-weight: bold;">₹\${(refundAmountPaise / 100).toFixed(2)}</td>
+            <td style="padding: 8px; border-bottom: 1px solid #eaeaea; font-weight: bold;">₹${(refundAmountPaise / 100).toFixed(2)}</td>
           </tr>
           <tr>
             <td style="padding: 8px; border-bottom: 1px solid #eaeaea; font-weight: bold;">Refund Status:</td>
-            <td style="padding: 8px; border-bottom: 1px solid #eaeaea; font-weight: bold;">\${refundStatus}</td>
+            <td style="padding: 8px; border-bottom: 1px solid #eaeaea; font-weight: bold;">${refundStatus}</td>
           </tr>
         </table>
 
         <p style="color: #666; font-size: 12px; margin-top: 40px; border-top: 1px solid #eaeaea; padding-top: 20px;">
-          This is an automated operational alert from the DRFTN Checkout Engine.
+          This is an automated operational alert from The Girls Collections Checkout Engine.
         </p>
       </div>
     `;
@@ -589,7 +589,7 @@ export async function sendAdminFallbackAlertEmail({
       from: FROM_ADDRESS,
       to: [adminEmail],
       replyTo: REPLY_TO_EMAIL,
-      subject: `[ALERT] Express Downgrade & Refund – Order \${orderNumber}`,
+      subject: `[ALERT] Express Downgrade & Refund – Order ${orderNumber}`,
       html: htmlString,
     });
 
@@ -657,13 +657,13 @@ export async function sendDeliveryStatusEmail({
       })
     );
 
-    let subject = `Order Update – Order ${orderNumber} | DRFTN`;
+    let subject = `Order Update – Order ${orderNumber} | The Girls Collections`;
     if (status === 'shipped') {
-      subject = `Your order has shipped! – Order ${orderNumber} | DRFTN`;
+      subject = `Your order has shipped! – Order ${orderNumber} | The Girls Collections`;
     } else if (status === 'out_for_delivery') {
-      subject = `Out for delivery ⚡ – Order ${orderNumber} | DRFTN`;
+      subject = `Out for delivery ⚡ – Order ${orderNumber} | The Girls Collections`;
     } else if (status === 'cancelled') {
-      subject = `Cancelled: Order ${orderNumber} | DRFTN`;
+      subject = `Cancelled: Order ${orderNumber} | The Girls Collections`;
     }
 
     const { error } = await resend.emails.send({
@@ -718,17 +718,16 @@ export async function sendWishlistReminderEmail({
       React.createElement(WishlistReminderEmail, {
         customerName,
         items,
-        siteUrl: process.env.NEXT_PUBLIC_APP_URL || 'https://drftnclothing.in',
+        siteUrl: process.env.NEXT_PUBLIC_APP_URL || 'https://thegirlscollections.com',
       })
     );
 
-    const isMulti = items.length > 1;
-    const firstItemName = items[0].name;
-    const defaultSubject = isMulti
-      ? `Still thinking about it? ${items.length} items waiting in your Wishlist | DRFTN`
-      : `Still thinking about it? Your ${firstItemName} is waiting | DRFTN`;
-
-    const subject = customSubject || defaultSubject;
+    const firstItemName = items[0]?.name || 'favorite item';
+    const subject = customSubject || (
+      items.length > 1
+        ? `Still thinking about it? ${items.length} items waiting in your Wishlist | The Girls Collections`
+        : `Still thinking about it? Your ${firstItemName} is waiting | The Girls Collections`
+    );
 
     const { error } = await resend.emails.send({
       from: FROM_ADDRESS,

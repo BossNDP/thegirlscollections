@@ -7,6 +7,7 @@ import { useToast } from '@/components/ToastContainer';
 import { useRouter } from 'next/navigation';
 import { db } from '@/lib/db';
 import { RGBA, getDominantColor, renderCompositeOnCanvas, rgbToHsl } from '@/lib/imageProcessor';
+import { CategoryCombobox } from '@/components/admin/CategoryCombobox';
 
 interface ProductFormProps {
   initialData?: Product | null;
@@ -14,7 +15,7 @@ interface ProductFormProps {
 }
 
 const AVAILABLE_SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '26', '28', '30', '32', '34', '36', '38'] as const;
-const GENDERS = ['unisex', 'men', 'women'] as const;
+const GENDERS = ['unisex', 'men', 'women', 'kids'] as const;
 
 export default function ProductForm({ initialData, mode }: ProductFormProps) {
   const { addToast } = useToast();
@@ -28,6 +29,7 @@ export default function ProductForm({ initialData, mode }: ProductFormProps) {
   const [category, setCategory] = useState('');
   const [subcategory, setSubcategory] = useState('');
   const [gender, setGender] = useState<typeof GENDERS[number]>('unisex');
+  const [fitType, setFitType] = useState<'regular' | 'plus_size'>('regular');
   const [images, setImages] = useState<string[]>([]);
   const [activeSizes, setActiveSizes] = useState<string[]>(['S', 'M', 'L']);
   const [stock, setStock] = useState<Record<string, number>>({
@@ -83,6 +85,64 @@ export default function ProductForm({ initialData, mode }: ProductFormProps) {
 
   // Background removal toggle state (default OFF)
   const [removeBgToggle, setRemoveBgToggle] = useState(false);
+
+  // Dirty tracking for AI auto-population
+  const [isNameDirty, setIsNameDirty] = useState(false);
+  const [isSlugDirty, setIsSlugDirty] = useState(false);
+  const [isDescDirty, setIsDescDirty] = useState(false);
+  const [isTagsDirty, setIsTagsDirty] = useState(false);
+  const [isCategoryDirty, setIsCategoryDirty] = useState(false);
+  const [isAnalyzingAi, setIsAnalyzingAi] = useState(false);
+  const [aiGeneratedMeta, setAiGeneratedMeta] = useState<{ usedAI: boolean; generatedAt: string; model: string } | null>(null);
+
+  const triggerAiAnalysis = async (imageUrl: string) => {
+    if (!imageUrl) return;
+    setIsAnalyzingAi(true);
+    try {
+      const res = await fetch('/api/products/analyze-image', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ imageUrl }),
+      });
+
+      const result = await res.json();
+      if (res.ok && result.success && result.data) {
+        const { productName, slug: aiSlug, description: aiDesc, seoTags, suggestedCategory, genderTargeting } = result.data;
+
+        if (!isNameDirty && productName) {
+          setName(productName);
+          if (!isSlugDirty && aiSlug) {
+            setSlug(aiSlug);
+          }
+        }
+        if (!isDescDirty && aiDesc) {
+          setDescription(aiDesc);
+        }
+        if (!isTagsDirty && Array.isArray(seoTags) && seoTags.length > 0) {
+          setTags(seoTags);
+          setTagsInput(seoTags.join(', '));
+        }
+        if (!isCategoryDirty && suggestedCategory) {
+          setCategory(suggestedCategory);
+        }
+        if (genderTargeting && ['women', 'unisex', 'men', 'kids'].includes(genderTargeting.toLowerCase())) {
+          setGender(genderTargeting.toLowerCase() as any);
+        }
+        setAiGeneratedMeta({
+          usedAI: true,
+          generatedAt: new Date().toISOString(),
+          model: 'gemini-3.5-flash',
+        });
+        addToast('✨ Gemini Vision analyzed preview image and auto-filled product details!', 'success');
+      } else if (result.message) {
+        addToast(result.message, 'info');
+      }
+    } catch (err) {
+      console.error('AI Analysis failed:', err);
+    } finally {
+      setIsAnalyzingAi(false);
+    }
+  };
 
   // Duplicate / Similar product name warning state
   const [similarProductWarning, setSimilarProductWarning] = useState<{
@@ -156,7 +216,8 @@ export default function ProductForm({ initialData, mode }: ProductFormProps) {
       setComparePrice(initialData.compare_price ? (initialData.compare_price / 100).toString() : '');
       setCategory(initialData.category || '');
       setSubcategory(initialData.subcategory || '');
-      setGender(initialData.gender as any);
+      setGender((initialData.gender as any) || 'women');
+      setFitType(initialData.fit_type || 'regular');
       setImages(initialData.images || []);
       setActiveSizes(initialData.sizes || []);
       
@@ -298,19 +359,17 @@ export default function ProductForm({ initialData, mode }: ProductFormProps) {
 
     for (let i = 0; i < validFiles.length; i++) {
       const file = validFiles[i];
-      const timestamp = Math.round(new Date().getTime() / 1000);
-      const folder = 'drftn-products';
 
       try {
-        const signRes = await fetch('/api/admin/cloudinary-sign', {
+        const signRes = await fetch('/api/cloudinary/sign', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ params: { timestamp, folder } })
         });
 
-        if (!signRes.ok) throw new Error('Failed to get signature');
+        if (!signRes.ok) throw new Error('Failed to get upload signature');
         const signData = await signRes.json();
-        const activeCloudName = signData.cloudName || process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'dtj01pdog';
+        const activeCloudName = signData.cloudName || 'lt3ga2by';
+        const folder = signData.folder || 'tgc/products';
 
         // Perform XHR request to track real-time upload progress percentage
         const url = await new Promise<string>((resolve, reject) => {
@@ -318,9 +377,13 @@ export default function ProductForm({ initialData, mode }: ProductFormProps) {
           const formData = new FormData();
           formData.append('file', file);
           formData.append('api_key', signData.apiKey);
-          formData.append('timestamp', String(timestamp));
+          formData.append('timestamp', String(signData.timestamp));
           formData.append('signature', signData.signature);
           formData.append('folder', folder);
+
+          if (removeBgToggle) {
+            formData.append('background_removal', 'cloudinary_ai');
+          }
 
           xhr.upload.addEventListener('progress', (event) => {
             if (event.lengthComputable) {
@@ -361,8 +424,14 @@ export default function ProductForm({ initialData, mode }: ProductFormProps) {
     }
 
     if (uploadedUrls.length > 0) {
+      const isFirstUpload = images.length === 0;
       setImages((prev) => [...prev, ...uploadedUrls]);
-      addToast(`${uploadedUrls.length} image(s) uploaded successfully`, 'success');
+      addToast(`${uploadedUrls.length} image(s) uploaded directly to Cloudinary!`, 'success');
+
+      // Auto-trigger Gemini Vision AI analysis on the preview image
+      if (isFirstUpload) {
+        triggerAiAnalysis(uploadedUrls[0]);
+      }
     }
     setIsUploading(false);
     setUploadingFiles([]);
@@ -513,26 +582,43 @@ export default function ProductForm({ initialData, mode }: ProductFormProps) {
       // 1. Optimize transparent blob on canvas (max 1600px) to prevent payload size errors
       const optimizedBlob = await optimizeTransparentBlob(blob, 1600);
 
-      // 2. Primary upload via server-side route
-      const uploadFormData = new FormData();
-      uploadFormData.append('file', optimizedBlob, `bg-removed-${fileName}`);
-
-      const uploadRes = await fetch('/api/admin/products/upload-image', {
+      // 2. Direct-to-Cloudinary upload using signed upload route
+      const signRes = await fetch('/api/cloudinary/sign', {
         method: 'POST',
-        body: uploadFormData,
+        headers: { 'Content-Type': 'application/json' },
       });
 
-      if (!uploadRes.ok) {
-        const errData = await uploadRes.json().catch(() => ({}));
-        throw new Error(errData.error || `Server upload failed (HTTP ${uploadRes.status})`);
+      if (!signRes.ok) throw new Error('Failed to get upload signature');
+      const signData = await signRes.json();
+      const activeCloudName = signData.cloudName || 'lt3ga2by';
+      const folder = signData.folder || 'tgc/products';
+
+      const uploadFormData = new FormData();
+      uploadFormData.append('file', optimizedBlob, `bg-removed-${fileName}`);
+      uploadFormData.append('api_key', signData.apiKey);
+      uploadFormData.append('timestamp', String(signData.timestamp));
+      uploadFormData.append('signature', signData.signature);
+      uploadFormData.append('folder', folder);
+
+      const cloudinaryRes = await fetch(
+        `https://api.cloudinary.com/v1_1/${activeCloudName}/image/upload`,
+        {
+          method: 'POST',
+          body: uploadFormData,
+        }
+      );
+
+      if (!cloudinaryRes.ok) {
+        const errData = await cloudinaryRes.json().catch(() => ({}));
+        throw new Error(errData.error?.message || `Cloudinary upload failed (HTTP ${cloudinaryRes.status})`);
       }
 
-      const uploadData = await uploadRes.json();
+      const uploadData = await cloudinaryRes.json();
       if (!uploadData?.secure_url) {
         throw new Error('Cloudinary upload returned invalid URL');
       }
 
-      const secureUrl: string = uploadData.secure_url;
+      const secureUrl: string = uploadData.secure_url.replace('/upload/', '/upload/f_auto,q_auto/');
 
       // 4. Auto-populate into Paste Cloudinary URLs input row
       setUrlPasteInputs(prev => {
@@ -679,26 +765,61 @@ export default function ProductForm({ initialData, mode }: ProductFormProps) {
       const file = validFiles[i];
 
       try {
-        const uploadFormData = new FormData();
-        uploadFormData.append('file', file);
-        if (removeBgToggle) {
-          uploadFormData.append('removeBackground', 'true');
-        }
-
-        const res = await fetch('/api/admin/products/upload-image', {
+        const signRes = await fetch('/api/cloudinary/sign', {
           method: 'POST',
-          body: uploadFormData,
+          headers: { 'Content-Type': 'application/json' },
         });
 
-        if (!res.ok) {
-          const errData = await res.json().catch(() => ({}));
-          throw new Error(errData.error || `HTTP ${res.status}`);
-        }
+        if (!signRes.ok) throw new Error('Failed to get upload signature');
+        const signData = await signRes.json();
+        const activeCloudName = signData.cloudName || 'lt3ga2by';
+        const folder = signData.folder || 'tgc/products';
 
-        const data = await res.json();
-        if (data.secure_url) {
-          uploadedUrls.push(data.secure_url);
-        }
+        const url = await new Promise<string>((resolve, reject) => {
+          const xhr = new XMLHttpRequest();
+          const formData = new FormData();
+          formData.append('file', file);
+          formData.append('api_key', signData.apiKey);
+          formData.append('timestamp', String(signData.timestamp));
+          formData.append('signature', signData.signature);
+          formData.append('folder', folder);
+
+          if (removeBgToggle) {
+            formData.append('background_removal', 'cloudinary_ai');
+          }
+
+          xhr.upload.addEventListener('progress', (event) => {
+            if (event.lengthComputable) {
+              const progress = Math.round((event.loaded / event.total) * 100);
+              setUploadingFiles(prev =>
+                prev.map((f, idx) => idx === i ? { ...f, progress } : f)
+              );
+            }
+          });
+
+          xhr.addEventListener('load', () => {
+            if (xhr.status >= 200 && xhr.status < 300) {
+              const res = JSON.parse(xhr.responseText);
+              resolve(res.secure_url);
+            } else {
+              let errMsg = `Upload failed (${xhr.status})`;
+              try {
+                const res = JSON.parse(xhr.responseText);
+                if (res.error?.message) errMsg = res.error.message;
+              } catch {}
+              reject(new Error(errMsg));
+            }
+          });
+
+          xhr.addEventListener('error', () => reject(new Error('Network error')));
+          xhr.addEventListener('abort', () => reject(new Error('Upload aborted')));
+
+          xhr.open('POST', `https://api.cloudinary.com/v1_1/${activeCloudName}/image/upload`);
+          xhr.send(formData);
+        });
+
+        const optimizedUrl = url.replace('/upload/', '/upload/f_auto,q_auto/');
+        uploadedUrls.push(optimizedUrl);
       } catch (err: any) {
         console.error('[Upload Image Error]:', err);
         addToast(`Failed to upload "${file.name}": ${err.message || err}`, 'error');
@@ -706,8 +827,12 @@ export default function ProductForm({ initialData, mode }: ProductFormProps) {
     }
 
     if (uploadedUrls.length > 0) {
+      const isFirstUpload = images.length === 0;
       setImages((prev) => [...prev, ...uploadedUrls]);
       addToast(`${uploadedUrls.length} image(s) uploaded successfully`, 'success');
+      if (isFirstUpload) {
+        triggerAiAnalysis(uploadedUrls[0]);
+      }
     }
     setIsUploading(false);
     setUploadingFiles((prev) => prev.filter((pf) => !validFiles.some((vf) => vf.name === pf.name)));
@@ -750,23 +875,21 @@ export default function ProductForm({ initialData, mode }: ProductFormProps) {
       });
 
       setBgRemovalStatus('Uploading composite image...');
-      const timestamp = Math.round(new Date().getTime() / 1000);
-      const folder = 'drftn-products';
 
-      const signRes = await fetch('/api/admin/cloudinary-sign', {
+      const signRes = await fetch('/api/cloudinary/sign', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ params: { timestamp, folder } })
       });
 
       if (!signRes.ok) throw new Error('Failed to fetch Cloudinary API signature');
       const signData = await signRes.json();
 
-      const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+      const cloudName = signData.cloudName || 'lt3ga2by';
+      const folder = signData.folder || 'tgc/products';
       const formData = new FormData();
       formData.append('file', compositeBlob, `processed-${processingImage.name}`);
       formData.append('api_key', signData.apiKey);
-      formData.append('timestamp', String(timestamp));
+      formData.append('timestamp', String(signData.timestamp));
       formData.append('signature', signData.signature);
       formData.append('folder', folder);
 
@@ -787,10 +910,10 @@ export default function ProductForm({ initialData, mode }: ProductFormProps) {
       const url = xhrRes.secure_url;
       const optimizedUrl = url.replace('/upload/', `/upload/f_auto,q_auto/`);
 
+      const isFirstUpload = images.length === 0;
       setImages((prev) => [...prev, optimizedUrl]);
       addToast('Studio image generated and added successfully', 'success');
-
-      // Auto-trigger description generation if first image
+      triggerAiAnalysis(optimizedUrl);
       if (!hasGeneratedDescription) {
         generateDescription(compositeBlob);
         setHasGeneratedDescription(true);
@@ -814,23 +937,20 @@ export default function ProductForm({ initialData, mode }: ProductFormProps) {
     setBgRemovalStatus('Uploading original image...');
 
     try {
-      const timestamp = Math.round(new Date().getTime() / 1000);
-      const folder = 'drftn-products';
-
-      const signRes = await fetch('/api/admin/cloudinary-sign', {
+      const signRes = await fetch('/api/cloudinary/sign', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ params: { timestamp, folder } })
       });
 
       if (!signRes.ok) throw new Error('Failed to fetch Cloudinary API signature');
       const signData = await signRes.json();
 
-      const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+      const cloudName = signData.cloudName || 'lt3ga2by';
+      const folder = signData.folder || 'tgc/products';
       const formData = new FormData();
       formData.append('file', processingImage);
       formData.append('api_key', signData.apiKey);
-      formData.append('timestamp', String(timestamp));
+      formData.append('timestamp', String(signData.timestamp));
       formData.append('signature', signData.signature);
       formData.append('folder', folder);
 
@@ -851,10 +971,10 @@ export default function ProductForm({ initialData, mode }: ProductFormProps) {
       const url = xhrRes.secure_url;
       const optimizedUrl = url.replace('/upload/', `/upload/f_auto,q_auto/`);
 
+      const isFirstUpload = images.length === 0;
       setImages((prev) => [...prev, optimizedUrl]);
       addToast('Original image added successfully', 'success');
-
-      // Auto-trigger description generation if first image
+      triggerAiAnalysis(optimizedUrl);
       if (!hasGeneratedDescription) {
         generateDescription(processingImage);
         setHasGeneratedDescription(true);
@@ -951,19 +1071,29 @@ export default function ProductForm({ initialData, mode }: ProductFormProps) {
     if (!name.trim()) return addToast('Product name is required', 'error');
     if (!slug.trim()) return addToast('Product slug is required', 'error');
     if (!description.trim()) return addToast('Product description is required', 'error');
+    if (!category.trim()) return addToast('Category is required', 'error');
+    if (!gender.trim()) return addToast('Age Group is required', 'error');
     if (!price || isNaN(Number(price))) return addToast('Valid product price is required', 'error');
     if (!weight || isNaN(Number(weight)) || Number(weight) <= 0) return addToast('Product weight is required and must be greater than 0', 'error');
-    if (images.length === 0) return addToast('Please upload at least one product image', 'error');
     if (activeSizes.length === 0) return addToast('Please select at least one active size', 'error');
+
+    // Build stock record based on active sizes, default 0 for inactive
+    const finalStock: Record<string, number> = {};
+    AVAILABLE_SIZES.forEach((size) => {
+      finalStock[size] = activeSizes.includes(size) ? (stock[size] || 0) : 0;
+    });
+
+    const totalStock = Object.values(finalStock).reduce((acc, curr) => acc + curr, 0);
+    if (totalStock === 0) {
+      const confirmZeroStock = window.confirm(
+        'Notice: Total stock across all sizes is 0.\n\nDo you want to publish this product anyway as "Out of Stock"?'
+      );
+      if (!confirmZeroStock) return;
+    }
 
     setIsSaving(true);
 
     try {
-      // Build stock record based on active sizes, default 0 for inactive
-      const finalStock: Record<string, number> = {};
-      AVAILABLE_SIZES.forEach((size) => {
-        finalStock[size] = activeSizes.includes(size) ? (stock[size] || 0) : 0;
-      });
 
       const finalDescription = tags.length > 0 
         ? `${description.trim()}\n\nTags: ${tags.join(', ')}`
@@ -977,7 +1107,7 @@ export default function ProductForm({ initialData, mode }: ProductFormProps) {
         });
 
         const colName = v.colour_name.trim() || `Variant ${idx + 1}`;
-        const autoSku = `DRFTN-${slug.trim().toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 8)}-${colName.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 5)}-${idx + 1}`;
+        const autoSku = `TGC-${slug.trim().toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 8)}-${colName.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 5)}-${idx + 1}`;
 
         return {
           id: v.id,
@@ -1012,6 +1142,7 @@ export default function ProductForm({ initialData, mode }: ProductFormProps) {
         category,
         subcategory: cleanSubcategory,
         gender,
+        fit_type: fitType,
         images,
         sizes: activeSizes,
         stock_quantity: finalStock,
@@ -1023,6 +1154,7 @@ export default function ProductForm({ initialData, mode }: ProductFormProps) {
         breadth_cm: parsedBreadth,
         height_cm: parsedHeight,
         variants: formattedVariants,
+        aiGenerated: aiGeneratedMeta || undefined,
       };
 
       if (mode === 'create') {
@@ -1094,7 +1226,7 @@ export default function ProductForm({ initialData, mode }: ProductFormProps) {
             {mode === 'create' ? 'New Product' : 'Edit Product'}
           </h1>
           <p className="text-zinc-500 text-sm mt-1">
-            {mode === 'create' ? 'Create a new streetwear piece.' : `Modify details for ${initialData?.name || 'product'}.`}
+            {mode === 'create' ? 'Create a new piece for thegirlscollections.' : `Modify details for ${initialData?.name || 'product'}.`}
           </p>
         </div>
       </div>
@@ -1105,16 +1237,35 @@ export default function ProductForm({ initialData, mode }: ProductFormProps) {
           
           {/* Main Info */}
           <div className="bg-white border border-zinc-200/80 shadow-sm p-6 md:p-8 space-y-6">
-            <h2 className="text-sm font-bold text-zinc-900 uppercase tracking-widest border-b border-zinc-200/60 pb-3 flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-brand-red" />
-              General Details
-            </h2>
+            <div className="flex items-center justify-between border-b border-zinc-200/60 pb-3">
+              <h2 className="text-sm font-bold text-zinc-900 uppercase tracking-widest flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-brand-red" />
+                General Details
+                {isAnalyzingAi && (
+                  <span className="text-xs text-amber-600 font-normal normal-case flex items-center gap-1.5 ml-2 animate-pulse font-mono">
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    Analyzing preview image with AI…
+                  </span>
+                )}
+              </h2>
+              {images.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => triggerAiAnalysis(images[0])}
+                  disabled={isAnalyzingAi || isUploading}
+                  className="text-xs font-bold uppercase tracking-wider text-zinc-900 hover:text-brand-red disabled:opacity-50 flex items-center gap-1.5 bg-zinc-100 hover:bg-zinc-200 px-3 py-1.5 rounded transition-colors"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-brand-red" />
+                  {isAnalyzingAi ? 'Analyzing...' : '✨ Regenerate with AI'}
+                </button>
+              )}
+            </div>
 
             <div className="space-y-2">
               <label className="text-xs uppercase tracking-wider text-zinc-500 font-bold block">Product Name</label>
               <input
                 type="text"
-                placeholder="e.g. Essential Black Tee"
+                placeholder="e.g. Anarkali Kurta Suit Set"
                 value={name}
                 onChange={handleNameChange}
                 className="w-full bg-zinc-50 border border-zinc-200 text-zinc-900 px-4 py-3 text-sm focus:outline-none focus:bg-white focus:border-zinc-950 focus:ring-1 focus:ring-zinc-950 transition-all"
@@ -1154,9 +1305,12 @@ export default function ProductForm({ initialData, mode }: ProductFormProps) {
               <label className="text-xs uppercase tracking-wider text-zinc-500 font-bold block">Slug URL path</label>
               <input
                 type="text"
-                placeholder="e.g. essential-black-tee"
+                placeholder="e.g. anarkali-kurta-suit-set"
                 value={slug}
-                onChange={(e) => setSlug(e.target.value)}
+                onChange={(e) => {
+                  setSlug(e.target.value);
+                  setIsSlugDirty(true);
+                }}
                 onBlur={handleSlugBlur}
                 className="w-full bg-zinc-50 border border-zinc-200 text-zinc-900 px-4 py-3 text-sm focus:outline-none focus:bg-white focus:border-zinc-950 focus:ring-1 focus:ring-zinc-950 transition-all font-mono"
                 required
@@ -1166,54 +1320,14 @@ export default function ProductForm({ initialData, mode }: ProductFormProps) {
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <label className="text-xs uppercase tracking-wider text-zinc-500 font-bold block">Description</label>
-                {images.length > 0 && (
-                  <button
-                    type="button"
-                    onClick={async () => {
-                      try {
-                        setIsGeneratingDescription(true);
-                        setBgRemovalStatus('Generating product details with Gemini...');
-                        // Server-side fetch avoids CORS restrictions on Cloudinary URLs
-                        const genRes = await fetch('/api/admin/generate-description', {
-                          method: 'POST',
-                          headers: { 'Content-Type': 'application/json' },
-                          body: JSON.stringify({ imageUrl: images[0] }),
-                        });
-                        if (!genRes.ok) {
-                          const errData = await genRes.json().catch(() => ({}));
-                          throw new Error(errData.error || `HTTP ${genRes.status}`);
-                        }
-                        const genData = await genRes.json();
-                        if (genData.title) {
-                          setName(genData.title);
-                          setSlug(genData.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, ''));
-                        }
-                        if (genData.description) setDescription(genData.description);
-                        if (genData.tags?.length > 0) {
-                          setTags(genData.tags);
-                          setTagsInput(genData.tags.join(', '));
-                        }
-                        addToast('AI title, description & tags generated!', 'success');
-                      } catch (err: any) {
-                        console.error(err);
-                        addToast(`Failed to generate AI copy: ${err.message || err}`, 'error');
-                      } finally {
-                        setIsGeneratingDescription(false);
-                        setBgRemovalStatus('');
-                      }
-                    }}
-                    disabled={isGeneratingDescription || isUploading}
-                    className="text-[10px] uppercase font-bold tracking-widest text-zinc-900 hover:text-zinc-700 disabled:opacity-50 flex items-center gap-1 transition-colors"
-                  >
-                    <Sparkles className="w-3.5 h-3.5" />
-                    Generate with AI
-                  </button>
-                )}
               </div>
               <textarea
-                placeholder="Describe the product fit, fabric weight (e.g. 240 GSM heavy cotton), design aesthetic, details..."
+                placeholder="Describe the product fit, fabric, embroidery, design aesthetic for thegirlscollections..."
                 value={description}
-                onChange={(e) => setDescription(e.target.value)}
+                onChange={(e) => {
+                  setDescription(e.target.value);
+                  setIsDescDirty(true);
+                }}
                 rows={5}
                 className="w-full bg-zinc-50 border border-zinc-200 text-zinc-900 px-4 py-3 text-sm focus:outline-none focus:bg-white focus:border-zinc-950 focus:ring-1 focus:ring-zinc-950 transition-all resize-none leading-relaxed"
                 required
@@ -1226,7 +1340,10 @@ export default function ProductForm({ initialData, mode }: ProductFormProps) {
                 type="text"
                 placeholder="e.g. oversized, distressed, premium fleece, boxy fit"
                 value={tagsInput}
-                onChange={(e) => setTagsInput(e.target.value)}
+                onChange={(e) => {
+                  setTagsInput(e.target.value);
+                  setIsTagsDirty(true);
+                }}
                 onBlur={handleTagsBlur}
                 className="w-full bg-zinc-50 border border-zinc-200 text-zinc-900 px-4 py-3 text-sm focus:outline-none focus:bg-white focus:border-zinc-950 focus:ring-1 focus:ring-zinc-950 transition-all font-mono"
               />
@@ -1327,7 +1444,7 @@ export default function ProductForm({ initialData, mode }: ProductFormProps) {
                       images: [],
                       sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
                       stock_quantity: { XS: 0, S: 5, M: 5, L: 5, XL: 0, XXL: 0 },
-                      sku: `DRFTN-${slug.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 8)}-${autoCol.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 5)}`,
+                      sku: `TGC-${slug.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 8)}-${autoCol.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 5)}`,
                       price_override: '',
                     },
                   ]);
@@ -1422,7 +1539,7 @@ export default function ProductForm({ initialData, mode }: ProductFormProps) {
                       <label className="text-[10px] uppercase font-bold text-zinc-500 tracking-wider">Variant SKU</label>
                       <input
                         type="text"
-                        placeholder="e.g. DRFTN-TEE-BLK-01"
+                        placeholder="e.g. TGC-TEE-BLK-01"
                         value={variant.sku}
                         onChange={(e) => {
                           const val = e.target.value;
@@ -2158,65 +2275,73 @@ export default function ProductForm({ initialData, mode }: ProductFormProps) {
           {/* Classification */}
           <div className="bg-white border border-zinc-200/80 shadow-sm p-6 md:p-8 space-y-6">
             <h2 className="text-sm font-bold text-zinc-900 uppercase tracking-widest border-b border-zinc-200/60 pb-3">
-              Classification
+              Classification & Fit
             </h2>
 
+            {/* Category Searchable Combobox */}
             <div className="space-y-2">
-              <label className="text-xs uppercase tracking-wider text-zinc-500 font-bold block">Category</label>
-              <select
+              <label className="text-xs uppercase tracking-wider text-zinc-500 font-bold block">
+                Category <span className="text-brand-red">*</span>
+              </label>
+              <CategoryCombobox
+                categories={categoriesList}
                 value={category}
-                onChange={(e) => {
-                  setCategory(e.target.value);
-                  setSubcategory(''); // Reset subcategory when category changes
+                required
+                onChange={(catSlug, selectedCat) => {
+                  setCategory(catSlug);
+                  setIsCategoryDirty(true);
+                  setSubcategory('');
+                  if (selectedCat) {
+                    if (selectedCat.age_group === 'ladies') {
+                      setGender('women');
+                    } else if (selectedCat.age_group === 'kids') {
+                      setGender('kids');
+                    }
+                  }
                 }}
+              />
+              <p className="text-[10px] text-zinc-400">
+                Type to filter categories by Ladies/Kids & Parent Group. Manage categories in <a href="/admin/categories" target="_blank" className="underline text-zinc-700 hover:text-black">Categories Manager</a>.
+              </p>
+            </div>
+
+            {/* Fit Type Selector */}
+            <div className="space-y-2">
+              <label className="text-xs uppercase tracking-wider text-zinc-500 font-bold block">
+                Fit Type <span className="text-brand-red">*</span>
+              </label>
+              <select
+                value={fitType}
+                onChange={(e) => setFitType(e.target.value as 'regular' | 'plus_size')}
                 className="w-full bg-zinc-50 border border-zinc-200 text-zinc-900 px-4 py-3 text-sm focus:outline-none focus:bg-white focus:border-zinc-950 focus:ring-1 focus:ring-zinc-950 transition-all uppercase tracking-wider font-bold"
                 required
               >
-                <option value="" disabled>[Select Category]</option>
-                {categoriesList.filter(c => !c.parent_id && c.is_active).map((cat) => (
-                  <option key={cat.id} value={cat.slug}>
-                    {cat.name}
-                  </option>
-                ))}
+                <option value="regular">Regular Fit</option>
+                <option value="plus_size">Plus Size</option>
               </select>
+              <p className="text-[10px] text-zinc-400">
+                Independent sizing facet (Regular / Plus Size). Used across Kurta Sets, Kurtis & Tops.
+              </p>
             </div>
 
-            {category && (() => {
-              const currentParent = categoriesList.find(c => c.slug === category);
-              const subs = currentParent ? categoriesList.filter(c => c.parent_id === currentParent.id && c.is_active) : [];
-              if (subs.length === 0) return null;
-              return (
-                <div className="space-y-2">
-                  <label className="text-xs uppercase tracking-wider text-zinc-500 font-bold block">Subcategory</label>
-                  <select
-                    value={subcategory}
-                    onChange={(e) => setSubcategory(e.target.value)}
-                    className="w-full bg-zinc-50 border border-zinc-200 text-zinc-900 px-4 py-3 text-sm focus:outline-none focus:bg-white focus:border-zinc-950 focus:ring-1 focus:ring-zinc-950 transition-all uppercase tracking-wider font-bold"
-                  >
-                    <option value="">[None] — No Subcategory</option>
-                    {subs.map((sub) => (
-                      <option key={sub.id} value={sub.slug}>
-                        {sub.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              );
-            })()}
-
+            {/* Age Group / Target Audience */}
             <div className="space-y-2">
-              <label className="text-xs uppercase tracking-wider text-zinc-500 font-bold block">Gender targeting</label>
+              <label className="text-xs uppercase tracking-wider text-zinc-500 font-bold block">
+                Age Group / Target Audience <span className="text-brand-red">*</span>
+              </label>
               <select
                 value={gender}
                 onChange={(e) => setGender(e.target.value as any)}
                 className="w-full bg-zinc-50 border border-zinc-200 text-zinc-900 px-4 py-3 text-sm focus:outline-none focus:bg-white focus:border-zinc-950 focus:ring-1 focus:ring-zinc-950 transition-all uppercase tracking-wider font-bold"
+                required
               >
-                {GENDERS.map((g) => (
-                  <option key={g} value={g}>
-                    {g}
-                  </option>
-                ))}
+                <option value="women">Women</option>
+                <option value="kids">Kids</option>
+                <option value="unisex">Unisex</option>
               </select>
+              <p className="text-[10px] text-zinc-400">
+                Auto-syncs when selecting a category, or can be adjusted manually for unisex items.
+              </p>
             </div>
           </div>
 

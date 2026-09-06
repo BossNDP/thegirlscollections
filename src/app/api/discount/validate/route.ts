@@ -1,10 +1,23 @@
+export const dynamic = 'force-dynamic';
+
 import { NextResponse } from 'next/server';
 import { db } from '@/db';
 import * as schema from '@/db/schema';
-import { eq, and, or, ne } from 'drizzle-orm';
+import { eq, and, or, ne, sql } from 'drizzle-orm';
 import { discountValidateSchema } from '@/lib/validations';
 
+import { rateLimit } from '@/lib/rateLimit';
+
 export async function POST(request: Request) {
+  const ip = request.headers.get('x-forwarded-for') || '127.0.0.1';
+  const rl = await rateLimit(`discount:validate:${ip}`, 10, 60 * 1000);
+  if (!rl.success) {
+    return NextResponse.json(
+      { error: `Too many discount verification attempts. Retry in ${rl.reset} seconds.` },
+      { status: 429, headers: { 'Retry-After': String(rl.reset) } }
+    );
+  }
+
   try {
     const body = await request.json();
 
@@ -17,7 +30,7 @@ export async function POST(request: Request) {
     const cleanCode = code.toUpperCase().trim();
 
     // Check if Drift Mode coupon (DRFTNMODEON20, DRIFTMODE20, DRIFT-*)
-    const isDriftCode = cleanCode === 'DRFTNMODEON20' || cleanCode === 'DRIFTMODE20' || cleanCode.startsWith('DRIFT-') || cleanCode.startsWith('DRIFT');
+    const isDriftCode = cleanCode === 'TGCMODEON20' || cleanCode === 'DRFTNMODEON20' || cleanCode === 'DRIFTMODE20' || cleanCode.startsWith('DRIFT-') || cleanCode.startsWith('DRIFT');
 
     if (isDriftCode) {
       const [settings] = await db
@@ -66,6 +79,16 @@ export async function POST(request: Request) {
       });
     }
 
+    // Ensure target_phone and is_phone_locked columns exist on discount_codes
+    try {
+      await db.execute(sql`
+        ALTER TABLE discount_codes ADD COLUMN IF NOT EXISTS target_phone text;
+        ALTER TABLE discount_codes ADD COLUMN IF NOT EXISTS is_phone_locked boolean DEFAULT false;
+      `);
+    } catch (migErr) {
+      console.warn('[DiscountValidate] Migration check notice:', migErr);
+    }
+
     const [discount] = await db
       .select()
       .from(schema.discountCodes)
@@ -96,13 +119,24 @@ export async function POST(request: Request) {
       });
     }
 
+    if (discount.is_phone_locked || discount.target_phone) {
+      const targetPhoneClean = discount.target_phone ? discount.target_phone.replace(/\D/g, '').slice(-10) : '';
+      const inputPhoneClean = phone ? phone.replace(/\D/g, '').slice(-10) : '';
+      if (!inputPhoneClean || inputPhoneClean !== targetPhoneClean) {
+        return NextResponse.json({
+          valid: false,
+          message: 'This exclusive coupon code is reserved for a specific mobile number.',
+        });
+      }
+    }
+
     const [signupSetting] = await db
       .select()
       .from(schema.settings)
       .where(eq(schema.settings.key, 'signup_discount_code'))
       .limit(1);
     
-    const signupCode = (signupSetting?.value || 'DRFTN10').toUpperCase().trim();
+    const signupCode = (signupSetting?.value || 'TGC10').toUpperCase().trim();
     const isFirstOrderCode = cleanCode === signupCode || cleanCode.includes('WELCOME') || cleanCode.includes('FIRST');
 
     if (isFirstOrderCode && (email || phone)) {

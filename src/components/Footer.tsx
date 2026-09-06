@@ -2,9 +2,11 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { ArrowRight, ShieldCheck, RefreshCw, Truck, Award } from 'lucide-react';
+import { ArrowRight, ShieldCheck, RefreshCw, Truck, Award, Scissors, Lock } from 'lucide-react';
 import BrandLogo from './BrandLogo';
 import ZariThread from '@/components/ui/ZariThread';
+
+import NotificationBellWidget from './NotificationBellWidget';
 
 export default function Footer() {
   const [email, setEmail] = useState('');
@@ -18,27 +20,92 @@ export default function Footer() {
     }
   };
 
+  const trustItems = [
+    {
+      icon: ShieldCheck,
+      title: 'Cash on Delivery',
+      subtitle: 'Available Pan-India',
+    },
+    {
+      icon: Truck,
+      title: 'Express Shipping',
+      subtitle: 'Dispatched in 24 Hours',
+    },
+    {
+      icon: RefreshCw,
+      title: 'Hassle-Free Returns',
+      subtitle: 'Easy Doorstep Pickups',
+    },
+    {
+      icon: Award,
+      title: '100% Certified Fabrics',
+      subtitle: 'Pure Silk & Handlooms',
+    },
+    {
+      icon: Scissors,
+      title: 'Custom Sizing',
+      subtitle: 'Tailored to Fit You',
+    },
+    {
+      icon: Lock,
+      title: 'Secure Checkout',
+      subtitle: '256-Bit Encrypted Payments',
+    },
+  ];
+
   return (
-    <footer className="bg-nearBlack text-ivory relative border-t border-zariGold/30 select-none">
-      {/* Top Woven Temple / Kolam Border Pattern */}
+    <footer className="bg-navy text-ivory relative border-t border-zariGold/30 select-none">
+      {/* Top Woven Pattern Border */}
       <ZariThread variant="footerWeave" />
 
-      {/* Newsletter Block */}
+      {/* HORIZONTAL TRUST STRIP */}
+      <div className="bg-nearBlack border-b border-zariGold/20 py-8">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-12">
+          <div
+            className="flex sm:grid sm:grid-cols-3 lg:grid-cols-6 gap-6 overflow-x-auto no-scrollbar snap-x snap-mandatory py-1"
+            style={{ WebkitOverflowScrolling: 'touch' }}
+          >
+            {trustItems.map((item, idx) => {
+              const Icon = item.icon;
+              return (
+                <div
+                  key={idx}
+                  className="flex items-center gap-3 shrink-0 snap-start min-w-[190px] sm:min-w-0"
+                >
+                  <div className="w-10 h-10 rounded-full bg-zariGold/15 border border-zariGold/30 flex items-center justify-center shrink-0">
+                    <Icon className="w-5 h-5 text-zariGold" />
+                  </div>
+                  <div>
+                    <p className="font-sans font-bold text-xs text-ivory leading-snug">
+                      {item.title}
+                    </p>
+                    <p className="font-sans text-[11px] text-ivory/60 leading-tight">
+                      {item.subtitle}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* NEWSLETTER SECTION */}
       <div className="max-w-[1440px] mx-auto px-6 sm:px-12 py-16 border-b border-zariGold/20">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
           <div className="lg:col-span-6 space-y-3">
-            <span className="eyebrow-text text-zariGoldLight">ROYAL INNER CIRCLE</span>
+            <span className="eyebrow-text text-zariGold">ROYAL INNER CIRCLE</span>
             <h3 className="text-2xl sm:text-4xl font-serif font-semibold text-ivory">
               Private Drop Invitations &amp; Festive Styling Guides
             </h3>
-            <p className="text-xs sm:text-sm text-ivory/70 font-sans font-light">
-              Receive 10% off your first handcrafted saree or kids ethnic ensemble.
+            <p className="text-xs font-sans text-ivory/70 mb-4">
+              Receive 10% off your first handcrafted anarkali or kids ethnic ensemble.
             </p>
           </div>
 
           <div className="lg:col-span-6">
             {subscribed ? (
-              <div className="p-4 rounded-[2px] bg-zariGold/15 border border-zariGold text-zariGoldLight text-sm font-serif">
+              <div className="p-4 rounded-[2px] bg-zariGold/15 border border-zariGold text-zariGold-light text-sm font-serif">
                 ✨ Thank you for joining. Welcome to The Girls Collections inner circle.
               </div>
             ) : (
@@ -53,7 +120,7 @@ export default function Footer() {
                 />
                 <button
                   type="submit"
-                  className="px-8 py-4 rounded-[2px] btn-gold-gradient text-xs font-semibold uppercase tracking-[0.2em] flex items-center justify-center space-x-2"
+                  className="px-8 py-4 rounded-[2px] btn-gold-gradient text-xs font-bold uppercase tracking-[0.2em] flex items-center justify-center space-x-2 cursor-pointer"
                 >
                   <span>Subscribe</span>
                   <ArrowRight className="w-4 h-4 text-white" />
@@ -64,14 +131,19 @@ export default function Footer() {
         </div>
       </div>
 
-      {/* Main Footer Navigation Columns */}
-      <div className="max-w-[1440px] mx-auto px-6 sm:px-12 py-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-10 border-b border-zariGold/20 text-xs font-sans">
+      {/* BROWSER DROP NOTIFICATION WIDGET */}
+      <div className="max-w-[1440px] mx-auto px-6 sm:px-12 pt-8">
+        <NotificationBellWidget />
+      </div>
+
+      {/* MAIN FOOTER COLUMNS */}
+      <div className="max-w-[1440px] mx-auto px-6 sm:px-12 py-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-10 border-b border-zariGold/20 text-xs font-sans">
         {/* Column 1: Brand Info */}
         <div className="lg:col-span-2 space-y-4">
           <BrandLogo variant="badge" size="lg" />
-          <p className="text-ivory/70 leading-relaxed max-w-sm font-light">
-            Curated D2C ethnic wear brand specializing in traditional &amp; contemporary sarees, lehengas, 
-            indo-western couture for women, and handcrafted pure silk pattu frocks for young girls.
+          <p className="text-ivory/75 leading-relaxed max-w-sm font-light">
+            Curated D2C luxury Indian fashion brand specializing in traditional &amp; contemporary anarkalis, lehengas, 
+            indo-western ensembles for women, and handcrafted pure silk pattu frocks for young girls.
           </p>
         </div>
 
@@ -79,10 +151,10 @@ export default function Footer() {
         <div className="space-y-3">
           <h4 className="text-xs font-serif font-bold text-zariGold uppercase tracking-[0.2em]">Shop</h4>
           <ul className="space-y-2.5 text-ivory/75 font-light">
-            <li><Link href="/shop?category=sarees" className="hover:text-zariGold transition-colors">Silk Sarees</Link></li>
-            <li><Link href="/shop?category=lehengas" className="hover:text-zariGold transition-colors">Bridal Lehengas</Link></li>
-            <li><Link href="/shop?category=pattu-frocks" className="hover:text-zariGold transition-colors">Kids Pattu Frocks</Link></li>
-            <li><Link href="/shop?category=gowns" className="hover:text-zariGold transition-colors">Designer Gowns</Link></li>
+            <li><Link href="/shop?category=anarkali-kurta-suit-sets" className="hover:text-zariGold transition-colors">Silk Anarkalis</Link></li>
+            <li><Link href="/shop?category=all-kurta-sets" className="hover:text-zariGold transition-colors">Kurta Suit Sets</Link></li>
+            <li><Link href="/shop?category=kids-lehenga-blouse-or-pattu-pavadai" className="hover:text-zariGold transition-colors">Kids Pattu Pavadai</Link></li>
+            <li><Link href="/shop?category=party-wear-frocks" className="hover:text-zariGold transition-colors">Party Wear Frocks</Link></li>
           </ul>
         </div>
 
@@ -92,8 +164,8 @@ export default function Footer() {
           <ul className="space-y-2.5 text-ivory/75 font-light">
             <li><Link href="/track" className="hover:text-zariGold transition-colors">Track Order</Link></li>
             <li><Link href="/contact" className="hover:text-zariGold transition-colors">Styling Concierge</Link></li>
-            <li><Link href="/policies" className="hover:text-zariGold transition-colors">Shipping &amp; Returns</Link></li>
-            <li><Link href="/policies" className="hover:text-zariGold transition-colors">Size Guide</Link></li>
+            <li><Link href="/policies/terms-and-conditions" className="hover:text-zariGold transition-colors font-medium text-zariGold">Terms &amp; Conditions</Link></li>
+            <li><Link href="/policies/privacy-policy" className="hover:text-zariGold transition-colors">Privacy Policy</Link></li>
           </ul>
         </div>
 
@@ -108,39 +180,7 @@ export default function Footer() {
         </div>
       </div>
 
-      {/* Trust Badges Strip */}
-      <div className="max-w-[1440px] mx-auto px-6 sm:px-12 py-8 border-b border-zariGold/20 grid grid-cols-2 lg:grid-cols-4 gap-6 text-xs text-ivory/80">
-        <div className="flex items-center space-x-3">
-          <Award className="w-6 h-6 text-zariGold shrink-0" />
-          <div>
-            <p className="font-semibold text-ivory">Pure Silk Certified</p>
-            <p className="text-[11px] text-ivory/60">100% Authentic Kanjeevaram</p>
-          </div>
-        </div>
-        <div className="flex items-center space-x-3">
-          <RefreshCw className="w-6 h-6 text-zariGold shrink-0" />
-          <div>
-            <p className="font-semibold text-ivory">7-Day Easy Returns</p>
-            <p className="text-[11px] text-ivory/60">Hassle-free Doorstep Pickups</p>
-          </div>
-        </div>
-        <div className="flex items-center space-x-3">
-          <ShieldCheck className="w-6 h-6 text-zariGold shrink-0" />
-          <div>
-            <p className="font-semibold text-ivory">Cash on Delivery</p>
-            <p className="text-[11px] text-ivory/60">Available Pan-India</p>
-          </div>
-        </div>
-        <div className="flex items-center space-x-3">
-          <Truck className="w-6 h-6 text-zariGold shrink-0" />
-          <div>
-            <p className="font-semibold text-ivory">Express Shipping</p>
-            <p className="text-[11px] text-ivory/60">Dispatched within 24 Hours</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Copyright & Payment */}
+      {/* COPYRIGHT & PAYMENT METHODS */}
       <div className="max-w-[1440px] mx-auto px-6 sm:px-12 py-6 flex flex-col sm:flex-row items-center justify-between text-[11px] text-ivory/60 space-y-4 sm:space-y-0">
         <p>© {new Date().getFullYear()} The Girls Collections. Custom Built with Quiet Luxury.</p>
         <div className="flex items-center space-x-3 text-zariGold font-sans text-[10px] tracking-widest uppercase">

@@ -14,12 +14,12 @@ const ALLOWED_CATEGORIES: Record<
   string,
   { title: string; description: string; ctaText: string; slug: string; aliases: string[] }
 > = {
-  sarees: {
-    title: 'SAREES & DRAPES',
+  anarkalis: {
+    title: 'ANARKALIS & SUITS',
     description: 'Handwoven organza, silk & zari.\nTimeless Indian elegance.',
-    ctaText: 'Explore Sarees',
-    slug: 'sarees',
-    aliases: ['sarees', 'saree', 'drapes', 'langa-davani', 'organza'],
+    ctaText: 'Explore Anarkalis',
+    slug: 'anarkalis',
+    aliases: ['anarkalis', 'anarkali', 'suits', 'suit-sets', 'organza'],
   },
   lehengas: {
     title: 'ROYAL LEHENGAS',
@@ -36,15 +36,15 @@ const ALLOWED_CATEGORIES: Record<
     aliases: ['pattu-frocks', 'kids-pattu', 'kids-lehenga', 'kids', 'frocks'],
   },
   kurtis: {
-    title: 'ANARKALIS & GOWNS',
+    title: 'KURTA SETS & GOWNS',
     description: 'Flowing silhouettes.\nMoti & Gota Patti embellishments.',
-    ctaText: 'Browse Anarkalis',
+    ctaText: 'Browse Kurta Sets',
     slug: 'kurtis',
-    aliases: ['kurtis', 'kurta', 'anarkali', 'indo-western', 'gowns', 'co-ords'],
+    aliases: ['kurtis', 'kurta', 'indo-western', 'gowns', 'co-ords'],
   },
 };
 
-const CATEGORY_ORDER = ['sarees', 'lehengas', 'pattu-frocks', 'kurtis'];
+const CATEGORY_ORDER = ['anarkalis', 'lehengas', 'pattu-frocks', 'kurtis'];
 
 /**
  * Builds exactly 4 editorial slides — one per allowed category.

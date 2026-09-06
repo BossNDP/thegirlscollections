@@ -15,10 +15,10 @@ interface DrapeCategory {
 const DRAPE_CATEGORIES: DrapeCategory[] = [
   {
     id: '1',
-    name: 'Kanjeevaram Silk Sarees',
-    count: '42 Drapes',
+    name: 'Royal Silk Anarkalis',
+    count: '42 Ensembles',
     image: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&q=85&w=800',
-    slug: 'sarees',
+    slug: 'anarkalis',
   },
   {
     id: '2',
@@ -36,10 +36,10 @@ const DRAPE_CATEGORIES: DrapeCategory[] = [
   },
   {
     id: '4',
-    name: 'Organza & Chanderi',
-    count: '19 Drapes',
+    name: 'Organza & Chanderi Suits',
+    count: '19 Outfits',
     image: 'https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&q=85&w=800',
-    slug: 'organza-sarees',
+    slug: 'anarkalis',
   },
   {
     id: '5',

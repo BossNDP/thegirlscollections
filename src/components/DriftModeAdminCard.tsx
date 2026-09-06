@@ -79,7 +79,7 @@ export const DriftModeAdminCard: React.FC = () => {
   if (isLoading) {
     return (
       <div className="bg-white border border-zinc-200/60 p-6 rounded-[16px] animate-pulse text-zinc-400 text-xs font-mono">
-        LOADING DRIFT MODE...
+        LOADING LAUNCH DISCOUNT...
       </div>
     );
   }
@@ -93,9 +93,9 @@ export const DriftModeAdminCard: React.FC = () => {
           </div>
           <div>
             <h3 className="text-sm font-extrabold tracking-wider uppercase text-zinc-900">
-              Drift Mode — Launch Discount
+              Launch Discount — First Order Offer
             </h3>
-            <p className="text-xs text-zinc-500 mt-0.5">First-order discount pop-up & top banner trigger</p>
+            <p className="text-xs text-zinc-500 mt-0.5">First-order discount pop-up &amp; top banner trigger</p>
           </div>
         </div>
 
@@ -106,7 +106,7 @@ export const DriftModeAdminCard: React.FC = () => {
           className={`w-12 h-6 flex items-center rounded-full p-1 transition-colors duration-300 ${
             isActive ? 'bg-black' : 'bg-zinc-200'
           }`}
-          aria-label="Toggle Drift Mode"
+          aria-label="Toggle Launch Discount"
         >
           <div
             className={`w-4 h-4 rounded-full bg-white transition-transform duration-300 ${

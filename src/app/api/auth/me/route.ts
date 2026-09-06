@@ -23,7 +23,7 @@ function formatUser(u: any) {
 export async function GET() {
   try {
     const cookieStore = cookies();
-    const sessionToken = cookieStore.get('drftn_session')?.value;
+    const sessionToken = cookieStore.get('tgc_session')?.value;
 
     if (sessionToken) {
       try {
@@ -56,7 +56,7 @@ export async function GET() {
 
         if (dbUser) {
           const token = await signToken({ userId: dbUser.id });
-          cookies().set('drftn_session', token, {
+          cookies().set('tgc_session', token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'strict',
@@ -86,11 +86,11 @@ export async function GET() {
           }
 
           let syncedUser;
+          let isNewUser = false;
           if (dbUserByEmail) {
             const [updated] = await db
               .update(schema.users)
               .set({
-                id: clerkAuth.userId,
                 auth_provider: 'google',
                 email_verified: true,
                 name: dbUserByEmail.name || name,
@@ -99,6 +99,7 @@ export async function GET() {
               .returning();
             syncedUser = updated;
           } else {
+            isNewUser = true;
             const [created] = await db
               .insert(schema.users)
               .values({
@@ -115,7 +116,7 @@ export async function GET() {
           }
 
           const token = await signToken({ userId: syncedUser.id });
-          cookies().set('drftn_session', token, {
+          cookies().set('tgc_session', token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'strict',
@@ -123,7 +124,7 @@ export async function GET() {
             path: '/',
           });
 
-          return NextResponse.json({ user: formatUser(syncedUser) });
+          return NextResponse.json({ user: formatUser(syncedUser), isNewUser });
         } catch (clerkErr) {
           console.warn('Clerk user sync skipped:', clerkErr);
         }

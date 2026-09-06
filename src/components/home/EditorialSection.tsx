@@ -31,7 +31,7 @@ export const EditorialSection: React.FC = () => {
                   THE HEIRLOOM SILK EDIT
                 </h2>
                 <p className="text-sm sm:text-base text-ivory/80 font-sans font-light mt-2 max-w-xl">
-                  Handcrafted Kanjeevaram weaves, organza sarees &amp; pure silk kids pattu frocks.
+                  Handcrafted Kanjeevaram weaves, organza suits &amp; pure silk kids pattu frocks.
                 </p>
               </div>
               <Link

@@ -52,7 +52,7 @@ export const ShopByCategoryIndex: React.FC = () => {
               >
                 {/* Full-Bleed Imagery */}
                 <Image
-                  src={item.image}
+                  src={item.image || 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&q=85&w=800'}
                   alt={item.name}
                   fill
                   sizes="(max-width: 1024px) 50vw, 33vw"
@@ -86,7 +86,7 @@ export const ShopByCategoryIndex: React.FC = () => {
               }`}
             >
               <Image
-                src={item.image}
+                src={item.image || 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&q=85&w=800'}
                 alt={item.name}
                 fill
                 sizes="100vw"

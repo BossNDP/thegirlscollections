@@ -8,16 +8,16 @@ import { useShop } from '@/context/ShopContext';
 import { MOCK_PRODUCTS, Product } from '@/data/shopData';
 
 const TRENDING_TAGS = [
-  'Kanjeevaram Sarees',
-  'Wedding Sarees',
+  'Silk Anarkalis',
+  'Wedding Lehengas',
   'Festive Organza',
   'Kids Pure Silk Pattu',
   'Zari Lehengas',
 ];
 
 const OCCASION_TILES = [
-  { label: 'Wedding', query: 'saree' },
-  { label: 'Reception', query: 'lehenga' },
+  { label: 'Wedding', query: 'lehenga' },
+  { label: 'Reception', query: 'anarkali' },
   { label: 'Festive', query: 'organza' },
   { label: 'Everyday', query: 'pattu' },
 ];
@@ -109,7 +109,7 @@ export const SearchOverlay: React.FC = () => {
                 saveRecentSearch(query.trim());
               }
             }}
-            placeholder="Search sarees, pattu frocks, lehengas, kurtis..."
+            placeholder="Search anarkalis, pattu frocks, lehengas, kurtis..."
             autoFocus
             className="w-full bg-transparent text-xl sm:text-3xl text-ivory placeholder-ivory/40 focus:outline-none font-serif tracking-tight"
           />
@@ -205,7 +205,7 @@ export const SearchOverlay: React.FC = () => {
 
             {results.length === 0 ? (
               <div className="py-12 text-center text-ivory/60 font-serif text-lg">
-                No items match your search. Try searching for &quot;Saree&quot;, &quot;Pattu Frock&quot;, or &quot;Lehenga&quot;.
+                No items match your search. Try searching for &quot;Anarkali&quot;, &quot;Pattu Frock&quot;, or &quot;Lehenga&quot;.
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">

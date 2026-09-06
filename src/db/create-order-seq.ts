@@ -24,7 +24,7 @@ async function main() {
   // Sanity check: call nextval once and show the result
   const testRes = await db.execute(sql`SELECT nextval('order_number_seq')::int AS next`);
   const nextVal = Number((testRes as any).rows?.[0]?.next ?? (testRes as any)[0]?.next);
-  console.log(`   First nextval() = ${nextVal}  →  order number: DRFTN-${1000 + nextVal}`);
+  console.log(`   First nextval() = ${nextVal}  →  order number: TGC-${1000 + nextVal}`);
 
   process.exit(0);
 }

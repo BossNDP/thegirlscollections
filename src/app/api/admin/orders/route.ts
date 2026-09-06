@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { requireAdmin } from '@/lib/auth/admin';
 import { db } from '@/db';
 import * as schema from '@/db/schema';
 import { eq, desc, sql } from 'drizzle-orm';
@@ -39,6 +40,9 @@ function formatOrderRow(r: any) {
 }
 
 export async function GET(request: Request) {
+  const authResult = await requireAdmin();
+  if (authResult instanceof NextResponse) return authResult;
+
   try {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
@@ -86,6 +90,9 @@ export async function GET(request: Request) {
 }
 
 export async function PATCH(request: Request) {
+  const authResult = await requireAdmin();
+  if (authResult instanceof NextResponse) return authResult;
+
   try {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');

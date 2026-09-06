@@ -12,7 +12,7 @@ export interface Product {
   id: string;
   slug: string;
   name: string;
-  category: string; // 'sarees' | 'kurtis' | 'lehengas' | 'indo-western' | 'pattu-frocks' | 'kids-kurta' | 'kids-lehenga'
+  category: string; // 'anarkalis' | 'kurtis' | 'lehengas' | 'indo-western' | 'pattu-frocks' | 'kids-kurta' | 'kids-lehenga'
   target: 'women' | 'kids';
   subcategory: string;
   occasion: 'Festive' | 'Wedding Guest' | 'Everyday' | 'Gifting';
@@ -50,7 +50,7 @@ export const NAVIGATION_CATEGORIES: CategoryMenu[] = [
     featuredImg: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&q=85&w=600",
     promoText: "The Festive Edit — Handwoven Silk & Zari Collection",
     subcategories: [
-      { name: "Sarees & Drapes", slug: "sarees" },
+      { name: "Anarkali Suit Sets", slug: "anarkalis" },
       { name: "Kurtis & Tunics", slug: "kurtis" },
       { name: "Lehenga Cholis", slug: "lehengas" },
       { name: "Indo-Western Gowns", slug: "indo-western" },
@@ -104,8 +104,8 @@ export const NAVIGATION_CATEGORIES: CategoryMenu[] = [
     featuredImg: "https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&q=85&w=600",
     promoText: "Blush & Gold Signature Festive Wear",
     subcategories: [
-      { name: "Royal Banarasi Sarees", slug: "sarees" },
-      { name: "Embroidered Anarkalis", slug: "kurtis" },
+      { name: "Royal Silk Anarkalis", slug: "anarkalis" },
+      { name: "Embroidered Kurta Sets", slug: "kurtis" },
       { name: "Silk Lehenga Sets", slug: "lehengas" },
       { name: "Kids Silk Collection", slug: "pattu-frocks" },
     ],
@@ -135,11 +135,11 @@ export const NAVIGATION_CATEGORIES: CategoryMenu[] = [
 export const MOCK_PRODUCTS: Product[] = [
   {
     id: "tgc-101",
-    slug: "gulmohar-blush-organza-saree",
-    name: "Gulmohar Blush Organza Saree",
-    category: "sarees",
+    slug: "gulmohar-blush-organza-suit",
+    name: "Gulmohar Blush Organza Anarkali Set",
+    category: "anarkalis",
     target: "women",
-    subcategory: "Sarees & Drapes",
+    subcategory: "Anarkali Suit Sets",
     occasion: "Festive",
     price: 4999,
     originalPrice: 6499,
@@ -152,10 +152,10 @@ export const MOCK_PRODUCTS: Product[] = [
       "https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&q=85&w=1200",
     ],
     sizes: [
-      { size: "Free Size", inStock: true },
-      { size: "Stitched Blouse S", inStock: true },
-      { size: "Stitched Blouse M", inStock: true },
-      { size: "Stitched Blouse L", inStock: false },
+      { size: "XS", inStock: true },
+      { size: "S", inStock: true },
+      { size: "M", inStock: true },
+      { size: "L", inStock: false },
     ],
     colors: [
       { name: "Blush Pink", hex: "#E8C9C4" },
@@ -163,8 +163,8 @@ export const MOCK_PRODUCTS: Product[] = [
       { name: "Sage Green", hex: "#7C9070" },
     ],
     fabric: "Pure Organza Silk with Handwoven Zari Border",
-    description: "Crafted for festive gatherings, this ethereal blush organza saree features delicate hand-embroidered floral motifs along the scalloped gold zari border. Comes with an unstitched brocade blouse piece.",
-    careInstructions: ["Dry Clean Only", "Store in Cotton Saree Bag", "Iron on Low Heat with Cloth Overlay"],
+    description: "Crafted for festive gatherings, this ethereal blush organza anarkali suit features delicate hand-embroidered floral motifs along the scalloped gold zari border. Comes with a matching dupatta and trousers.",
+    careInstructions: ["Dry Clean Only", "Store in Cotton Garment Bag", "Iron on Low Heat with Cloth Overlay"],
     rating: 4.9,
     reviewsCount: 38,
   },

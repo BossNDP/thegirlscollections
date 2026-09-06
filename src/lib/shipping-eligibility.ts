@@ -73,7 +73,7 @@ export async function checkDeliveryEligibility(pincode: string): Promise<Eligibi
     try {
       // Retrieve pickup location from settings or fallback to standard store address
       const dbSettings = await db.select().from(schema.settings);
-      let pickupAddr = 'DRFTN Store, Yelahanka, Bengaluru - 560064';
+      let pickupAddr = 'The Girls Collections Store, Yelahanka, Bengaluru - 560064';
       dbSettings.forEach((row: any) => {
         if (row.key === 'borzo_pickup_address') pickupAddr = row.value;
       });

@@ -41,7 +41,7 @@ export const CategoryTiles: React.FC = () => {
               </span>
             </div>
             <p className="text-xs text-charcoal-muted font-sans font-light">
-              Handwoven Organza Sarees, Zari Lehengas, Embroidered Anarkalis &amp; Indo-Western Couture
+              Handwoven Organza Suits, Zari Lehengas, Embroidered Anarkalis &amp; Indo-Western Couture
             </p>
           </div>
         </Link>

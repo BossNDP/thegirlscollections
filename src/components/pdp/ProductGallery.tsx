@@ -26,47 +26,50 @@ export const ProductGallery: React.FC<ProductGalleryProps> = ({ images, productN
   const hasMultipleImages = images && images.length > 1;
 
   return (
-    <div className="w-full">
-      {/* Desktop Gallery: Vertical Thumbnail Rail + Temple Arch Main Image */}
+    <div id="pdp-primary-gallery" className="w-full select-none">
+      {/* Desktop Gallery Layout: Thumbnail Rail + Clean Rectangular Main Image */}
       <div className="hidden lg:flex gap-5 items-start">
+        {/* Left Thumbnail Rail */}
         {hasMultipleImages && (
           <div className="flex flex-col space-y-3.5 w-20 shrink-0">
             {images.map((img, idx) => (
               <button
                 key={idx}
                 onClick={() => setSelectedIdx(idx)}
-                className={`arch-frame-sm relative aspect-[3/4] w-full transition-all ${
+                className={`relative aspect-[3/4] w-full rounded-xl overflow-hidden border-2 transition-all duration-200 ${
                   idx === selectedIdx
-                    ? 'ring-2 ring-zariGold opacity-100'
-                    : 'opacity-50 hover:opacity-100'
+                    ? 'border-zariGold ring-2 ring-zariGold/40 scale-[1.02] shadow-md'
+                    : 'border-zariGold/20 opacity-60 hover:opacity-100 hover:border-zariGold/60'
                 }`}
               >
-                <div className="arch-inner relative w-full h-full">
-                  <Image src={img} alt={`${productName} thumb ${idx + 1}`} fill className="object-cover" />
-                </div>
+                <Image
+                  src={img}
+                  alt={`${productName} thumbnail ${idx + 1}`}
+                  fill
+                  className="object-cover object-top"
+                  sizes="80px"
+                />
               </button>
             ))}
           </div>
         )}
 
-        {/* Main Display Image wrapped in Temple Arch Frame */}
-        <div className="arch-frame relative aspect-[3/4] max-h-[660px] flex-1 shadow-2xl">
-          <div className="arch-inner relative w-full h-full bg-woven-texture">
-            <Image
-              src={images[selectedIdx] || images[0]}
-              alt={productName}
-              fill
-              priority
-              className="object-cover transition-transform duration-700"
-              sizes="(max-width: 1024px) 100vw, 50vw"
-            />
-          </div>
+        {/* Main Display Image - Clean Normal Portrait Rectangle */}
+        <div className="relative flex-1 aspect-[3/4] max-h-[680px] rounded-2xl overflow-hidden border border-zariGold/30 shadow-xl bg-sand/10">
+          <Image
+            src={images[selectedIdx] || images[0]}
+            alt={productName}
+            fill
+            priority
+            className="object-cover object-top transition-transform duration-700 hover:scale-[1.03]"
+            sizes="(max-width: 1024px) 100vw, 50vw"
+          />
         </div>
       </div>
 
-      {/* Mobile Gallery: Full-Bleed Temple Arch Swipeable Carousel */}
-      <div className="lg:hidden arch-frame relative w-full aspect-[3/4] shadow-xl">
-        <div className="arch-inner relative w-full h-full">
+      {/* Mobile Gallery Layout: Clean Normal Portrait Rectangle Carousel */}
+      <div className="lg:hidden w-full flex flex-col items-center">
+        <div className="relative w-full aspect-[3/4] max-h-[540px] rounded-2xl overflow-hidden border border-zariGold/30 shadow-lg bg-sand/10">
           <div
             onScroll={handleMobileScroll}
             className="flex w-full h-full overflow-x-auto snap-x snap-mandatory no-scrollbar scroll-smooth"
@@ -78,26 +81,31 @@ export const ProductGallery: React.FC<ProductGalleryProps> = ({ images, productN
                   alt={`${productName} slide ${idx + 1}`}
                   fill
                   priority={idx === 0}
-                  className="object-cover"
+                  className="object-cover object-top"
                   sizes="100vw"
                 />
               </div>
             ))}
           </div>
-
-          {hasMultipleImages && (
-            <div className="absolute bottom-4 inset-x-0 flex justify-center items-center space-x-2 z-20 pointer-events-none">
-              {images.map((_, idx) => (
-                <div
-                  key={idx}
-                  className={`h-2 rounded-full transition-all duration-300 ${
-                    idx === selectedIdx ? 'w-6 bg-zariGold' : 'w-2 bg-ivory/70 border border-inkNavy/20'
-                  }`}
-                />
-              ))}
-            </div>
-          )}
         </div>
+
+        {/* Pagination Dots with Clear Vertical Spacing */}
+        {hasMultipleImages && (
+          <div className="mt-5 mb-2 flex justify-center items-center gap-2 z-10">
+            {images.map((_, idx) => (
+              <button
+                key={idx}
+                onClick={() => setSelectedIdx(idx)}
+                aria-label={`Go to slide ${idx + 1}`}
+                className={`h-2 rounded-full transition-all duration-300 ${
+                  idx === selectedIdx
+                    ? 'w-6 bg-zariGold shadow-sm'
+                    : 'w-2 bg-inkNavy/30 hover:bg-inkNavy/60'
+                }`}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

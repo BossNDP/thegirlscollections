@@ -100,12 +100,12 @@ export const LuxuryHeartButton: React.FC<LuxuryHeartButtonProps> = ({
             transition={{ duration: 0.25, ease: [0.25, 0.46, 0.45, 0.94] }}
             className="flex items-center justify-center"
           >
-            {/* Iconic Organic Heart SVG */}
+            {/* Iconic Organic Heart SVG with Rose-Gold Fill Transition */}
             <svg
-              className={`${iconSizes[size]} transition-all duration-300 ${
+              className={`${iconSizes[size]} transition-colors duration-300 ${
                 isLiked
-                  ? 'fill-[#E53E3E] text-[#E53E3E] drop-shadow-xs'
-                  : 'fill-none text-navy/80 group-hover/heartBtn:text-[#E53E3E] group-hover/heartBtn:fill-[#E53E3E]/15'
+                  ? 'fill-[#B4863C] text-[#B4863C] drop-shadow-xs'
+                  : 'fill-none text-inkNavy/70 group-hover/heartBtn:text-[#B4863C] group-hover/heartBtn:fill-[#B4863C]/15'
               }`}
               viewBox="0 0 24 24"
               stroke="currentColor"

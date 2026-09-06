@@ -37,7 +37,7 @@ export const DriftModePopup: React.FC = () => {
         e.stopPropagation();
       }
       try {
-        localStorage.setItem('drftn_drift_popup_dismissed_at', Date.now().toString());
+        localStorage.setItem('tgc_popup_dismissed_at', Date.now().toString());
       } catch {}
       closePopup();
     },
@@ -86,10 +86,10 @@ export const DriftModePopup: React.FC = () => {
 
     // Client-side session frequency cap for all users
     try {
-      const sessionCount = parseInt(sessionStorage.getItem('drftn_drift_popup_session_count') || '0', 10);
+      const sessionCount = parseInt(sessionStorage.getItem('tgc_popup_session_count') || '0', 10);
       if (sessionCount >= 2) return;
 
-      const dismissedAt = localStorage.getItem('drftn_drift_popup_dismissed_at');
+      const dismissedAt = localStorage.getItem('tgc_popup_dismissed_at');
       if (dismissedAt) {
         const timeDiff = Date.now() - parseInt(dismissedAt, 10);
         if (timeDiff < GUEST_DISMISS_TTL_MS) {
@@ -103,8 +103,8 @@ export const DriftModePopup: React.FC = () => {
 
       // Track view count upon automatic display (client-side per session)
       try {
-        const currentCount = parseInt(sessionStorage.getItem('drftn_drift_popup_session_count') || '0', 10);
-        sessionStorage.setItem('drftn_drift_popup_session_count', (currentCount + 1).toString());
+        const currentCount = parseInt(sessionStorage.getItem('tgc_popup_session_count') || '0', 10);
+        sessionStorage.setItem('tgc_popup_session_count', (currentCount + 1).toString());
       } catch {}
     }, 1200);
 
@@ -180,14 +180,14 @@ export const DriftModePopup: React.FC = () => {
           </h2>
 
           <p className="text-xs text-zinc-400 font-normal leading-relaxed mb-4">
-            Enjoy a flat {discountPercent}% discount on your first DRFTN purchase. Single-use code per customer.
+            Enjoy a flat {discountPercent}% discount on your first The Girls Collections purchase. Single-use code per customer.
           </p>
 
           {/* Code Display Box */}
           {isSignedIn ? (
             <div className="w-full mb-3">
               <div className="bg-zinc-900/90 border border-dashed border-zinc-700 rounded-xl p-3 flex items-center justify-between font-mono font-bold text-sm tracking-[0.18em] text-white">
-                <span className="select-all text-white font-mono">{userCode || 'DRFTNMODEON20'}</span>
+                <span className="select-all text-white font-mono">{userCode || 'TGCMODEON20'}</span>
 
                 <button
                   type="button"

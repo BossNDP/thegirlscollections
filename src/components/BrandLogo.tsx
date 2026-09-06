@@ -32,10 +32,10 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
         <span className="animate-logo-shimmer" />
 
         <Image
-          src="/logo.png"
+          src="/logo.webp"
           alt="The Girls Collections Emblem"
-          width={322}
-          height={353}
+          width={160}
+          height={175}
           style={{ height: '100%', width: 'auto', objectFit: 'contain' }}
           className="h-full w-auto max-h-full object-contain filter drop-shadow-xs relative z-0"
           priority

@@ -19,13 +19,13 @@ interface CategoryRailConfig {
 
 const CATEGORY_RAILS: CategoryRailConfig[] = [
   {
-    id: 'sarees-rail',
-    title: 'Sarees & Weaves',
+    id: 'anarkali-silk-rail',
+    title: 'Silk Anarkali Sets',
     eyebrow: 'HANDWOVEN SILK & ORGANZA',
-    description: 'Bridal Kanjeevaram drapes, zari borders, & handcrafted organza weaves.',
-    categoryFilter: (p) => p.category === 'sarees' || p.target === 'women',
-    linkUrl: '/shop?category=sarees',
-    linkText: 'View All Sarees & Weaves',
+    description: 'Royal Kanjeevaram anarkalis, gold zari borders, & handcrafted organza ensembles.',
+    categoryFilter: (p) => p.category === 'anarkalis' || p.target === 'women',
+    linkUrl: '/shop?category=anarkalis',
+    linkText: 'View All Silk Anarkali Sets',
   },
   {
     id: 'anarkali-rail',

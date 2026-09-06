@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { NextResponse } from 'next/server';
 export const runtime = 'nodejs';
 import crypto from 'crypto';
@@ -13,7 +15,7 @@ function generateOrderNumber(): string {
   for (let i = 0; i < 6; i++) {
     randomStr += chars[bytes[i] % chars.length];
   }
-  return `DRFTN-${randomStr}`;
+  return `TGC-${randomStr}`;
 }
 
 import { createOrderSchema } from '@/lib/validations';
@@ -57,7 +59,7 @@ export async function POST(request: Request) {
     const sessionToken = rawCookie
       .split(';')
       .map(c => c.trim())
-      .find(c => c.startsWith('drftn_session='))
+      .find(c => c.startsWith('tgc_session='))
       ?.split('=')?.[1];
 
     if (sessionToken) {
@@ -252,22 +254,23 @@ export async function POST(request: Request) {
     let matchedPhone = '';
 
     if (verifiedPhoneToken === 'session_verified_phone') {
-      // Look up logged-in user details in database to verify phone
+      // Look up logged-in user details in database to verify phone status in Neon
       const [dbUser] = await db
         .select()
         .from(schema.users)
         .where(eq(schema.users.id, finalUserId!))
         .limit(1);
       
-      if (dbUser && dbUser.phoneVerified && dbUser.phone) {
+      if (dbUser && dbUser.phone_verified && dbUser.phone) {
         verifiedSuccess = true;
         matchedPhone = dbUser.phone;
-      } else if (dbUser && verifiedPhone) {
-        // Gmail users may not have a phone in DB yet — they just verified
-        // via OTP at checkout. Trust the client-supplied verifiedPhone since
-        // the session cookie proves they're authenticated.
-        verifiedSuccess = true;
-        matchedPhone = verifiedPhone;
+      } else {
+        // HARD SERVER-SIDE GATE: Any customer with phone_verified = false in Neon MUST verify OTP.
+        // Reject session_verified_phone flag.
+        return NextResponse.json(
+          { error: 'Phone verification is mandatory. Please verify your phone number via OTP to complete checkout.' },
+          { status: 400 }
+        );
       }
     } else if (verifiedPhoneToken.startsWith('mock_token_')) {
       // Mock OTP bypass — only allowed when explicitly enabled for local dev.
@@ -326,6 +329,34 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Verified phone number mismatch.' }, { status: 400 });
     }
 
+    // Mandatory Server-Side Gate Update: Update Neon Postgres user profile to phone_verified = true
+    if (finalUserId) {
+      try {
+        await db
+          .insert(schema.users)
+          .values({
+            id: finalUserId,
+            name: customerInfo.name || 'Customer',
+            email: customerInfo.email || null,
+            phone: cleanVerified,
+            phone_verified: true,
+            auth_provider: 'google',
+            created_at: new Date(),
+            last_active_at: new Date(),
+          })
+          .onConflictDoUpdate({
+            target: schema.users.id,
+            set: {
+              phone: cleanVerified,
+              phone_verified: true,
+              last_active_at: new Date(),
+            },
+          });
+      } catch (neonUpdErr) {
+        console.error('[Order Create] Failed to update phone_verified in Neon Postgres:', neonUpdErr);
+      }
+    }
+
     logPerf('Phone OTP Verified');
 
     // 2. Fetch products, product images, settings, discount code, and sequence number concurrently
@@ -348,6 +379,16 @@ export async function POST(request: Request) {
       : Promise.resolve([]);
 
     const cleanCode = discountCode ? discountCode.toUpperCase().trim() : null;
+    if (cleanCode) {
+      try {
+        await db.execute(sql`
+          ALTER TABLE discount_codes ADD COLUMN IF NOT EXISTS target_phone text;
+          ALTER TABLE discount_codes ADD COLUMN IF NOT EXISTS is_phone_locked boolean DEFAULT false;
+        `);
+      } catch (migErr) {
+        console.warn('[OrdersCreate] Migration check notice:', migErr);
+      }
+    }
     const dbCodePromise = cleanCode
       ? db
           .select()
@@ -438,7 +479,7 @@ export async function POST(request: Request) {
     let discountAmount = 0;
     let validatedCode: string | undefined = undefined;
 
-    const isDriftOrderCode = cleanCode && (cleanCode === 'DRFTNMODEON20' || cleanCode === 'DRIFTMODE20' || cleanCode.startsWith('DRIFT-') || cleanCode.startsWith('DRIFT'));
+    const isDriftOrderCode = cleanCode && (cleanCode === 'TGCMODEON20' || cleanCode === 'DRFTNMODEON20' || cleanCode === 'DRIFTMODE20' || cleanCode.startsWith('DRIFT-') || cleanCode.startsWith('DRIFT'));
 
     if (isDriftOrderCode) {
       const [settings] = await db
@@ -469,7 +510,7 @@ export async function POST(request: Request) {
       }
 
       // First-order welcome discount check
-      let signupDiscountCode = 'DRFTN10';
+      let signupDiscountCode = 'TGC10';
       dbSettings.forEach((row: any) => {
         if (row.key === 'signup_discount_code') signupDiscountCode = row.value.toUpperCase().trim();
       });
@@ -503,6 +544,18 @@ export async function POST(request: Request) {
               { status: 400 }
             );
           }
+        }
+      }
+
+      // Phone-number-specific target discount verification
+      if (dbCode.is_phone_locked && dbCode.target_phone) {
+        const orderPhone = (customerInfo.phone || verifiedPhone || '').replace(/\D/g, '');
+        const targetPhoneClean = dbCode.target_phone.replace(/\D/g, '');
+        if (!orderPhone || (!orderPhone.endsWith(targetPhoneClean) && !targetPhoneClean.endsWith(orderPhone))) {
+          return NextResponse.json(
+            { error: 'This discount code is reserved for a specific phone number and cannot be applied to this order.' },
+            { status: 400 }
+          );
         }
       }
 
@@ -589,7 +642,7 @@ export async function POST(request: Request) {
     // Shipping address fallback if pickup order
     const shippingAddr = isPickup 
       ? {
-          line1: "DRFTN Store, 1st Floor, Kogilu Main Rd",
+          line1: "The Girls Collections Store, 1st Floor, Kogilu Main Rd",
           line2: "above Sri Venkateshwar Vaibhava Veg Hotel, K B Sandra, Yelahanka",
           city: "Bengaluru",
           state: "Karnataka",

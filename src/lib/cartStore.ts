@@ -5,12 +5,14 @@ import { CartItem, DiscountCode } from '../types';
 interface CartState {
   items: CartItem[];
   isOpen: boolean;
+  hasHydrated: boolean;
   discountCode: DiscountCode | null;
   addItem: (item: Omit<CartItem, 'quantity'>, quantity?: number) => void;
   removeItem: (id: string, size: string) => void;
   updateQuantity: (id: string, size: string, quantity: number) => void;
   clearCart: () => void;
   setIsOpen: (isOpen: boolean) => void;
+  setHasHydrated: (state: boolean) => void;
   applyDiscount: (code: DiscountCode | null) => void;
   getCartTotal: () => number;
   getCartCount: () => number;
@@ -21,6 +23,7 @@ export const useCartStore = create<CartState>()(
     (set, get) => ({
       items: [],
       isOpen: false,
+      hasHydrated: false,
       discountCode: null,
 
       addItem: (item, quantity = 1) => {
@@ -74,6 +77,8 @@ export const useCartStore = create<CartState>()(
       clearCart: () => set({ items: [], discountCode: null }),
       
       setIsOpen: (isOpen) => set({ isOpen }),
+
+      setHasHydrated: (hasHydrated) => set({ hasHydrated }),
       
       applyDiscount: (discountCode) => set({ discountCode }),
 
@@ -87,6 +92,9 @@ export const useCartStore = create<CartState>()(
     }),
     {
       name: 'drftn-cart-storage',
+      onRehydrateStorage: () => (state) => {
+        state?.setHasHydrated(true);
+      },
     }
   )
 );

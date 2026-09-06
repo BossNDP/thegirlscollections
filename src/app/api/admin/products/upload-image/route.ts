@@ -1,5 +1,7 @@
+export const dynamic = 'force-dynamic';
+
 import { NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
+import { requireStaffOrAdmin } from '@/lib/auth/admin';
 import { v2 as cloudinary } from 'cloudinary';
 
 export const maxDuration = 60;
@@ -14,14 +16,9 @@ function getCloudinaryCredentials() {
 
 export async function POST(request: Request) {
   try {
-    // 1. Verify admin session/auth before proceeding
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json(
-        { error: 'Unauthorized: Session missing' },
-        { status: 401 }
-      );
-    }
+    // 1. Verify admin/staff session auth before proceeding
+    const authResult = await requireStaffOrAdmin();
+    if (authResult instanceof NextResponse) return authResult;
 
     const { cloudName, apiKey, apiSecret } = getCloudinaryCredentials();
 
@@ -39,6 +36,8 @@ export async function POST(request: Request) {
 
     const contentType = request.headers.get('content-type') || '';
 
+    const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/avif'];
+
     // 2. Accept bg-removed image as multipart/form-data or base64 JSON
     if (contentType.includes('multipart/form-data')) {
       const formData = await request.formData();
@@ -49,6 +48,13 @@ export async function POST(request: Request) {
       if (!file) {
         return NextResponse.json(
           { error: 'No image file provided in form data.' },
+          { status: 400 }
+        );
+      }
+
+      if (!ALLOWED_MIME_TYPES.includes(file.type.toLowerCase())) {
+        return NextResponse.json(
+          { error: 'Invalid file type. Only JPEG, PNG, WEBP, and AVIF images are permitted.' },
           { status: 400 }
         );
       }

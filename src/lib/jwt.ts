@@ -1,4 +1,4 @@
-const secret = process.env.ADMIN_JWT_SECRET || 'drftn_default_jwt_secret_key_2026_fallback';
+const secret = process.env.ADMIN_JWT_SECRET || 'tgc_default_jwt_secret_key_2026_fallback';
 
 function base64UrlEncode(str: string): string {
   return Buffer.from(str, 'utf-8').toString('base64url');

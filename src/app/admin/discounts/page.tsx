@@ -21,6 +21,7 @@ export default function AdminDiscounts() {
     discount_value: '',
     min_order_value: '',
     usage_limit: '',
+    target_phone: '',
     expires_at: '',
     is_active: true,
   });
@@ -64,6 +65,12 @@ export default function AdminDiscounts() {
     }
   };
 
+  const handleCopyForWhatsApp = (code: string, phone?: string) => {
+    const message = `Hello! Here is your exclusive promo code from The Girls Collections: *${code}*. Apply at checkout to redeem your discount! https://thegirlscollections.com/shop`;
+    navigator.clipboard.writeText(message);
+    addToast(`WhatsApp promo message copied for ${code}!`, 'success');
+  };
+
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newCode.code || !newCode.discount_value) {
@@ -82,6 +89,8 @@ export default function AdminDiscounts() {
         discount_value: newCode.discount_type === 'flat' ? Math.round(val * 100) : val,
         min_order_value: Math.round(minVal * 100),
         usage_limit: newCode.usage_limit ? Number(newCode.usage_limit) : undefined,
+        target_phone: newCode.target_phone.trim() || undefined,
+        is_phone_locked: Boolean(newCode.target_phone.trim()),
         is_active: newCode.is_active,
         expires_at: newCode.expires_at || undefined,
       };
@@ -95,6 +104,7 @@ export default function AdminDiscounts() {
         discount_value: '',
         min_order_value: '',
         usage_limit: '',
+        target_phone: '',
         expires_at: '',
         is_active: true,
       });
@@ -125,7 +135,7 @@ export default function AdminDiscounts() {
         </button>
       </div>
 
-      {/* Storewide Drift Mode Sale Controls */}
+      {/* Storewide Launch Discount Controls */}
       <DriftModeAdminCard />
 
       <div className="bg-white border border-zinc-200/60 rounded-[16px] shadow-[0_8px_30px_rgb(0,0,0,0.02)] overflow-hidden">

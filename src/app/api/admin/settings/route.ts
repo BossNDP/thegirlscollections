@@ -1,13 +1,14 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/db';
 import * as schema from '@/db/schema';
+import { requireAdmin } from '@/lib/auth/admin';
 
 export const dynamic = 'force-dynamic';
 
 const DEFAULT_SETTINGS = {
   store_name: 'The Girls Collections',
   contact_number: '+91 7483848505',
-  instagram_handle: '@drftnclothing',
+  instagram_handle: '@thegirlscollections',
   free_shipping_threshold: 99900, // paise (₹999)
   default_shipping_charge: 9900,  // paise (₹99)
   razorpay_key_id: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || 'rzp_test_placeholderkey',
@@ -18,7 +19,7 @@ const DEFAULT_SETTINGS = {
   borzo_free_threshold: 149900, // ₹1499 in paise
   borzo_cutoff_start: '11:00',
   borzo_cutoff_end: '16:00',
-  borzo_pickup_address: 'DRFTN Store, 1st Floor, Kogilu Main Rd, above Sri Venkateshwar Vaibhava Veg Hotel, K B Sandra, Yelahanka, Bengaluru, Karnataka, 560064',
+  borzo_pickup_address: 'The Girls Collections Atelier, 1st Floor, Yelahanka, Bengaluru, Karnataka, 560064',
   maintenance_mode: 'false',
 };
 
@@ -37,6 +38,9 @@ function getEnvStatus() {
 }
 
 export async function GET() {
+  const authResult = await requireAdmin();
+  if (authResult instanceof NextResponse) return authResult;
+
   try {
     const rows = await db.select().from(schema.settings);
     const settingsObj: Record<string, any> = { ...DEFAULT_SETTINGS };
@@ -76,6 +80,9 @@ export async function GET() {
 }
 
 export async function PATCH(request: Request) {
+  const authResult = await requireAdmin();
+  if (authResult instanceof NextResponse) return authResult;
+
   try {
     const body = await request.json();
 

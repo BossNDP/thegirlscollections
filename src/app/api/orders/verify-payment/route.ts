@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { NextResponse } from 'next/server';
 export const runtime = 'nodejs';
 import crypto from 'crypto';
@@ -26,7 +28,7 @@ export async function POST(request: Request) {
     const sessionToken = rawCookie
       .split(';')
       .map(c => c.trim())
-      .find(c => c.startsWith('drftn_session='))
+      .find(c => c.startsWith('tgc_session='))
       ?.split('=')?.[1];
 
     if (sessionToken) {

@@ -42,7 +42,7 @@ export const CategoryBentoGrid: React.FC = () => {
                 Women&apos;s Royal Drapes
               </h3>
               <p className="text-xs sm:text-sm text-ivory/80 font-sans mt-2 max-w-md">
-                Bridal sarees, zari lehengas, langa davanis, and handcrafted festive ensembles.
+                Bridal anarkalis, zari lehengas, langa davanis, and handcrafted festive ensembles.
               </p>
             </div>
             <ZariThread variant="cardBorder" isHovered={hoveredTile === 'tile1'} />

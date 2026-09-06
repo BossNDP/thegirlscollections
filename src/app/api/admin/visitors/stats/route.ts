@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getAuth } from '@clerk/nextjs/server';
+import { requireAdmin } from '@/lib/auth/admin';
 import { redis } from '@/lib/redis';
 import { db } from '@/db';
 import * as schema from '@/db/schema';
@@ -7,13 +7,11 @@ import { eq, gte, count, countDistinct } from 'drizzle-orm';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET(request: Request) {
-  try {
-    const session = getAuth(request as any);
-    if (!session.userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+export async function GET() {
+  const authRes = await requireAdmin();
+  if (authRes instanceof NextResponse) return authRes;
 
+  try {
     const now = new Date();
     const nowSec = Math.floor(now.getTime() / 1000);
     const threeMinsAgoSec = nowSec - 180;
@@ -27,19 +25,17 @@ export async function GET(request: Request) {
     // 1. Fetch live active visitors from Redis sorted set
     try {
       if (redis) {
-        // Clean up entries older than 3 minutes
         await redis.zremrangebyscore('analytics:live_visitors', 0, threeMinsAgoSec);
         liveVisitors = await redis.zcard('analytics:live_visitors');
         monthlyVisitors = await redis.pfcount(`analytics:visitors:${monthStr}`);
         overallVisitors = await redis.pfcount('analytics:visitors:overall');
       }
     } catch (err) {
-      // Ignore Redis errors, fallback to PostgreSQL
+      // Fallback
     }
 
-    // 2. Query PostgreSQL database to ensure accuracy and as fail-safe fallback
+    // 2. Query PostgreSQL database as fallback
     try {
-      // Postgres Live Visitors (if Redis is empty)
       if (liveVisitors === 0) {
         const [dbLive] = await db
           .select({ value: countDistinct(schema.uniqueVisitors.visitor_id) })
@@ -48,7 +44,6 @@ export async function GET(request: Request) {
         liveVisitors = dbLive?.value || 0;
       }
 
-      // Postgres Monthly Visitors
       const [dbMonthly] = await db
         .select({ value: count(schema.uniqueVisitors.visitor_id) })
         .from(schema.uniqueVisitors)
@@ -57,7 +52,6 @@ export async function GET(request: Request) {
       const dbMonthlyCount = dbMonthly?.value || 0;
       monthlyVisitors = Math.max(monthlyVisitors, dbMonthlyCount);
 
-      // Postgres Overall Visitors
       const [dbOverall] = await db
         .select({ value: count(schema.uniqueVisitors.visitor_id) })
         .from(schema.uniqueVisitors);
@@ -65,7 +59,7 @@ export async function GET(request: Request) {
       const dbOverallCount = dbOverall?.value || 0;
       overallVisitors = Math.max(overallVisitors, dbOverallCount);
     } catch (dbErr) {
-      // Postgres error fallback
+      // Ignore DB errors
     }
 
     return NextResponse.json({

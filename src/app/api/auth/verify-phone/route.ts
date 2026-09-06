@@ -108,9 +108,18 @@ export async function POST(request: Request) {
       .limit(1);
 
     if (dbUser) {
+      // Update phone_verified status if not already set
+      if (!dbUser.phone_verified) {
+        await db
+          .update(schema.users)
+          .set({ phone_verified: true, last_active_at: new Date() })
+          .where(eq(schema.users.id, dbUser.id));
+        dbUser.phone_verified = true;
+      }
+
       // ── Returning user ── set session cookie and return immediately
       const token = await signToken({ userId: dbUser.id });
-      cookies().set('drftn_session', token, {
+      cookies().set('tgc_session', token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'strict',
@@ -122,7 +131,7 @@ export async function POST(request: Request) {
         ...dbUser,
         authProvider: dbUser.auth_provider,
         notificationsOptIn: dbUser.notifications_opt_in,
-        phoneVerified: dbUser.phone_verified,
+        phoneVerified: true,
         emailVerified: dbUser.email_verified,
       };
 

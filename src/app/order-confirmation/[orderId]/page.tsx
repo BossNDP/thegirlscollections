@@ -19,7 +19,7 @@ export const dynamic = 'force-dynamic';
 export default async function OrderConfirmationPage({ params }: { params: { orderId: string } }) {
   let userId: string | null = null;
   const cookieStore = cookies();
-  const sessionToken = cookieStore.get('drftn_session')?.value;
+  const sessionToken = cookieStore.get('tgc_session')?.value;
 
   if (sessionToken) {
     const payload = await verifyToken(sessionToken);

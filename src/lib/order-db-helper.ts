@@ -78,7 +78,7 @@ export async function confirmAndWriteOrder(checkout: any, razorpayPaymentId: str
 
     // ── Step 2: Increment discount coupon usage count / mark drift coupon used ──
     if (checkout.discount_code) {
-      const isDriftCode = checkout.discount_code === 'DRFTNMODEON20' || checkout.discount_code.startsWith('DRIFT');
+      const isDriftCode = checkout.discount_code === 'TGCMODEON20' || checkout.discount_code === 'DRFTNMODEON20' || checkout.discount_code.startsWith('DRIFT');
       if (isDriftCode) {
         if (checkout.user_id) {
           await tx
@@ -168,7 +168,7 @@ export async function confirmAndWriteOrder(checkout: any, razorpayPaymentId: str
           for (let i = 0; i < 6; i++) {
             randomStr += chars[bytes[i] % chars.length];
           }
-          orderNumberToUse = `DRFTN-${randomStr}`;
+          orderNumberToUse = `TGC-${randomStr}`;
           console.warn(
             `[confirmAndWriteOrder] order_number collision on ${checkout.order_number}. Retrying with ${orderNumberToUse}...`
           );

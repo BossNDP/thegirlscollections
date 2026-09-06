@@ -20,6 +20,9 @@ export default function SmoothScrollProvider({ children }: SmoothScrollProviderP
 
     // Detect if primary pointer is coarse (mobile touch)
     const isTouchDevice = window.matchMedia('(pointer: coarse)').matches;
+    if (isTouchDevice) return;
+
+    gsap.registerPlugin(ScrollTrigger);
 
     // Initialize Lenis smooth scroll engine with autoRaf so RAF sleeps when idle
     const lenis = new Lenis({

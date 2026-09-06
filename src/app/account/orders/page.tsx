@@ -12,7 +12,7 @@ import ProfileSection from '@/components/ProfileSection';
 
 export const metadata = {
   title: 'My Orders & Profile',
-  description: 'Manage your DRFTN Clothing profile and track your orders.',
+  description: 'Manage your The Girls Collections Clothing profile and track your orders.',
 };
 
 export const dynamic = 'force-dynamic';
@@ -48,7 +48,7 @@ function getStatusColor(status: string) {
 export default async function CustomerOrdersPage() {
   let userId: string | null = null;
   const cookieStore = cookies();
-  const sessionToken = cookieStore.get('drftn_session')?.value;
+  const sessionToken = cookieStore.get('tgc_session')?.value;
 
   if (sessionToken) {
     const payload = await verifyToken(sessionToken);
@@ -134,7 +134,7 @@ export default async function CustomerOrdersPage() {
                 No orders yet
               </h3>
               <p className="text-zinc-500 text-xs max-w-xs mx-auto">
-                You haven&apos;t participated in any DRFTN drops yet. Grab your first fit now.
+                You haven&apos;t participated in any The Girls Collections drops yet. Grab your first fit now.
               </p>
             </div>
             <Link

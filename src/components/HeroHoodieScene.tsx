@@ -265,7 +265,7 @@ export default function HeroHoodieScene({ products }: HeroHoodieSceneProps) {
               <div className="relative w-full h-full md:hidden">
                 <Image
                   src="/mobilewhite.webp"
-                  alt="DRFTN Full-Body Outfit — White Edition"
+                  alt="The Girls Collections Full-Body Outfit — White Edition"
                   fill
                   priority
                   fetchPriority="high"
@@ -277,7 +277,7 @@ export default function HeroHoodieScene({ products }: HeroHoodieSceneProps) {
               <div className="relative w-full h-full hidden md:flex items-center justify-center p-8 md:p-16">
                 <Image
                   src="/hero/hoodie-light.webp"
-                  alt="DRFTN Stitch Hoodie — White Edition"
+                  alt="The Girls Collections Stitch Hoodie — White Edition"
                   fill
                   priority
                   fetchPriority="high"
@@ -303,7 +303,7 @@ export default function HeroHoodieScene({ products }: HeroHoodieSceneProps) {
               <div className="relative w-full h-full md:hidden">
                 <Image
                   src="/mobileblack.webp"
-                  alt="DRFTN Full-Body Outfit — Black Edition"
+                  alt="The Girls Collections Full-Body Outfit — Black Edition"
                   fill
                   sizes="(max-width: 767px) 100vw, 1080px"
                   quality={95}
@@ -313,7 +313,7 @@ export default function HeroHoodieScene({ products }: HeroHoodieSceneProps) {
               <div className="relative w-full h-full hidden md:flex items-center justify-center p-8 md:p-16">
                 <Image
                   src="/hero/hoodie-dark.webp"
-                  alt="DRFTN Stitch Hoodie — Black Edition"
+                  alt="The Girls Collections Stitch Hoodie — Black Edition"
                   fill
                   sizes="(min-width: 768px) 100vw, 1200px"
                   quality={80}

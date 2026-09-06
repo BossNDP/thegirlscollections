@@ -104,13 +104,14 @@ export async function publishQStashShippingJobIdempotent(params: {
   const rawBase =
     process.env.NEXT_PUBLIC_APP_URL ||
     process.env.APP_BASE_URL ||
-    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://www.drftnclothing.in');
+    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://www.thegirlscollections.com');
 
-  // Normalize apex domain (drftnclothing.in / drftn.in) to canonical www.drftnclothing.in
+  // Normalize apex domain (thegirlscollections.com) to canonical www.thegirlscollections.com
   // This prevents Vercel 301 redirects converting QStash POST webhooks into GET (which throws 405)
   const baseUrl = rawBase
-    .replace('://drftnclothing.in', '://www.drftnclothing.in')
-    .replace('://drftn.in', '://www.drftnclothing.in');
+    .replace('://thegirlscollections.com', '://www.thegirlscollections.com')
+    .replace('://drftnclothing.in', '://www.thegirlscollections.com')
+    .replace('://drftn.in', '://www.thegirlscollections.com');
 
   const destinationUrl = `${baseUrl.replace(/\/$/, '')}/api/webhooks/qstash/shipping-worker`;
 

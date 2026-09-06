@@ -1,9 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import TopBanner from '@/components/TopBanner';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
-import PageTransition from '@/components/PageTransition';
+import StorefrontShell from '@/components/StorefrontShell';
 import SmoothScrollProvider from '@/components/SmoothScrollProvider';
 import { ClerkProvider } from '@clerk/nextjs';
 import { AuthSessionProvider } from '@/context/AuthContext';
@@ -110,27 +107,7 @@ export default function RootLayout({
           <SmoothScrollProvider>
             <AuthSessionProvider>
               <ShopProvider>
-                {/* Section 1: Top Utility Bar */}
-                <TopBanner />
-
-                {/* Section 2: Main Navbar */}
-                <Navbar />
-
-                {/* Main Page Body */}
-                <main className="flex-1 flex flex-col relative w-full p-0 m-0 pb-24 md:pb-0">
-                  <PageTransition>{children}</PageTransition>
-                </main>
-
-                {/* Global Footer */}
-                <Footer />
-
-                {/* Interactive Drawers, Toast & Overlays */}
-                <CartDrawer />
-                <QuickViewModal />
-                <SearchOverlay />
-                <ToastContainer />
-                <WhatsAppButton />
-                <FloatingLuxuryDock />
+                <StorefrontShell>{children}</StorefrontShell>
 
                 {/* Clerk Smart CAPTCHA anchor */}
                 <div id="clerk-captcha" />

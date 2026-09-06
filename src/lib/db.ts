@@ -154,12 +154,15 @@ export const dbService = {
         id: r.id,
         name: r.name,
         slug: r.slug,
+        parent_group: r.parent_group || null,
+        age_group: r.age_group || 'ladies',
         image_url: r.image_url || '',
         description: r.description || '',
         parent_id: r.parent_id || null,
         is_active: r.is_active,
         display_order: r.display_order || 0,
-        created_at: r.created_at.toISOString(),
+        sort_order: r.sort_order || 0,
+        created_at: r.created_at ? r.created_at.toISOString() : undefined,
       }));
     } else {
       const res = await fetch('/api/admin/categories');
@@ -191,6 +194,8 @@ export const dbService = {
         id: inserted.id,
         name: inserted.name,
         slug: inserted.slug,
+        section: cat.section || 'women',
+        level: cat.level || 3,
         image_url: inserted.image_url || '',
         description: inserted.description || '',
         parent_id: inserted.parent_id || null,
@@ -237,6 +242,8 @@ export const dbService = {
         id: updated.id,
         name: updated.name,
         slug: updated.slug,
+        section: updates.section || 'women',
+        level: updates.level || 3,
         image_url: updated.image_url || '',
         description: updated.description || '',
         parent_id: updated.parent_id || null,
@@ -254,6 +261,10 @@ export const dbService = {
       const data = await res.json();
       return data.category;
     }
+  },
+
+  async createStaffMember(staff: any): Promise<any> {
+    return staff;
   },
 
   async deleteCategory(id: string): Promise<boolean> {
@@ -290,11 +301,11 @@ export const dbService = {
       const cachedData = await getProductsFromRedisCache();
       if (cachedData) return cachedData;
 
-      const { db } = await import('@/db');
+      const { dbHttp } = await import('@/db');
       const schema = await import('@/db/schema');
       const { eq, desc, inArray, asc } = await import('drizzle-orm');
       
-      const results = await db
+      const results = await dbHttp
         .select()
         .from(schema.products)
         .where(eq(schema.products.is_active, true))
@@ -306,13 +317,13 @@ export const dbService = {
       }
 
       const productIds = results.map((r: any) => r.id);
-      const allImages = await db
+      const allImages = await dbHttp
         .select()
         .from(schema.productImages)
         .where(inArray(schema.productImages.product_id, productIds))
         .orderBy(asc(schema.productImages.sort_order));
 
-      const allVariants = await db
+      const allVariants = await dbHttp
         .select()
         .from(schema.productVariants)
         .where(inArray(schema.productVariants.product_id, productIds))
@@ -474,6 +485,7 @@ export const dbService = {
           category: r.category,
           subcategory: r.subcategory || undefined,
           gender: r.gender,
+          fit_type: r.fit_type || 'regular',
           images: fallbackImgs,
           hidden_detail_image: hiddenImageByProductId[r.id] || undefined,
           sizes: r.sizes,
@@ -924,7 +936,7 @@ export const dbService = {
             sizes: v.sizes || ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
             stock_quantity: stockMap,
             stock_qty: totalStock,
-            sku: v.sku || `DRFTN-${inserted.slug.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 8)}-${(v.colour_name || 'VAR').toUpperCase().slice(0, 5)}-${Math.floor(100 + Math.random() * 900)}`,
+            sku: v.sku || `TGC-${inserted.slug.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 8)}-${(v.colour_name || 'VAR').toUpperCase().slice(0, 5)}-${Math.floor(100 + Math.random() * 900)}`,
             price_override: v.price_override ? Number(v.price_override) : null,
             is_active: v.is_active !== undefined ? v.is_active : true,
           })
@@ -1068,7 +1080,7 @@ export const dbService = {
             sizes: v.sizes || ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
             stock_quantity: stockMap,
             stock_qty: totalStock,
-            sku: v.sku || `DRFTN-${updated.slug.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 8)}-${(v.colour_name || 'VAR').toUpperCase().slice(0, 5)}-${Math.floor(100 + Math.random() * 900)}`,
+            sku: v.sku || `TGC-${updated.slug.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 8)}-${(v.colour_name || 'VAR').toUpperCase().slice(0, 5)}-${Math.floor(100 + Math.random() * 900)}`,
             price_override: v.price_override ? Number(v.price_override) : null,
             is_active: v.is_active !== undefined ? v.is_active : true,
           });

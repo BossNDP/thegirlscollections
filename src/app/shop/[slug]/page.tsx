@@ -43,10 +43,12 @@ export default function ProductDetailPage({ params }: PDPProps) {
             <ChevronRight className="w-3 h-3 text-roseGold/40 shrink-0" />
             <Link href="/shop" className="hover:text-roseGold transition-colors shrink-0">Shop</Link>
             <ChevronRight className="w-3 h-3 text-roseGold/40 shrink-0" />
-            <span className="capitalize shrink-0">{product.target}</span>
-            <ChevronRight className="w-3 h-3 text-roseGold/40 shrink-0" />
-            <span className="text-navy font-semibold truncate min-w-0 max-w-[140px] sm:max-w-[280px]">
-              {product.name}
+            <span className="capitalize shrink-0 text-navy font-medium">{product.target}</span>
+            <span className="hidden sm:inline-flex items-center space-x-1.5 shrink-0">
+              <ChevronRight className="w-3 h-3 text-roseGold/40 shrink-0" />
+              <span className="text-navy font-semibold truncate max-w-[280px]">
+                {product.name}
+              </span>
             </span>
           </nav>
         </div>

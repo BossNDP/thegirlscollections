@@ -1,195 +1,341 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, LayoutGrid, Heart, ShoppingBag } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Home, LayoutGrid, Heart, ShoppingBag, Sparkles } from 'lucide-react';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useShop } from '@/context/ShopContext';
-import StyleQuizSheet from '@/components/StyleQuizSheet';
-
-// Clean 4-point luxury sparkle icon
-const SparkleStarIcon: React.FC<{ className?: string }> = ({ className = 'w-4 h-4' }) => (
-  <svg
-    viewBox="0 0 24 24"
-    fill="currentColor"
-    className={className}
-    aria-hidden="true"
-  >
-    <path d="M12 2C12 7.52285 7.52285 12 2 12C7.52285 12 12 16.4771 12 22C12 16.4771 16.4771 12 22 12C16.4771 12 12 7.52285 12 2Z" />
-  </svg>
-);
 
 export default function MobileBottomNav() {
   const pathname = usePathname();
   const { cartCount, wishlist, setIsCartOpen } = useShop();
+  const shouldReduceMotion = useReducedMotion();
 
-  const [isScrolledDown, setIsScrolledDown] = useState(false);
-  const [lastScrollY, setLastScrollY] = useState(0);
-  const [isStyleQuizOpen, setIsStyleQuizOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [showBagBurst, setShowBagBurst] = useState(false);
+  const [activeSheenTab, setActiveSheenTab] = useState<string | null>(null);
 
-  // Scroll listener for collapse/expand behavior
+  const prevCartCountRef = useRef(cartCount);
+
+  // Trigger add-to-bag celebration burst
   useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      if (currentScrollY > 120 && currentScrollY > lastScrollY) {
-        setIsScrolledDown(true);
-      } else {
-        setIsScrolledDown(false);
-      }
-      setLastScrollY(currentScrollY);
-    };
+    if (cartCount > prevCartCountRef.current) {
+      setShowBagBurst(true);
+      const timer = setTimeout(() => setShowBagBurst(false), 450);
+      prevCartCountRef.current = cartCount;
+      return () => clearTimeout(timer);
+    }
+    prevCartCountRef.current = cartCount;
+  }, [cartCount]);
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [lastScrollY]);
+  // Listen for custom menu events
+  useEffect(() => {
+    const handleOpenMenu = () => setIsMenuOpen(true);
+    const handleCloseMenu = () => setIsMenuOpen(false);
+
+    window.addEventListener('open-category-menu', handleOpenMenu);
+    window.addEventListener('close-category-menu', handleCloseMenu);
+
+    return () => {
+      window.removeEventListener('open-category-menu', handleOpenMenu);
+      window.removeEventListener('close-category-menu', handleCloseMenu);
+    };
+  }, []);
 
   const isExcluded = pathname?.startsWith('/admin') || pathname === '/checkout';
   if (isExcluded) return null;
 
   const wishlistCount = wishlist.length;
 
+  const handleToggleMenu = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (isMenuOpen) {
+      setIsMenuOpen(false);
+      window.dispatchEvent(new CustomEvent('close-category-menu'));
+    } else {
+      setIsMenuOpen(true);
+      window.dispatchEvent(new CustomEvent('open-category-menu'));
+    }
+  };
+
+  const triggerSheen = (tabId: string) => {
+    if (shouldReduceMotion) return;
+    setActiveSheenTab(tabId);
+    setTimeout(() => setActiveSheenTab(null), 200);
+  };
+
+  // Nav Items array: HOME | SHOP | MENU (center) | WISHLIST | BAG
+  const allTabs = [
+    {
+      id: 'home',
+      label: 'HOME',
+      href: '/',
+      icon: Home,
+      isActive: pathname === '/' && !isMenuOpen,
+    },
+    {
+      id: 'shop',
+      label: 'SHOP',
+      href: '/shop',
+      icon: LayoutGrid,
+      isActive: (pathname === '/shop' || pathname?.startsWith('/shop/')) && !isMenuOpen,
+    },
+    {
+      id: 'menu',
+      label: 'MENU',
+      isCenterMenu: true,
+      isActive: isMenuOpen,
+    },
+    {
+      id: 'wishlist',
+      label: 'WISHLIST',
+      href: '/wishlist',
+      icon: Heart,
+      badge: wishlistCount,
+      isActive: pathname === '/wishlist' && !isMenuOpen,
+    },
+    {
+      id: 'bag',
+      label: 'BAG',
+      href: '#bag',
+      icon: ShoppingBag,
+      badge: cartCount,
+      isActive: false,
+      isBagButton: true,
+      onClick: (e: React.MouseEvent) => {
+        e.preventDefault();
+        setIsCartOpen(true);
+        triggerSheen('bag');
+      },
+    },
+  ];
+
+  const springTransition = shouldReduceMotion
+    ? { duration: 0.15 }
+    : ({ type: 'spring', stiffness: 300, damping: 30 } as const);
+
   return (
-    <>
-      <nav
-        className={`fixed bottom-4 inset-x-0 z-[95] md:hidden max-w-[365px] mx-auto transition-all duration-200 ease-out select-none px-3 ${
-          isScrolledDown ? 'h-[52px]' : 'h-[60px]'
-        }`}
-        aria-label="Mobile Navigation Bar"
-      >
-        <div className="relative w-full h-full rounded-[26px] bg-ivory/95 backdrop-blur-[20px] border border-zariGold/30 shadow-[0_8px_30px_rgba(28,31,59,0.12)] p-1 flex items-center justify-between overflow-hidden">
-          
-          {/* 1. HOME */}
-          <Link
-            href="/"
-            className={`flex-1 h-full flex flex-col items-center justify-center rounded-2xl transition-all duration-150 relative ${
-              pathname === '/' ? 'text-zariGold font-bold' : 'text-inkNavy/70 hover:text-inkNavy'
-            }`}
-          >
-            {pathname === '/' && (
-              <motion.span
-                layoutId="activeTabRing"
-                className="absolute inset-x-2 inset-y-1 rounded-xl bg-zariGold/10 border border-zariGold/30 z-0"
-                transition={{ duration: 0.15 }}
-              />
-            )}
-            <Home className={`w-4 h-4 stroke-[1.5] relative z-10 transition-transform duration-150 ${pathname === '/' ? 'scale-110' : ''}`} />
-            {!isScrolledDown && (
-              <span className="text-[8.5px] font-sans font-bold uppercase tracking-wider mt-0.5 relative z-10">
-                HOME
-              </span>
-            )}
-          </Link>
+    <nav
+      className="fixed bottom-[calc(12px+env(safe-area-inset-bottom))] inset-x-0 z-[90] md:hidden px-3 max-w-[390px] mx-auto select-none pointer-events-auto"
+      aria-label="Bottom Navigation"
+    >
+      {/* SVG SCALLOPED NECKLACE/PENDANT DOCK CONTAINER */}
+      <div className="relative w-full h-[64px] flex items-center justify-between px-2">
+        {/* SVG Background Path with Arch Scallop Notch */}
+        <svg
+          className="absolute inset-0 w-full h-full filter drop-shadow-[0_12px_32px_rgba(28,31,59,0.18)]"
+          viewBox="0 0 364 64"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          preserveAspectRatio="none"
+        >
+          <path
+            d="M 28 0 
+               L 142 0 
+               C 152 0, 156 12, 164 18 
+               C 172 24, 192 24, 200 18 
+               C 208 12, 212 0, 222 0 
+               L 336 0 
+               C 351.468 0, 364 12.532, 364 28 
+               L 364 36 
+               C 364 51.468, 351.468 64, 336 64 
+               L 28 64 
+               C 12.532 64, 0 51.468, 0 36 
+               L 0 28 
+               C 0 12.532, 12.532 0, 28 0 Z"
+            fill="#FAF5EA"
+            fillOpacity="0.96"
+            stroke="#B4863C"
+            strokeWidth="1.2"
+            strokeOpacity="0.35"
+          />
+        </svg>
 
-          {/* 2. SHOP */}
-          <Link
-            href="/shop"
-            className={`flex-1 h-full flex flex-col items-center justify-center rounded-2xl transition-all duration-150 relative ${
-              pathname === '/shop' || pathname?.startsWith('/shop/')
-                ? 'text-zariGold font-bold'
-                : 'text-inkNavy/70 hover:text-inkNavy'
-            }`}
-          >
-            {(pathname === '/shop' || pathname?.startsWith('/shop/')) && (
-              <motion.span
-                layoutId="activeTabRing"
-                className="absolute inset-x-2 inset-y-1 rounded-xl bg-zariGold/10 border border-zariGold/30 z-0"
-                transition={{ duration: 0.15 }}
-              />
-            )}
-            <LayoutGrid className={`w-4 h-4 stroke-[1.5] relative z-10 transition-transform duration-150 ${pathname === '/shop' || pathname?.startsWith('/shop/') ? 'scale-110' : ''}`} />
-            {!isScrolledDown && (
-              <span className="text-[8.5px] font-sans font-bold uppercase tracking-wider mt-0.5 relative z-10">
-                SHOP
-              </span>
-            )}
-          </Link>
+        {/* NAV TAB ITEMS */}
+        <div className="relative z-10 w-full h-full flex items-center justify-between px-1">
+          {allTabs.map((tab) => {
+            // CENTER MENU BUTTON
+            if (tab.isCenterMenu) {
+              return (
+                <div key={tab.id} className="relative shrink-0 -mt-5 px-1 z-30">
+                  <motion.button
+                    onClick={handleToggleMenu}
+                    whileTap={shouldReduceMotion ? undefined : { scale: 0.93 }}
+                    animate={
+                      shouldReduceMotion
+                        ? undefined
+                        : { scale: isMenuOpen ? 1.05 : [1, 1.03, 1] }
+                    }
+                    transition={
+                      shouldReduceMotion
+                        ? undefined
+                        : isMenuOpen
+                        ? { duration: 0.2 }
+                        : { repeat: Infinity, duration: 3.2, ease: 'easeInOut' }
+                    }
+                    className={`relative w-[52px] h-[52px] rounded-full flex flex-col items-center justify-center transition-colors duration-300 shadow-md border cursor-pointer focus:outline-none ${
+                      isMenuOpen
+                        ? 'bg-roseGold text-ivory border-roseGold shadow-[0_0_20px_rgba(180,134,60,0.5)]'
+                        : 'bg-navy text-roseGold border-roseGold/40 hover:border-roseGold'
+                    }`}
+                    aria-label="Toggle Category Menu"
+                  >
+                    {/* Morphing Hamburger / Close Icon */}
+                    <div className="w-5 h-5 flex flex-col items-center justify-center relative">
+                      <motion.span
+                        animate={isMenuOpen ? { rotate: 45, y: 0 } : { rotate: 0, y: -4 }}
+                        transition={{ duration: 0.25 }}
+                        className={`absolute w-4 h-[1.8px] rounded-full ${
+                          isMenuOpen ? 'bg-ivory' : 'bg-roseGold'
+                        }`}
+                      />
+                      <motion.span
+                        animate={isMenuOpen ? { opacity: 0, scale: 0 } : { opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.15 }}
+                        className={`absolute w-4 h-[1.8px] rounded-full ${
+                          isMenuOpen ? 'bg-ivory' : 'bg-roseGold'
+                        }`}
+                      />
+                      <motion.span
+                        animate={isMenuOpen ? { rotate: -45, y: 0 } : { rotate: 0, y: 4 }}
+                        transition={{ duration: 0.25 }}
+                        className={`absolute w-4 h-[1.8px] rounded-full ${
+                          isMenuOpen ? 'bg-ivory' : 'bg-roseGold'
+                        }`}
+                      />
+                    </div>
+                    <span
+                      className={`text-[7.5px] font-sans font-bold tracking-[0.18em] uppercase mt-0.5 ${
+                        isMenuOpen ? 'text-ivory' : 'text-roseGold'
+                      }`}
+                    >
+                      MENU
+                    </span>
+                  </motion.button>
+                </div>
+              );
+            }
 
-          {/* 3. DISCOVER — Integrated Interactive Personal Stylist Action */}
-          <button
-            onClick={() => setIsStyleQuizOpen(true)}
-            className={`flex-1 h-full flex flex-col items-center justify-center rounded-2xl transition-all duration-150 relative cursor-pointer ${
-              isStyleQuizOpen ? 'text-zariGold font-bold' : 'text-zariGold/80 hover:text-zariGold'
-            }`}
-            aria-label="Open Personal Stylist Discover Quiz"
-          >
-            {isStyleQuizOpen && (
-              <motion.span
-                layoutId="activeTabRing"
-                className="absolute inset-x-2 inset-y-1 rounded-xl bg-zariGold/15 border border-zariGold/40 z-0"
-                transition={{ duration: 0.15 }}
-              />
-            )}
-            <SparkleStarIcon className={`w-4 h-4 relative z-10 transition-transform duration-150 ${isStyleQuizOpen ? 'scale-110 text-zariGold' : 'text-zariGold/80'}`} />
-            {!isScrolledDown && (
-              <span className="text-[8.5px] font-sans font-bold uppercase tracking-[0.16em] mt-0.5 relative z-10">
-                DISCOVER
-              </span>
-            )}
-          </button>
+            const Icon = tab.icon!;
+            const active = tab.isActive;
+            const isBag = tab.isBagButton;
+            const hasSheen = activeSheenTab === tab.id;
 
-          {/* 4. WISHLIST */}
-          <Link
-            href="/wishlist"
-            className={`flex-1 h-full flex flex-col items-center justify-center rounded-2xl relative transition-all duration-150 ${
-              pathname === '/wishlist'
-                ? 'text-zariGold font-bold'
-                : 'text-inkNavy/70 hover:text-inkNavy'
-            }`}
-          >
-            {pathname === '/wishlist' && (
-              <motion.span
-                layoutId="activeTabRing"
-                className="absolute inset-x-2 inset-y-1 rounded-xl bg-zariGold/10 border border-zariGold/30 z-0"
-                transition={{ duration: 0.15 }}
-              />
-            )}
-            <div className="relative z-10">
-              <Heart className={`w-4 h-4 stroke-[1.5] transition-transform duration-150 ${pathname === '/wishlist' ? 'scale-110' : ''}`} />
-              {wishlistCount > 0 && (
-                <span className="absolute -top-1 -right-2 text-[8px] font-bold bg-zariGold text-white w-3.5 h-3.5 rounded-full flex items-center justify-center animate-badge-pop shadow-xs">
-                  {wishlistCount}
-                </span>
-              )}
-            </div>
-            {!isScrolledDown && (
-              <span className="text-[8.5px] font-sans font-bold uppercase tracking-wider mt-0.5 relative z-10">
-                WISHLIST
-              </span>
-            )}
-          </Link>
+            const tabInnerContent = (
+              <div className="relative w-full h-full flex flex-col items-center justify-center py-1">
+                {/* Active Soft Rose Gold Pill Background with Spring Physics */}
+                {active && (
+                  <motion.div
+                    layoutId="activeNavPill"
+                    transition={springTransition}
+                    className="absolute inset-x-1.5 inset-y-1.5 rounded-full bg-roseGold/15 border border-roseGold/30"
+                  />
+                )}
 
-          {/* 5. BAG */}
-          <button
-            onClick={(e) => {
-              e.preventDefault();
-              setIsCartOpen(true);
-            }}
-            className="flex-1 h-full flex flex-col items-center justify-center rounded-2xl relative text-inkNavy/70 hover:text-inkNavy transition-all duration-150 cursor-pointer"
-          >
-            <div className="relative z-10">
-              <ShoppingBag className="w-4 h-4 stroke-[1.5]" />
-              {cartCount > 0 && (
-                <span className="absolute -top-1 -right-2 text-[8px] font-bold bg-zariGold text-white w-3.5 h-3.5 rounded-full flex items-center justify-center animate-badge-pop shadow-xs">
-                  {cartCount}
-                </span>
-              )}
-            </div>
-            {!isScrolledDown && (
-              <span className="text-[8.5px] font-sans font-bold uppercase tracking-wider mt-0.5 relative z-10">
-                BAG
-              </span>
-            )}
-          </button>
+                {/* Zari Gold Sheen Sweep Overlay */}
+                {hasSheen && (
+                  <div className="absolute inset-0 overflow-hidden rounded-full pointer-events-none">
+                    <div className="w-full h-full bg-zari-shimmer animate-zari-sheen opacity-60" />
+                  </div>
+                )}
 
+                <div className="relative z-10 flex flex-col items-center justify-center">
+                  <div className="relative">
+                    <motion.div
+                      animate={
+                        isBag && showBagBurst && !shouldReduceMotion
+                          ? { scale: [1, 1.32, 1] }
+                          : { scale: active ? 1.1 : 1 }
+                      }
+                      transition={{ duration: 0.25 }}
+                    >
+                      <Icon
+                        className={`w-[20px] h-[20px] stroke-[1.6] transition-colors duration-200 ${
+                          active
+                            ? 'text-navy fill-roseGold/20'
+                            : 'text-navy/70 hover:text-navy'
+                        }`}
+                      />
+                    </motion.div>
+
+                    {/* Badge Count with Number Roll-Up Animation */}
+                    {!!tab.badge && tab.badge > 0 && (
+                      <span className="absolute -top-1.5 -right-2 text-[8px] font-bold bg-roseGold text-ivory w-3.5 h-3.5 rounded-full flex items-center justify-center font-sans shadow-xs overflow-hidden">
+                        <AnimatePresence mode="wait">
+                          <motion.span
+                            key={tab.badge}
+                            initial={{ y: 6, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            exit={{ y: -6, opacity: 0 }}
+                            transition={{ duration: 0.15 }}
+                          >
+                            {tab.badge}
+                          </motion.span>
+                        </AnimatePresence>
+                      </span>
+                    )}
+
+                    {/* Celebratory Sparkle Burst on Bag Addition */}
+                    {isBag && showBagBurst && (
+                      <AnimatePresence>
+                        <motion.div
+                          initial={{ opacity: 0, scale: 0.4 }}
+                          animate={{ opacity: 1, scale: 1.4 }}
+                          exit={{ opacity: 0, scale: 1.8 }}
+                          transition={{ duration: 0.4 }}
+                          className="absolute -inset-2 flex items-center justify-center pointer-events-none z-20"
+                        >
+                          <Sparkles className="w-6 h-6 text-roseGold filter drop-shadow-[0_0_6px_#B4863C]" />
+                        </motion.div>
+                      </AnimatePresence>
+                    )}
+                  </div>
+
+                  <span
+                    className={`text-[8.5px] font-sans uppercase tracking-[0.14em] mt-0.5 relative z-10 transition-colors duration-150 ${
+                      active ? 'text-navy font-bold' : 'text-navy/70 font-medium'
+                    }`}
+                  >
+                    {tab.label}
+                  </span>
+                </div>
+              </div>
+            );
+
+            if (tab.isBagButton) {
+              return (
+                <motion.button
+                  key={tab.id}
+                  onClick={tab.onClick}
+                  whileTap={shouldReduceMotion ? undefined : { scale: 0.94 }}
+                  className="flex-1 h-full relative flex items-center justify-center cursor-pointer focus:outline-none"
+                  aria-label={tab.label}
+                >
+                  {tabInnerContent}
+                </motion.button>
+              );
+            }
+
+            return (
+              <Link
+                key={tab.id}
+                href={tab.href!}
+                onClick={() => triggerSheen(tab.id)}
+                className="flex-1 h-full relative flex items-center justify-center focus:outline-none"
+                aria-label={tab.label}
+              >
+                <motion.div
+                  whileTap={shouldReduceMotion ? undefined : { scale: 0.94 }}
+                  className="w-full h-full flex items-center justify-center"
+                >
+                  {tabInnerContent}
+                </motion.div>
+              </Link>
+            );
+          })}
         </div>
-      </nav>
-
-      {/* Style Quiz Sheet Component */}
-      <StyleQuizSheet
-        isOpen={isStyleQuizOpen}
-        onClose={() => setIsStyleQuizOpen(false)}
-      />
-    </>
+      </div>
+    </nav>
   );
 }

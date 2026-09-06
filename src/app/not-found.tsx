@@ -8,7 +8,7 @@ export default function NotFound() {
       <div className="relative w-36 h-10 select-none mb-8">
         <Image
           src="/logo.png?v=3"
-          alt="DRFTN"
+          alt="The Girls Collections"
           fill
           unoptimized
           priority

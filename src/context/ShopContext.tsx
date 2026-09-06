@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Product, MOCK_PRODUCTS } from '@/data/shopData';
+import { useCartStore } from '@/lib/cartStore';
 
 export interface CartItem {
   id: string; // unique cart item id: product.id + size + color
@@ -60,10 +61,23 @@ export const ShopProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, []);
 
-  // Save cart to localStorage
+  // Sync ShopContext cart to both localStorage and useCartStore (the single source of truth for checkout)
   useEffect(() => {
     try {
       localStorage.setItem('tgc_cart', JSON.stringify(cart));
+
+      // Sync to useCartStore so checkout and cart pages read the exact same items
+      const cartStoreItems = cart.map((item) => ({
+        id: item.product.id,
+        name: item.product.name,
+        slug: item.product.slug,
+        price: item.product.price > 10000 ? item.product.price : item.product.price * 100, // ensure price in paise
+        image: item.product.images[0] || '',
+        size: item.selectedSize,
+        quantity: item.quantity,
+      }));
+
+      useCartStore.setState({ items: cartStoreItems, hasHydrated: true });
     } catch (e) {
       console.error('Failed to save cart to localStorage', e);
     }
@@ -140,7 +154,10 @@ export const ShopProvider: React.FC<{ children: React.ReactNode }> = ({ children
     Math.round((cartSubtotal / FREE_SHIPPING_LIMIT) * 100)
   );
 
-  const clearCart = () => setCart([]);
+  const clearCart = () => {
+    setCart([]);
+    useCartStore.getState().clearCart();
+  };
 
   return (
     <ShopContext.Provider
