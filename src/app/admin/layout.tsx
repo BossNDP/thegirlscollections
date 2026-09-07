@@ -58,15 +58,22 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }, [pathname]);
 
   useEffect(() => {
-    if (isLoaded && pathname !== '/admin/login') {
+    if (isLoaded) {
       const hasAdminCookie = typeof document !== 'undefined' && document.cookie.includes('tgc_admin_session=true');
       const userEmail = (user?.primaryEmailAddress?.emailAddress || user?.emailAddresses[0]?.emailAddress || '').toLowerCase().trim();
-      const allowlist = ['nagarjundp256@gmail.com', 'admin@tgc.in', 'nnvg2608@gmail.com'];
+      const allowlist = ['nagarjundp256@gmail.com', 'admin@tgc.in', 'nnvg2608@gmail.com', 'drftnclothing@gmail.com', 'chethansc47@gmail.com'];
       const isEmailAllowed = Boolean(userEmail && allowlist.includes(userEmail));
 
       const role = user?.publicMetadata?.role;
       const isAdmin = role === 'admin' || isEmailAllowed || hasAdminCookie;
       const isStaff = role === 'staff';
+
+      if (pathname === '/admin/login') {
+        if (isAdmin || isStaff) {
+          router.push('/admin');
+        }
+        return;
+      }
 
       if (!userId && !hasAdminCookie) {
         router.push('/admin/login');
@@ -117,7 +124,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }
 
   const userEmail = user?.primaryEmailAddress?.emailAddress || user?.emailAddresses[0]?.emailAddress || '';
-  const allowlist = ['nagarjundp256@gmail.com', 'admin@tgc.in', 'nnvg2608@gmail.com'];
+  const allowlist = ['nagarjundp256@gmail.com', 'admin@tgc.in', 'nnvg2608@gmail.com', 'drftnclothing@gmail.com', 'chethansc47@gmail.com'];
   const isEmailAllowed = Boolean(userEmail && allowlist.includes(userEmail.toLowerCase()));
   const isStaffRole = user?.publicMetadata?.role === 'staff';
 

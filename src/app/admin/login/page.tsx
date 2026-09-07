@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, Suspense } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useSignIn } from '@clerk/nextjs';
+import { useSignIn, useUser } from '@clerk/nextjs';
 import { Lock, User, AlertCircle, ShieldCheck } from 'lucide-react';
 import { useToast } from '@/components/ToastContainer';
 
@@ -11,13 +11,25 @@ function AdminLoginContent() {
   const searchParams = useSearchParams();
   const { addToast } = useToast();
   const { isLoaded, signIn, setActive } = useSignIn() as any;
+  const { user } = useUser();
   
-  const [email, setEmail] = useState('westend_admin');
-  const [password, setPassword] = useState('••••••••••••');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
   const unauthorizedError = searchParams.get('error') === 'unauthorized';
+
+  useEffect(() => {
+    const hasAdminCookie = typeof document !== 'undefined' && document.cookie.includes('tgc_admin_session=true');
+    const userEmail = (user?.primaryEmailAddress?.emailAddress || user?.emailAddresses[0]?.emailAddress || '').toLowerCase().trim();
+    const allowlist = ['nagarjundp256@gmail.com', 'admin@tgc.in', 'nnvg2608@gmail.com', 'drftnclothing@gmail.com', 'chethansc47@gmail.com'];
+    const isAllowed = Boolean(userEmail && allowlist.includes(userEmail)) || user?.publicMetadata?.role === 'admin' || user?.publicMetadata?.role === 'staff' || hasAdminCookie;
+
+    if (isAllowed) {
+      router.push('/admin');
+    }
+  }, [user, router]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -130,7 +142,7 @@ function AdminLoginContent() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full bg-zinc-950 border border-zinc-700 text-white px-4 py-3 text-sm rounded-lg focus:outline-none focus:border-amber-400 transition-colors font-mono"
-                placeholder="westend_admin or admin@tgc.in"
+                placeholder="nnvg2608@gmail.com or admin@tgc.in"
               />
             </div>
             
@@ -145,7 +157,7 @@ function AdminLoginContent() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full bg-zinc-950 border border-zinc-700 text-white px-4 py-3 text-sm rounded-lg focus:outline-none focus:border-amber-400 transition-colors font-mono"
-                placeholder="••••••••••••"
+                placeholder="Enter password"
               />
             </div>
 
