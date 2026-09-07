@@ -61,7 +61,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     if (isLoaded && pathname !== '/admin/login') {
       const hasAdminCookie = typeof document !== 'undefined' && document.cookie.includes('tgc_admin_session=true');
       const userEmail = (user?.primaryEmailAddress?.emailAddress || user?.emailAddresses[0]?.emailAddress || '').toLowerCase().trim();
-      const allowlist = ['nagarjundp256@gmail.com', 'admin@tgc.in'];
+      const allowlist = ['nagarjundp256@gmail.com', 'admin@tgc.in', 'nnvg2608@gmail.com'];
       const isEmailAllowed = Boolean(userEmail && allowlist.includes(userEmail));
 
       const role = user?.publicMetadata?.role;
@@ -117,7 +117,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }
 
   const userEmail = user?.primaryEmailAddress?.emailAddress || user?.emailAddresses[0]?.emailAddress || '';
-  const allowlist = ['nagarjundp256@gmail.com', 'admin@tgc.in'];
+  const allowlist = ['nagarjundp256@gmail.com', 'admin@tgc.in', 'nnvg2608@gmail.com'];
   const isEmailAllowed = Boolean(userEmail && allowlist.includes(userEmail.toLowerCase()));
   const isStaffRole = user?.publicMetadata?.role === 'staff';
 

@@ -5,6 +5,7 @@ import { NextResponse } from 'next/server';
 const DEFAULT_ADMIN_ALLOWLIST = [
   'nagarjundp256@gmail.com',
   'admin@tgc.in',
+  'nnvg2608@gmail.com',
 ];
 
 export interface AdminAuthContext {

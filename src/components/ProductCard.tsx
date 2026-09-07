@@ -29,7 +29,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 
   const inWishlist = isInWishlist(product.id);
 
-  // Viewport entrance stagger-fade animation
+  // Viewport entrance stagger-fade animation (fires ONCE to prevent scroll-jitter)
   useEffect(() => {
     const node = cardRef.current;
     if (!node) return;
@@ -59,10 +59,14 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     toggleWishlist(product.id);
   };
 
+  const discountPercent = product.originalPrice
+    ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
+    : 0;
+
   const tagText = product.isNew ? 'NEW IN' : product.isSale ? 'SALE' : null;
   const isSaleTag = product.isSale && !product.isNew;
   const availableSizes = product.sizes?.filter((s) => s.inStock) || [];
-  const staggerDelay = (index % 6) * 50; // 50ms stagger per card
+  const staggerDelay = (index % 6) * 50;
 
   return (
     <div
@@ -86,18 +90,23 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             archShape ? 'arch-frame-sm arch-inner' : ''
           }`}
         >
-          {/* Soft Rounded Badge */}
-          {tagText && (
-            <div className="absolute top-2.5 left-2.5 z-10">
+          {/* Soft Animated Badge */}
+          <div className="absolute top-2.5 left-2.5 z-10 flex flex-col gap-1">
+            {tagText && (
               <span
-                className={`px-3 py-1 text-[10px] sm:text-[10.5px] font-sans font-bold uppercase tracking-wider shadow-xs border border-zariGold/30 block rounded-full ${
+                className={`px-2.5 py-0.5 text-[9.5px] sm:text-[10px] font-sans font-bold uppercase tracking-wider shadow-xs border border-zariGold/30 block rounded-full ${
                   isSaleTag ? 'bg-oxblood text-white' : 'bg-gold-gradient text-white'
                 }`}
               >
                 {tagText}
               </span>
-            </div>
-          )}
+            )}
+            {discountPercent > 0 && (
+              <span className="px-2 py-0.5 text-[9px] font-sans font-bold uppercase tracking-wider bg-roseGold/90 text-white rounded-full shadow-2xs border border-roseGold/30 animate-pulse">
+                {discountPercent}% OFF
+              </span>
+            )}
+          </div>
 
           {/* Wishlist Heart Icon Button (Top-Right) */}
           <div className="absolute top-2 right-2 z-20">
@@ -108,7 +117,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             />
           </div>
 
-          {/* Primary Image with Slow Luxury Scale Drift */}
+          {/* Primary Image */}
           {product.images[0] ? (
             <>
               <Image
@@ -122,7 +131,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
                 sizes="(max-width: 640px) 85vw, (max-width: 1024px) 45vw, 30vw"
               />
 
-              {/* Hover Crossfade Image (Desktop) */}
+              {/* Hover Crossfade Image */}
               {product.images[1] && (
                 <Image
                   src={product.images[1]}
@@ -144,7 +153,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         </Link>
       </div>
 
-      {/* Product Details Section with Enlarged Fonts */}
+      {/* Product Details Section */}
       <div className="pt-3 pb-1 flex flex-col text-left shrink-0">
         
         {/* Uniform Size Chips Row */}
@@ -166,14 +175,14 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           </div>
         )}
 
-        {/* Full Editorial Serif Product Title (Font Medium, No Truncation) */}
+        {/* Title */}
         <Link href={`/shop/${product.slug}`}>
           <h3 className="text-sm sm:text-base font-serif font-medium text-inkNavy group-hover:text-zariGold tracking-[-0.015em] transition-colors leading-snug">
             {product.name}
           </h3>
         </Link>
 
-        {/* Enlarged Pricing Hierarchy */}
+        {/* Pricing */}
         <div className="mt-1.5 flex items-baseline gap-2.5">
           <span className="text-base sm:text-[19px] font-sans font-extrabold text-zariGold font-tnum">
             ₹{product.price.toLocaleString('en-IN')}

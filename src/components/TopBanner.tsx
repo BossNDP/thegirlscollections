@@ -1,16 +1,16 @@
 'use client';
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Truck, Tag, Sparkles, RotateCcw, Gift } from 'lucide-react';
+import { TruckIcon, TagIcon, SparklesIcon, PackageIcon } from '@/components/ui/BrandIcons';
 import { ANNOUNCEMENT_MESSAGES, AnnouncementMessage } from '@/config/announcements';
 
-const ICON_MAP = {
-  truck: Truck,
-  tag: Tag,
-  sparkles: Sparkles,
-  rotate: RotateCcw,
-  gift: Gift,
+const ICON_MAP: Record<string, React.FC<{ className?: string; color?: string }>> = {
+  truck: TruckIcon,
+  tag: TagIcon,
+  sparkles: SparklesIcon,
+  gift: PackageIcon,
+  rotate: SparklesIcon,
 };
 
 export const TopBanner: React.FC = () => {
@@ -19,7 +19,6 @@ export const TopBanner: React.FC = () => {
   const [isScrolledDown, setIsScrolledDown] = useState(false);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
-  // Detect reduced motion setting
   useEffect(() => {
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
     setPrefersReducedMotion(mediaQuery.matches);
@@ -32,17 +31,15 @@ export const TopBanner: React.FC = () => {
     setIndex((prev) => (prev + 1) % ANNOUNCEMENT_MESSAGES.length);
   }, []);
 
-  // Timer loop with pause support
   useEffect(() => {
     if (isPaused) return;
     const interval = setInterval(() => {
       nextMessage();
-    }, 3800);
+    }, 4000);
 
     return () => clearInterval(interval);
   }, [isPaused, nextMessage]);
 
-  // Hide on scroll down, show on scroll up
   useEffect(() => {
     let lastY = window.scrollY;
     const handleScroll = () => {
@@ -59,7 +56,7 @@ export const TopBanner: React.FC = () => {
   }, []);
 
   const currentMessage: AnnouncementMessage = ANNOUNCEMENT_MESSAGES[index];
-  const IconComponent = ICON_MAP[currentMessage.icon] || Sparkles;
+  const IconComponent = ICON_MAP[currentMessage.icon] || SparklesIcon;
 
   return (
     <div
@@ -67,9 +64,11 @@ export const TopBanner: React.FC = () => {
       aria-live="polite"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
+      onFocus={() => setIsPaused(true)}
+      onBlur={() => setIsPaused(false)}
       onTouchStart={() => setIsPaused(true)}
       onTouchEnd={() => setIsPaused(false)}
-      className={`relative w-full bg-inkNavy text-ivory select-none z-40 overflow-hidden border-b border-zariGold/30 transition-all duration-300 ease-out ${
+      className={`relative w-full bg-navy text-ivory select-none z-40 overflow-hidden border-b border-roseGold/30 transition-all duration-300 ease-out ${
         isScrolledDown ? 'max-h-0 py-0 opacity-0 border-b-0 pointer-events-none' : 'max-h-12 py-2.5 opacity-100'
       }`}
     >
@@ -99,7 +98,7 @@ export const TopBanner: React.FC = () => {
             className="flex items-center justify-center gap-1.5 sm:gap-2 max-w-full overflow-hidden text-center cursor-pointer"
             onClick={nextMessage}
           >
-            <IconComponent className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-zariGold shrink-0 hidden xs:inline-block" />
+            <IconComponent className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-roseGold shrink-0 hidden xs:inline-block" />
             <span className="font-sans text-[10px] xs:text-[11px] sm:text-[12px] font-medium tracking-[0.15em] sm:tracking-[0.2em] text-ivory uppercase truncate whitespace-nowrap">
               {currentMessage.text}
             </span>
@@ -107,7 +106,7 @@ export const TopBanner: React.FC = () => {
         </AnimatePresence>
       </div>
 
-      {/* Subtle bottom progress dots */}
+      {/* Progress indicators */}
       <div className="absolute bottom-0.5 left-1/2 -translate-x-1/2 flex items-center gap-1 opacity-40 hover:opacity-100 transition-opacity">
         {ANNOUNCEMENT_MESSAGES.map((msg, i) => (
           <button
@@ -115,7 +114,7 @@ export const TopBanner: React.FC = () => {
             onClick={() => setIndex(i)}
             aria-label={`Jump to announcement ${i + 1}`}
             className={`h-0.5 rounded-full transition-all duration-300 ${
-              i === index ? 'w-3 bg-zariGold' : 'w-1 bg-ivory/40'
+              i === index ? 'w-3 bg-roseGold' : 'w-1 bg-ivory/40'
             }`}
           />
         ))}

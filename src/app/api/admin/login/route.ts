@@ -24,7 +24,8 @@ export async function POST(request: Request) {
     const { email, password } = body;
 
     // Check allowlisted admin credentials
-    if (email === 'nagarjundp256@gmail.com' && password === process.env.ADMIN_SECRET_KEY) {
+    const adminAllowlist = ['nagarjundp256@gmail.com', 'admin@tgc.in', 'nnvg2608@gmail.com'];
+    if (adminAllowlist.includes(email?.toLowerCase()?.trim()) && password === process.env.ADMIN_SECRET_KEY) {
       const cookieStore = cookies();
       cookieStore.set('tgc_admin_session', 'true', {
         path: '/',
