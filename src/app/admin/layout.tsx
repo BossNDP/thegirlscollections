@@ -3,8 +3,8 @@
 import React, { useEffect, useState, createContext, useContext } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { LayoutDashboard, ShoppingBag, PackageSearch, Settings, LogOut, Tag, Menu, X, Bell, Users, Loader2, Heart, Clock, Database, ShieldCheck } from 'lucide-react';
-import { useAuth, useUser, useClerk } from '@clerk/nextjs';
+import { LayoutDashboard, ShoppingBag, PackageSearch, Settings, LogOut, Tag, Menu, X, Bell, Users, Loader2, Heart, Clock, Database, ShieldCheck, ShieldAlert } from 'lucide-react';
+import { useAuth, useUser, useClerk, SignIn } from '@clerk/nextjs';
 
 const NAV_ITEMS = [
   { label: 'Dashboard', href: '/admin', icon: LayoutDashboard },
@@ -19,6 +19,14 @@ const NAV_ITEMS = [
   { label: 'Notifications', href: '/admin/notifications', icon: Bell },
   { label: 'Users', href: '/admin/users', icon: Users },
   { label: 'Settings', href: '/admin/settings', icon: Settings },
+];
+
+const ADMIN_ALLOWLIST = [
+  'nagarjundp256@gmail.com',
+  'admin@tgc.in',
+  'nnvg2608@gmail.com',
+  'drftnclothing@gmail.com',
+  'chethansc47@gmail.com',
 ];
 
 interface AdminLoadingContextType {
@@ -57,34 +65,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     setIsMobileOpen(false);
   }, [pathname]);
 
-  useEffect(() => {
-    if (isLoaded) {
-      const hasAdminCookie = typeof document !== 'undefined' && document.cookie.includes('tgc_admin_session=true');
-      const userEmail = (user?.primaryEmailAddress?.emailAddress || user?.emailAddresses[0]?.emailAddress || '').toLowerCase().trim();
-      const allowlist = ['nagarjundp256@gmail.com', 'admin@tgc.in', 'nnvg2608@gmail.com', 'drftnclothing@gmail.com', 'chethansc47@gmail.com'];
-      const isEmailAllowed = Boolean(userEmail && allowlist.includes(userEmail));
-
-      const role = user?.publicMetadata?.role;
-      const isAdmin = role === 'admin' || isEmailAllowed || hasAdminCookie;
-      const isStaff = role === 'staff';
-
-      if (pathname === '/admin/login') {
-        if (isAdmin || isStaff) {
-          router.push('/admin');
-        }
-        return;
-      }
-
-      if (!userId && !hasAdminCookie) {
-        router.push('/admin/login');
-      } else if (userId && !isAdmin && !isStaff) {
-        router.push('/admin/login?error=unauthorized');
-      } else if (isStaff && (pathname.startsWith('/admin/orders') || pathname.startsWith('/admin/discounts') || pathname.startsWith('/admin/settings') || pathname.startsWith('/admin/users'))) {
-        router.push('/admin/products?error=unauthorized');
-      }
-    }
-  }, [isLoaded, userId, user, pathname, router]);
-
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     if (pathname === href) {
       e.preventDefault();
@@ -105,43 +85,78 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       await fetch('/api/admin/login', { method: 'DELETE' });
       await signOut();
     } catch (e) {}
-    router.push('/admin/login');
+    router.push('/admin');
   };
 
-  if (!isLoaded && pathname !== '/admin/login') {
+  // 1. Loading State
+  if (!isLoaded) {
     return (
-      <div className="min-h-screen bg-[#F9F9F8] flex flex-col items-center justify-center gap-3 text-zinc-500 font-medium select-none">
+      <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center gap-3 text-zinc-400 font-medium select-none">
         <div className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-600 via-yellow-500 to-amber-600 z-[99999] animate-pulse" />
-        <Loader2 className="w-6 h-6 animate-spin text-zinc-900" />
-        <span>Loading TGC Admin Portal...</span>
+        <Loader2 className="w-6 h-6 animate-spin text-amber-400" />
+        <span className="text-xs uppercase tracking-widest font-bold">Verifying Admin Authorization...</span>
       </div>
     );
   }
 
-  // If we are on the login page, just render the children without the sidebar
-  if (pathname === '/admin/login') {
-    return <div className="min-h-screen bg-zinc-950">{children}</div>;
+  const userEmail = (user?.primaryEmailAddress?.emailAddress || user?.emailAddresses[0]?.emailAddress || '').toLowerCase().trim();
+  const hasAdminCookie = typeof document !== 'undefined' && document.cookie.includes('tgc_admin_session=true');
+  const isEmailAllowed = Boolean(userEmail && ADMIN_ALLOWLIST.includes(userEmail));
+
+  const role = user?.publicMetadata?.role;
+  const isAdmin = role === 'admin' || isEmailAllowed || hasAdminCookie;
+  const isStaff = role === 'staff';
+
+  // 2. Unauthenticated User -> Render Clerk Sign In directly
+  if (!userId && !hasAdminCookie) {
+    return (
+      <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center p-4 animate-fade-in">
+        <div className="text-center mb-8">
+          <h1 className="text-2xl font-extrabold tracking-[0.15em] text-white uppercase mb-2">
+            THE GIRLS COLLECTIONS <span className="text-amber-400 font-light text-xs align-top">ADMIN</span>
+          </h1>
+          <p className="text-zinc-500 text-xs tracking-widest uppercase">Sign in with authorized Gmail account</p>
+        </div>
+        <div className="w-full max-w-md bg-zinc-900/90 border border-zinc-800 p-6 rounded-2xl shadow-2xl flex justify-center">
+          <SignIn routing="hash" />
+        </div>
+      </div>
+    );
   }
 
-  const userEmail = user?.primaryEmailAddress?.emailAddress || user?.emailAddresses[0]?.emailAddress || '';
-  const allowlist = ['nagarjundp256@gmail.com', 'admin@tgc.in', 'nnvg2608@gmail.com', 'drftnclothing@gmail.com', 'chethansc47@gmail.com'];
-  const isEmailAllowed = Boolean(userEmail && allowlist.includes(userEmail.toLowerCase()));
-  const isStaffRole = user?.publicMetadata?.role === 'staff';
+  // 3. Authenticated but unauthorized email -> Access Denied Screen
+  if (userId && !isAdmin && !isStaff) {
+    return (
+      <div className="min-h-screen bg-zinc-950 flex items-center justify-center p-4 text-center animate-fade-in">
+        <div className="max-w-md w-full bg-zinc-900 border border-red-900/40 p-8 rounded-2xl shadow-2xl space-y-6">
+          <div className="w-12 h-12 bg-red-950/60 border border-red-800/50 rounded-full flex items-center justify-center mx-auto text-red-500">
+            <ShieldAlert className="w-6 h-6" />
+          </div>
+          <div>
+            <h2 className="text-lg font-bold text-white uppercase tracking-wider">Access Restricted</h2>
+            <p className="text-xs text-zinc-400 mt-2 leading-relaxed">
+              Signed in as <span className="text-amber-400 font-mono font-bold">{userEmail}</span>. This account is not authorized for Admin Panel access.
+            </p>
+          </div>
+          <button
+            onClick={handleLogout}
+            className="w-full bg-zinc-800 hover:bg-zinc-700 text-white py-3 rounded-xl font-bold uppercase tracking-wider text-xs transition-colors flex items-center justify-center gap-2"
+          >
+            <LogOut className="w-4 h-4 text-red-400" />
+            Sign Out &amp; Switch Account
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   // Filter navigation items based on user role
   const visibleNavItems = NAV_ITEMS.filter((item) => {
-    if (isStaffRole) {
+    if (isStaff) {
       return item.href === '/admin' || item.href === '/admin/categories' || item.href === '/admin/products';
     }
     return true;
   });
-
-  const hasAdminCookie = typeof document !== 'undefined' && document.cookie.includes('tgc_admin_session=true');
-
-  // If user metadata is loaded and role is not admin or intern, don't render layout content while redirecting
-  if (user && user.publicMetadata?.role !== 'admin' && user.publicMetadata?.role !== 'intern' && !isEmailAllowed && !hasAdminCookie) {
-    return <div className="min-h-screen bg-[#F9F9F8] flex items-center justify-center text-brand-red font-bold">Redirecting...</div>;
-  }
 
   return (
     <AdminLoadingContext.Provider value={{ isGlobalLoading: isLoadingActive, startLoading, stopLoading }}>
