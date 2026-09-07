@@ -39,11 +39,7 @@ const mappedMockProducts: Product[] = MOCK_PRODUCTS.map((p: any) => ({
 export default async function HomePage() {
   let allProducts: Product[] = [];
   try {
-    const dbPromise = dbService.getProducts();
-    const timeoutPromise = new Promise<Product[]>((resolve) =>
-      setTimeout(() => resolve([]), 200)
-    );
-    allProducts = await Promise.race([dbPromise, timeoutPromise]);
+    allProducts = await dbService.getProducts();
   } catch (err) {
     console.error('Failed to load DB products for homepage:', err);
   }

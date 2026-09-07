@@ -51,21 +51,64 @@ export const SearchOverlay: React.FC = () => {
     }
   };
 
+  const [dbProducts, setDbProducts] = useState<Product[]>([]);
+
+  useEffect(() => {
+    async function loadProducts() {
+      try {
+        const res = await fetch('/api/products');
+        if (res.ok) {
+          const data = await res.json();
+          if (data.products && data.products.length > 0) {
+            const formatted: Product[] = data.products.map((p: any) => ({
+              id: p.id,
+              slug: p.slug,
+              name: p.name,
+              category: p.category || 'ethnic-wear',
+              target: (p.gender === 'kids' || p.category?.includes('kids')) ? 'kids' : 'women',
+              subcategory: p.subcategory || p.category || '',
+              occasion: p.occasion || 'Festive',
+              price: p.price > 10000 ? Math.round(p.price / 100) : p.price,
+              originalPrice: p.compare_price ? (p.compare_price > 10000 ? Math.round(p.compare_price / 100) : p.compare_price) : undefined,
+              isNew: true,
+              isBestSeller: !!p.is_featured,
+              isSale: !!p.compare_price,
+              images: Array.isArray(p.images) && p.images.length > 0 ? p.images : [],
+              sizes: [{ size: 'Free Size', inStock: true }],
+              colors: [{ name: 'Standard', hex: '#C9A66B' }],
+              fabric: p.description || '',
+              description: p.description || '',
+              careInstructions: ['Dry Clean Only'],
+              rating: 5.0,
+              reviewsCount: 10,
+            }));
+            setDbProducts(formatted);
+          }
+        }
+      } catch (e) {
+        console.error('Failed to load search products:', e);
+      }
+    }
+    loadProducts();
+  }, []);
+
   useEffect(() => {
     if (query.trim() === '') {
       setResults([]);
     } else {
       const q = query.toLowerCase();
-      const filtered = MOCK_PRODUCTS.filter(
+      const pool = dbProducts.length > 0 ? dbProducts : MOCK_PRODUCTS;
+      const filtered = pool.filter(
         (p) =>
           p.name.toLowerCase().includes(q) ||
           p.category.toLowerCase().includes(q) ||
-          p.subcategory.toLowerCase().includes(q) ||
-          p.fabric.toLowerCase().includes(q)
+          (p.subcategory && p.subcategory.toLowerCase().includes(q)) ||
+          (p.fabric && p.fabric.toLowerCase().includes(q)) ||
+          (p.description && p.description.toLowerCase().includes(q))
       );
       setResults(filtered);
     }
-  }, [query]);
+  }, [query, dbProducts]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {

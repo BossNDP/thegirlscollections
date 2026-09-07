@@ -39,8 +39,8 @@ export const ProductCarousel: React.FC<ProductCarouselProps> = ({
     });
   };
 
-  const formatPrice = (priceInPaise: number) => {
-    const rupees = Math.round(priceInPaise / 100);
+  const formatPrice = (val: number) => {
+    const rupees = val > 10000 ? Math.round(val / 100) : val;
     return `₹${rupees.toLocaleString('en-IN')}`;
   };
 

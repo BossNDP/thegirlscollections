@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { SlidersHorizontal, ChevronDown, ChevronRight, X } from 'lucide-react';
-import { MOCK_PRODUCTS } from '@/data/shopData';
+import { MOCK_PRODUCTS, Product } from '@/data/shopData';
 import { FilterSidebar, FilterState } from './FilterSidebar';
 import { MobileFilterSheet } from './MobileFilterSheet';
 import { ProductGrid } from './ProductGrid';
@@ -31,11 +31,68 @@ const SORT_OPTIONS = [
   { value: 'price-high', label: 'Price: High to Low' },
 ];
 
+function formatDbProductToShopProduct(p: any): Product {
+  const priceRupees = p.price > 10000 ? Math.round(p.price / 100) : p.price;
+  const originalPriceRupees = p.compare_price
+    ? (p.compare_price > 10000 ? Math.round(p.compare_price / 100) : p.compare_price)
+    : undefined;
+
+  let sizesList: any[] = [];
+  if (Array.isArray(p.sizes)) {
+    sizesList = p.sizes.map((s: any) =>
+      typeof s === 'string' ? { size: s, inStock: true } : s
+    );
+  } else if (p.stock_quantity && typeof p.stock_quantity === 'object') {
+    sizesList = Object.entries(p.stock_quantity).map(([size, qty]) => ({
+      size,
+      inStock: Number(qty) > 0,
+    }));
+  }
+
+  if (sizesList.length === 0) {
+    sizesList = [
+      { size: 'XS', inStock: true },
+      { size: 'S', inStock: true },
+      { size: 'M', inStock: true },
+      { size: 'L', inStock: true },
+      { size: 'XL', inStock: true },
+    ];
+  }
+
+  const cat = (p.category || '').toLowerCase();
+  const subcat = (p.subcategory || '').toLowerCase();
+  const isKids = p.gender === 'kids' || cat.includes('kids') || cat.includes('children') || cat.includes('frock') || subcat.includes('kids');
+
+  return {
+    id: p.id,
+    slug: p.slug,
+    name: p.name,
+    category: p.category || 'ethnic-wear',
+    target: isKids ? 'kids' : 'women',
+    subcategory: p.subcategory || p.category || '',
+    occasion: p.occasion || 'Festive',
+    price: priceRupees,
+    originalPrice: originalPriceRupees,
+    isNew: true,
+    isBestSeller: !!p.is_featured,
+    isSale: !!originalPriceRupees,
+    images: Array.isArray(p.images) && p.images.length > 0 ? p.images : [],
+    sizes: sizesList,
+    colors: [{ name: 'Standard', hex: '#C9A66B' }],
+    fabric: p.description || 'Premium Ethnic Wear',
+    description: p.description || '',
+    careInstructions: ['Dry Clean Only'],
+    rating: 5.0,
+    reviewsCount: 18,
+  };
+}
+
 export const PLPPageContent: React.FC<PLPPageContentProps> = ({
   initialCategory,
   initialTarget,
   initialOccasion,
 }) => {
+  const [dbProducts, setDbProducts] = useState<Product[]>([]);
   const [filters, setFilters] = useState<FilterState>({
     ...DEFAULT_FILTERS,
     category: initialCategory ? [initialCategory] : [],
@@ -47,6 +104,28 @@ export const PLPPageContent: React.FC<PLPPageContentProps> = ({
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
   const [isSortOpen, setIsSortOpen] = useState(false);
   const [visibleCount, setVisibleCount] = useState(8);
+
+  useEffect(() => {
+    async function loadProducts() {
+      try {
+        const res = await fetch('/api/products');
+        if (res.ok) {
+          const data = await res.json();
+          if (data.products && data.products.length > 0) {
+            const formatted = data.products.map(formatDbProductToShopProduct);
+            setDbProducts(formatted);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to load dynamic products:', err);
+      }
+    }
+    loadProducts();
+  }, []);
+
+  const allProductsList = useMemo(() => {
+    return dbProducts.length > 0 ? dbProducts : MOCK_PRODUCTS;
+  }, [dbProducts]);
 
   const resetFilters = () => setFilters(DEFAULT_FILTERS);
 
@@ -63,9 +142,9 @@ export const PLPPageContent: React.FC<PLPPageContentProps> = ({
   }, [filters]);
 
   const filteredProducts = useMemo(() => {
-    return MOCK_PRODUCTS.filter((product) => {
+    return allProductsList.filter((product) => {
       if (filters.target.length > 0 && !filters.target.includes(product.target)) return false;
-      if (filters.category.length > 0 && !filters.category.includes(product.category)) return false;
+      if (filters.category.length > 0 && !filters.category.includes(product.category) && !filters.category.includes(product.subcategory)) return false;
       if (filters.occasion.length > 0 && !filters.occasion.includes(product.occasion)) return false;
       if (filters.size.length > 0) {
         const hasMatchingSize = product.sizes.some((s) => filters.size.includes(s.size) && s.inStock);
@@ -83,7 +162,7 @@ export const PLPPageContent: React.FC<PLPPageContentProps> = ({
       if (sortBy === 'newest') return (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0);
       return 0;
     });
-  }, [filters, sortBy]);
+  }, [allProductsList, filters, sortBy]);
 
   const visibleProducts = filteredProducts.slice(0, visibleCount);
   const hasMore = visibleCount < filteredProducts.length;

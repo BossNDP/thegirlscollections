@@ -1,10 +1,10 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { ChevronRight } from 'lucide-react';
-import { MOCK_PRODUCTS } from '@/data/shopData';
+import { ChevronRight, Loader2 } from 'lucide-react';
+import { MOCK_PRODUCTS, Product } from '@/data/shopData';
 import { ProductGallery } from '@/components/pdp/ProductGallery';
 import { ProductInfo } from '@/components/pdp/ProductInfo';
 import { StickyAddToCartBar } from '@/components/pdp/StickyAddToCartBar';
@@ -18,20 +18,121 @@ interface PDPProps {
   };
 }
 
+function formatDbProductToShopProduct(p: any): Product {
+  const priceRupees = p.price > 10000 ? Math.round(p.price / 100) : p.price;
+  const originalPriceRupees = p.compare_price
+    ? (p.compare_price > 10000 ? Math.round(p.compare_price / 100) : p.compare_price)
+    : undefined;
+
+  let sizesList: any[] = [];
+  if (Array.isArray(p.sizes)) {
+    sizesList = p.sizes.map((s: any) =>
+      typeof s === 'string' ? { size: s, inStock: true } : s
+    );
+  } else if (p.stock_quantity && typeof p.stock_quantity === 'object') {
+    sizesList = Object.entries(p.stock_quantity).map(([size, qty]) => ({
+      size,
+      inStock: Number(qty) > 0,
+    }));
+  }
+
+  if (sizesList.length === 0) {
+    sizesList = [
+      { size: 'XS', inStock: true },
+      { size: 'S', inStock: true },
+      { size: 'M', inStock: true },
+      { size: 'L', inStock: true },
+      { size: 'XL', inStock: true },
+    ];
+  }
+
+  const cat = (p.category || '').toLowerCase();
+  const isKids = p.gender === 'kids' || cat.includes('kids') || cat.includes('children') || cat.includes('frock');
+
+  return {
+    id: p.id,
+    slug: p.slug,
+    name: p.name,
+    category: p.category || 'ethnic-wear',
+    target: isKids ? 'kids' : 'women',
+    subcategory: p.subcategory || p.category || '',
+    occasion: p.occasion || 'Festive',
+    price: priceRupees,
+    originalPrice: originalPriceRupees,
+    isNew: true,
+    isBestSeller: !!p.is_featured,
+    isSale: !!originalPriceRupees,
+    images: Array.isArray(p.images) && p.images.length > 0 ? p.images : [],
+    sizes: sizesList,
+    colors: [{ name: 'Standard', hex: '#C9A66B' }],
+    fabric: p.description || 'Premium Ethnic Wear',
+    description: p.description || '',
+    careInstructions: ['Dry Clean Only', 'Store in Cotton Garment Bag'],
+    rating: 5.0,
+    reviewsCount: 18,
+  };
+}
+
 export default function ProductDetailPage({ params }: PDPProps) {
   const { addToCart } = useShop();
+  const [product, setProduct] = useState<Product | null>(null);
+  const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const product = MOCK_PRODUCTS.find((p) => p.slug === params.slug) || MOCK_PRODUCTS[0];
+  useEffect(() => {
+    async function loadProduct() {
+      try {
+        setIsLoading(true);
+        const res = await fetch(`/api/products?slug=${params.slug}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.product) {
+            const formatted = formatDbProductToShopProduct(data.product);
+            setProduct(formatted);
+
+            // Load related products
+            const allRes = await fetch('/api/products');
+            if (allRes.ok) {
+              const allData = await allRes.json();
+              if (allData.products) {
+                const formattedAll: Product[] = allData.products.map(formatDbProductToShopProduct);
+                const related = formattedAll.filter((p) => p.id !== formatted.id).slice(0, 4);
+                setRelatedProducts(related);
+              }
+            }
+            setIsLoading(false);
+            return;
+          }
+        }
+      } catch (err) {
+        console.error('Failed to load product detail:', err);
+      } finally {
+        setIsLoading(false);
+      }
+
+      // Fallback to MOCK_PRODUCTS
+      const mockProd = MOCK_PRODUCTS.find((p) => p.slug === params.slug) || MOCK_PRODUCTS[0];
+      setProduct(mockProd);
+      setRelatedProducts(MOCK_PRODUCTS.filter((p) => p.id !== mockProd.id).slice(0, 4));
+    }
+
+    loadProduct();
+  }, [params.slug]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-ivory flex flex-col items-center justify-center gap-3 text-navy">
+        <Loader2 className="w-6 h-6 animate-spin text-zariGold" />
+        <span className="text-xs font-sans font-bold uppercase tracking-widest text-zariGold">Loading Garment Details...</span>
+      </div>
+    );
+  }
 
   if (!product) {
     notFound();
   }
 
   const selectedSize = product.sizes.find((s) => s.inStock)?.size || 'Free Size';
-
-  const relatedProducts = MOCK_PRODUCTS.filter(
-    (p) => p.id !== product.id && (p.category === product.category || p.target === product.target)
-  ).slice(0, 4);
 
   return (
     <div className="bg-ivory text-navy min-h-screen pb-24">
