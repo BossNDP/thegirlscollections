@@ -34,7 +34,7 @@ export async function POST(request: Request) {
 
     const clientId = process.env.PHONE_EMAIL_CLIENT_ID ||
       process.env.NEXT_PUBLIC_PHONE_EMAIL_CLIENT_ID ||
-      '17565400827940866842';
+      '19014171169408573674';
 
     let verifiedPhone: string | null = null;
 

@@ -2,21 +2,22 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { TruckIcon, TagIcon, SparklesIcon, PackageIcon } from '@/components/ui/BrandIcons';
-import { ANNOUNCEMENT_MESSAGES, AnnouncementMessage } from '@/config/announcements';
 
-const ICON_MAP: Record<string, React.FC<{ className?: string; color?: string }>> = {
-  truck: TruckIcon,
-  tag: TagIcon,
-  sparkles: SparklesIcon,
-  gift: PackageIcon,
-  rotate: SparklesIcon,
-};
+const ANNOUNCEMENTS = [
+  { text: 'COMPLIMENTARY SHIPPING ON ORDERS OVER ₹1,999', badge: 'FREE EXPRESS' },
+  { text: 'CASH ON DELIVERY AVAILABLE ACROSS INDIA', badge: 'COD AVAILABLE' },
+  { text: 'NEW FESTIVE COUTURE EDIT \u201926 NOW LIVE', badge: 'JUST DROPPED' },
+  { text: 'HANDCRAFTED PURE SILK & ZARI WEAVES', badge: 'HERITAGE' },
+  { text: 'USE CODE "GIRLS100" FOR ₹100 OFF FIRST ORDER', badge: 'WELCOME OFFER' },
+];
 
-export const TopBanner: React.FC = () => {
+interface TopBannerProps {
+  isFloating?: boolean;
+}
+
+export const TopBanner: React.FC<TopBannerProps> = () => {
   const [index, setIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
-  const [isScrolledDown, setIsScrolledDown] = useState(false);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
   useEffect(() => {
@@ -28,35 +29,18 @@ export const TopBanner: React.FC = () => {
   }, []);
 
   const nextMessage = useCallback(() => {
-    setIndex((prev) => (prev + 1) % ANNOUNCEMENT_MESSAGES.length);
+    setIndex((prev) => (prev + 1) % ANNOUNCEMENTS.length);
   }, []);
 
   useEffect(() => {
     if (isPaused) return;
     const interval = setInterval(() => {
       nextMessage();
-    }, 4000);
-
+    }, 3800);
     return () => clearInterval(interval);
   }, [isPaused, nextMessage]);
 
-  useEffect(() => {
-    let lastY = window.scrollY;
-    const handleScroll = () => {
-      const currentY = window.scrollY;
-      if (currentY > 40 && currentY > lastY) {
-        setIsScrolledDown(true);
-      } else if (currentY < lastY || currentY <= 40) {
-        setIsScrolledDown(false);
-      }
-      lastY = currentY;
-    };
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  const currentMessage: AnnouncementMessage = ANNOUNCEMENT_MESSAGES[index];
-  const IconComponent = ICON_MAP[currentMessage.icon] || SparklesIcon;
+  const currentAnnouncement = ANNOUNCEMENTS[index];
 
   return (
     <div
@@ -68,56 +52,58 @@ export const TopBanner: React.FC = () => {
       onBlur={() => setIsPaused(false)}
       onTouchStart={() => setIsPaused(true)}
       onTouchEnd={() => setIsPaused(false)}
-      className={`relative w-full bg-navy text-ivory select-none z-40 overflow-hidden border-b border-roseGold/30 transition-all duration-300 ease-out ${
-        isScrolledDown ? 'max-h-0 py-0 opacity-0 border-b-0 pointer-events-none' : 'max-h-12 py-2.5 opacity-100'
-      }`}
+      /*
+        On-brand: same navy as the navbar below (#1C1F3B), always visible.
+        A gold hairline at the bottom visually separates it from the navbar.
+      */
+      className="relative w-full bg-[#1C1F3B] select-none z-40 overflow-hidden border-b border-[#C9A84C]/30 py-1.5"
     >
-      <div className="max-w-[1440px] mx-auto flex items-center justify-center relative px-3 sm:px-4 h-5">
+      <div className="max-w-[1440px] mx-auto flex items-center justify-center relative px-3 h-5">
         <AnimatePresence mode="wait">
           <motion.div
-            key={currentMessage.id}
+            key={index}
             initial={
               prefersReducedMotion
                 ? { opacity: 0 }
-                : { y: '100%', opacity: 0 }
+                : { y: 10, opacity: 0 }
             }
-            animate={
-              prefersReducedMotion
-                ? { opacity: 1 }
-                : { y: '0%', opacity: 1 }
-            }
+            animate={{ y: 0, opacity: 1 }}
             exit={
               prefersReducedMotion
                 ? { opacity: 0 }
-                : { y: '-100%', opacity: 0 }
+                : { y: -10, opacity: 0 }
             }
             transition={{
-              duration: prefersReducedMotion ? 0.2 : 0.45,
+              duration: prefersReducedMotion ? 0.2 : 0.32,
               ease: [0.16, 1, 0.3, 1],
             }}
-            className="flex items-center justify-center gap-1.5 sm:gap-2 max-w-full overflow-hidden text-center cursor-pointer"
-            onClick={nextMessage}
+            className="flex items-center justify-center gap-2 text-center cursor-default max-w-full overflow-hidden"
           >
-            <IconComponent className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-roseGold shrink-0 hidden xs:inline-block" />
-            <span className="font-sans text-[10px] xs:text-[11px] sm:text-[12px] font-medium tracking-[0.15em] sm:tracking-[0.2em] text-ivory uppercase truncate whitespace-nowrap">
-              {currentMessage.text}
+            {/* Badge — gold text on navy, hairline gold border */}
+            <span className="hidden xs:inline-block font-sans text-[8px] font-extrabold tracking-[0.18em] text-[#C9A84C] bg-[#C9A84C]/10 border border-[#C9A84C]/40 px-1.5 py-0.5 rounded uppercase shrink-0">
+              {currentAnnouncement.badge}
+            </span>
+
+            {/* Main text — solid ivory, no gradient */}
+            <span className="font-sans text-[9.5px] xs:text-[10.5px] sm:text-[11px] font-medium tracking-[0.20em] sm:tracking-[0.24em] text-[#F5F0E8] uppercase truncate whitespace-nowrap">
+              {currentAnnouncement.text}
             </span>
           </motion.div>
         </AnimatePresence>
-      </div>
 
-      {/* Progress indicators */}
-      <div className="absolute bottom-0.5 left-1/2 -translate-x-1/2 flex items-center gap-1 opacity-40 hover:opacity-100 transition-opacity">
-        {ANNOUNCEMENT_MESSAGES.map((msg, i) => (
-          <button
-            key={msg.id}
-            onClick={() => setIndex(i)}
-            aria-label={`Jump to announcement ${i + 1}`}
-            className={`h-0.5 rounded-full transition-all duration-300 ${
-              i === index ? 'w-3 bg-roseGold' : 'w-1 bg-ivory/40'
-            }`}
-          />
-        ))}
+        {/* Desktop dot indicators */}
+        <div className="hidden md:flex items-center gap-1 absolute right-4 top-1/2 -translate-y-1/2">
+          {ANNOUNCEMENTS.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setIndex(i)}
+              className={`h-1 rounded-full transition-all duration-300 ${
+                i === index ? 'w-3 bg-[#C9A84C]' : 'w-1 bg-white/20 hover:bg-white/40'
+              }`}
+              aria-label={`Go to announcement ${i + 1}`}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );

@@ -3,38 +3,40 @@
 /**
  * SHAPE RULE GUIDELINE:
  * - CIRCLES = Category / discovery navigation (e.g. CircularCategoryScroller)
- * - ARCHES = Heritage / editorial storytelling sections (e.g. Arch Collection Coverflow / ShopByCategoryBento)
+ * - ARCHES = Heritage / editorial storytelling sections (e.g. Arch Collection Showcase)
  * - RECTANGLES = Product / shopping grids (e.g. ProductRail, ProductGrid)
  */
 
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ArrowRight, Sparkles } from 'lucide-react';
 import { gsap } from 'gsap';
-import SectionHeader from '@/components/ui/SectionHeader';
+import { motion, AnimatePresence } from 'framer-motion';
 
-interface CategoryItem {
+export interface CategoryArchItem {
   id: string;
+  group: 'women' | 'kids';
   name: string;
   eyebrow: string;
-  description?: string;
+  description: string;
   slug: string;
-  image?: string;
-  gradientClass?: string;
+  image: string;
 }
 
-const CATEGORY_ITEMS: CategoryItem[] = [
+const ALL_ARCH_ITEMS: CategoryArchItem[] = [
   {
-    id: '1',
-    name: 'Kurta Suit Ensembles',
-    eyebrow: 'WOMEN EDIT',
-    description: 'Anarkalis, straight-cut & palazzo suit sets for celebrations.',
-    slug: 'all-kurta-sets',
-    image: '/categories/all-kurta-sets.webp',
+    id: 'w-1',
+    group: 'women',
+    name: 'Anarkali Suit Sets',
+    eyebrow: 'ROYAL HERITAGE',
+    description: 'Flared royal silk Anarkalis featuring hand-embroidered zari dupattas.',
+    slug: 'anarkali-kurta-suit-sets',
+    image: '/categories/anarkali-kurta-suit-sets.webp',
   },
   {
-    id: '2',
+    id: 'k-1',
+    group: 'kids',
     name: 'Silk Pattu Pavadai',
     eyebrow: 'LITTLE ROYALTY',
     description: 'Traditional Kanjeevaram pure silk drapes for young girls.',
@@ -42,43 +44,82 @@ const CATEGORY_ITEMS: CategoryItem[] = [
     image: '/categories/kids-lehenga-blouse-or-pattu-pavadai.webp',
   },
   {
-    id: '3',
-    name: 'Co-ord Sets & Tunics',
-    eyebrow: 'CONTEMPORARY',
-    description: 'Matching festive tunic & trouser duos.',
-    slug: 'co-ord-set',
-    image: '/categories/co-ord-set.webp',
+    id: 'w-2',
+    group: 'women',
+    name: 'Kurta Ensembles',
+    eyebrow: 'WOMEN EDIT',
+    description: 'Contemporary & classic straight-cut suit sets for celebrations.',
+    slug: 'all-kurta-sets',
+    image: '/categories/all-kurta-sets.webp',
   },
   {
-    id: '4',
+    id: 'k-2',
+    group: 'kids',
     name: 'Party Wear Frocks',
-    eyebrow: 'CELEBRATION',
-    description: 'Layered tulle & organza birthday frocks.',
+    eyebrow: 'CELEBRATION FROCKS',
+    description: 'Layered tulle & organza birthday frocks tailored for young girls.',
     slug: 'party-wear-frocks',
     image: '/categories/party-wear-frocks.webp',
   },
   {
-    id: '5',
+    id: 'w-3',
+    group: 'women',
+    name: 'Co-ord Sets & Tunics',
+    eyebrow: 'CONTEMPORARY FESTIVE',
+    description: 'Matching silk & chanderi tunic and trouser duos.',
+    slug: 'co-ord-set',
+    image: '/categories/co-ord-set.webp',
+  },
+  {
+    id: 'k-3',
+    group: 'kids',
     name: 'Traditional Gowns',
-    eyebrow: 'FESTIVE EDIT',
-    description: 'Single-piece elegant ethnic gowns for kids.',
+    eyebrow: 'FESTIVE GOWNS',
+    description: 'Single-piece traditional ethnic gowns tailored for young royalty.',
     slug: 'kids-traditional-gown-1-pc',
     image: '/categories/kids-traditional-gown-1-pc.webp',
   },
+  {
+    id: 'w-4',
+    group: 'women',
+    name: 'Skirt & Crop Top Sets',
+    eyebrow: 'TWIRL EDIT',
+    description: 'Twirl-worthy skirts paired with rich zardosi embroidered tops.',
+    slug: 'skirt-and-top',
+    image: '/categories/skirt-and-top.webp',
+  },
+  {
+    id: 'k-4',
+    group: 'kids',
+    name: 'Children Co-ord Sets',
+    eyebrow: 'PLAYFUL WEAR',
+    description: 'Matching printed & solid kids co-ord tunic sets.',
+    slug: 'children-co-ord-set',
+    image: '/categories/children-co-ord-set.webp',
+  },
 ];
 
-export const ShopByCategoryBento: React.FC = () => {
+interface ShopByCategoryBentoProps {
+  filter?: 'all' | 'women' | 'kids';
+}
+
+export const ShopByCategoryBento: React.FC<ShopByCategoryBentoProps> = ({ filter = 'all' }) => {
+  const categoryItems = useMemo(() => {
+    if (filter === 'all') return ALL_ARCH_ITEMS;
+    return ALL_ARCH_ITEMS.filter((item) => item.group === filter);
+  }, [filter]);
+
   const [activeIndex, setActiveIndex] = useState(0);
   const [isAutoplayActive, setIsAutoplayActive] = useState(true);
 
-  const sectionRef = useRef<HTMLElement | null>(null);
-  const mobileCardRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const desktopCardRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const wiggleRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const lightSweepRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const hasInteracted = useRef(false);
+  useEffect(() => {
+    setActiveIndex(0);
+  }, [filter]);
 
-  // Check prefers-reduced-motion
+  const sectionRef = useRef<HTMLElement | null>(null);
+  const mobileScrollRef = useRef<HTMLDivElement | null>(null);
+  const desktopCardRefs = useRef<(HTMLDivElement | null)[]>([]);
+
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -90,656 +131,297 @@ export const ShopByCategoryBento: React.FC = () => {
     }
   }, []);
 
-  const totalCards = CATEGORY_ITEMS.length;
+  const totalCards = categoryItems.length;
 
   const goToNext = useCallback(() => {
-    hasInteracted.current = true;
     setActiveIndex((prev) => (prev + 1) % totalCards);
   }, [totalCards]);
 
   const goToPrev = useCallback(() => {
-    hasInteracted.current = true;
     setActiveIndex((prev) => (prev - 1 + totalCards) % totalCards);
   }, [totalCards]);
 
-  // Autoplay support (pauses on hover/interaction)
+  // Autoplay for Desktop coverflow
   useEffect(() => {
-    if (!isAutoplayActive || prefersReducedMotion) return;
+    if (!isAutoplayActive || prefersReducedMotion || totalCards <= 1) return;
     const timer = setInterval(() => {
       setActiveIndex((prev) => (prev + 1) % totalCards);
-    }, 5500);
-
+    }, 6000);
     return () => clearInterval(timer);
   }, [isAutoplayActive, prefersReducedMotion, totalCards]);
 
-  // One-time CSS Keyframe Swipe Hint on Touch Devices
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    const section = sectionRef.current || document.getElementById('arch-collection-section');
-    if (!section) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry.isIntersecting) return;
-
-        const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        const touchDevice =
-          window.matchMedia('(pointer: coarse)').matches ||
-          window.matchMedia('(hover: none)').matches ||
-          'ontouchstart' in window ||
-          (typeof navigator !== 'undefined' && navigator.maxTouchPoints > 0);
-
-        let alreadyShown = false;
-        try {
-          alreadyShown = sessionStorage.getItem('archSwipeHintShown') === 'true';
-        } catch {
-          alreadyShown = false;
-        }
-
-        if (
-          touchDevice &&
-          !alreadyShown &&
-          !reducedMotion &&
-          !hasInteracted.current &&
-          activeIndex === 0
-        ) {
-          try {
-            sessionStorage.setItem('archSwipeHintShown', 'true');
-          } catch {
-            // Ignore
-          }
-
-          const targetEl = wiggleRefs.current[0];
-          if (targetEl) {
-            const handleAnimationEnd = () => {
-              targetEl.classList.remove('swipe-hint-active');
-              targetEl.removeEventListener('animationend', handleAnimationEnd);
-            };
-            targetEl.addEventListener('animationend', handleAnimationEnd);
-            targetEl.classList.add('swipe-hint-active');
-          }
-
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.3 }
-    );
-
-    observer.observe(section);
-    return () => observer.disconnect();
-  }, [activeIndex]);
-
-  // Helper to calculate mobile card step
-  const getMobileCardStep = useCallback(() => {
-    const activeCard = mobileCardRefs.current[activeIndex];
-    if (activeCard && activeCard.offsetWidth) {
-      return activeCard.offsetWidth + 18;
-    }
-    if (typeof window !== 'undefined') {
-      const vw = window.innerWidth;
-      const cardW = Math.min(vw * 0.76, 330);
-      return cardW + 18;
-    }
-    return 308;
-  }, [activeIndex]);
-
-  // Animate Mobile Carousel Cards
-  const animateMobileCards = useCallback((customDuration?: number) => {
-    const cardStep = getMobileCardStep();
-    const duration = customDuration ?? 0.42;
-
-    mobileCardRefs.current.forEach((cardEl, idx) => {
-      if (!cardEl) return;
-
-      let rIdx = idx - activeIndex;
-      if (rIdx > totalCards / 2) rIdx -= totalCards;
-      if (rIdx < -totalCards / 2) rIdx += totalCards;
-
-      gsap.killTweensOf(cardEl);
-
-      if (prefersReducedMotion) {
-        gsap.to(cardEl, {
-          opacity: rIdx === 0 ? 1 : 0,
-          scale: 1,
-          x: rIdx * cardStep,
-          y: 0,
-          duration: 0.3,
-        });
-        return;
-      }
-
-      if (rIdx === 0) {
-        gsap.to(cardEl, {
-          scale: 1,
-          opacity: 1,
-          x: 0,
-          y: 0,
-          zIndex: 30,
-          duration: duration,
-          ease: 'power3.out',
-          force3D: true,
-        });
-      } else if (Math.abs(rIdx) === 1) {
-        gsap.to(cardEl, {
-          scale: 0.94,
-          opacity: 0.65,
-          x: rIdx * cardStep,
-          y: 0,
-          zIndex: 20,
-          duration: duration,
-          ease: 'power3.out',
-          force3D: true,
-        });
-      } else {
-        gsap.to(cardEl, {
-          scale: 0.88,
-          opacity: 0,
-          x: rIdx * cardStep,
-          y: 0,
-          zIndex: 0,
-          duration: duration,
-          ease: 'power3.out',
-          force3D: true,
-        });
-      }
-    });
-  }, [activeIndex, totalCards, prefersReducedMotion, getMobileCardStep]);
-
-  // Animate Desktop 3D Coverflow Cards
   const animateDesktopCoverflow = useCallback((customDuration?: number) => {
-    const duration = customDuration ?? 0.45;
-    const isLg = typeof window !== 'undefined' && window.innerWidth >= 1024;
-    const sideOffset = isLg ? 340 : 280;
-    const farOffset = isLg ? 540 : 460;
+    const duration = customDuration ?? 0.55;
 
     desktopCardRefs.current.forEach((cardEl, idx) => {
       if (!cardEl) return;
 
-      let rIdx = idx - activeIndex;
-      if (rIdx > totalCards / 2) rIdx -= totalCards;
-      if (rIdx < -totalCards / 2) rIdx += totalCards;
+      let relativeIndex = idx - activeIndex;
+      if (relativeIndex > totalCards / 2) relativeIndex -= totalCards;
+      if (relativeIndex < -totalCards / 2) relativeIndex += totalCards;
 
       gsap.killTweensOf(cardEl);
 
-      if (prefersReducedMotion) {
+      if (relativeIndex === 0) {
         gsap.to(cardEl, {
-          opacity: rIdx === 0 ? 1 : Math.abs(rIdx) === 1 ? 0.5 : 0,
-          scale: rIdx === 0 ? 1 : 0.8,
-          x: rIdx * sideOffset,
-          filter: rIdx === 0 ? 'blur(0px)' : 'blur(3px)',
-          duration: 0.3,
-        });
-        return;
-      }
-
-      if (rIdx === 0) {
-        // Center Card: Full size, 100% opacity, sharp focus, zIndex 30
-        gsap.to(cardEl, {
-          x: 0,
-          scale: 1,
+          scale: 1.05,
           opacity: 1,
-          filter: 'blur(0px)',
-          zIndex: 30,
-          duration: duration,
+          x: 0,
+          y: 0,
+          zIndex: 40,
+          duration,
           ease: 'power3.out',
           force3D: true,
         });
-      } else if (rIdx === 1) {
-        // Right Adjacent Card: ~78% scale, 55% opacity, 3px blur, zIndex 20
+      } else if (Math.abs(relativeIndex) === 1) {
+        const sign = relativeIndex > 0 ? 1 : -1;
         gsap.to(cardEl, {
-          x: sideOffset,
-          scale: 0.78,
-          opacity: 0.55,
-          filter: 'blur(3px)',
-          zIndex: 20,
-          duration: duration,
+          scale: 0.92,
+          opacity: 0.75,
+          x: sign * 260,
+          y: 0,
+          zIndex: 25,
+          duration,
           ease: 'power3.out',
           force3D: true,
         });
-      } else if (rIdx === -1) {
-        // Left Adjacent Card: ~78% scale, 55% opacity, 3px blur, zIndex 20
+      } else if (Math.abs(relativeIndex) === 2) {
+        const sign = relativeIndex > 0 ? 1 : -1;
         gsap.to(cardEl, {
-          x: -sideOffset,
-          scale: 0.78,
-          opacity: 0.55,
-          filter: 'blur(3px)',
-          zIndex: 20,
-          duration: duration,
+          scale: 0.82,
+          opacity: 0.4,
+          x: sign * 460,
+          y: 0,
+          zIndex: 10,
+          duration,
           ease: 'power3.out',
           force3D: true,
         });
       } else {
-        // Beyond immediate neighbors: Receding/Hidden, 0 opacity, 6px blur
+        const sign = relativeIndex > 0 ? 1 : -1;
         gsap.to(cardEl, {
-          x: rIdx > 0 ? farOffset : -farOffset,
-          scale: 0.62,
+          scale: 0.72,
           opacity: 0,
-          filter: 'blur(6px)',
-          zIndex: 10,
-          duration: duration,
+          x: sign * 600,
+          y: 0,
+          zIndex: 0,
+          duration,
           ease: 'power3.out',
           force3D: true,
         });
       }
     });
-  }, [activeIndex, totalCards, prefersReducedMotion]);
+  }, [activeIndex, totalCards]);
 
   useEffect(() => {
-    animateMobileCards();
     animateDesktopCoverflow();
-  }, [activeIndex, animateMobileCards, animateDesktopCoverflow]);
+  }, [activeIndex, animateDesktopCoverflow]);
 
-  // Touch Drag Handlers (Mobile)
-  const dragOffsetRef = useRef(0);
-  const touchStartRef = useRef({ startX: 0, startY: 0, isDragging: false, isHorizontal: false });
-
-  const handleTouchStart = (e: React.TouchEvent) => {
-    hasInteracted.current = true;
-    const touch = e.touches[0];
-    touchStartRef.current = {
-      startX: touch.clientX,
-      startY: touch.clientY,
-      isDragging: true,
-      isHorizontal: false,
-    };
-    dragOffsetRef.current = 0;
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (!touchStartRef.current.isDragging) return;
-    const touch = e.touches[0];
-    const dx = touch.clientX - touchStartRef.current.startX;
-    const dy = touch.clientY - touchStartRef.current.startY;
-
-    if (!touchStartRef.current.isHorizontal) {
-      if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 5) {
-        touchStartRef.current.isHorizontal = true;
-      } else if (Math.abs(dy) > 8) {
-        touchStartRef.current.isDragging = false;
-        return;
-      }
+  const handleMobileScroll = () => {
+    if (!mobileScrollRef.current) return;
+    const { scrollLeft, clientWidth } = mobileScrollRef.current;
+    const newIdx = Math.round(scrollLeft / (clientWidth * 0.82));
+    if (newIdx >= 0 && newIdx < totalCards && newIdx !== activeIndex) {
+      setActiveIndex(newIdx);
     }
-
-    if (!touchStartRef.current.isHorizontal) return;
-
-    dragOffsetRef.current = dx;
-    const cardStep = getMobileCardStep();
-
-    mobileCardRefs.current.forEach((cardEl, idx) => {
-      if (!cardEl) return;
-      let rIdx = idx - activeIndex;
-      if (rIdx > totalCards / 2) rIdx -= totalCards;
-      if (rIdx < -totalCards / 2) rIdx += totalCards;
-
-      if (Math.abs(rIdx) <= 1) {
-        gsap.set(cardEl, {
-          x: rIdx * cardStep + dx,
-          force3D: true,
-        });
-      }
-    });
   };
 
-  const handleTouchEnd = () => {
-    if (!touchStartRef.current.isDragging) return;
-    touchStartRef.current.isDragging = false;
-
-    const dx = dragOffsetRef.current;
-    const threshold = 40;
-
-    if (dx < -threshold) {
-      goToNext();
-    } else if (dx > threshold) {
-      goToPrev();
-    } else {
-      animateMobileCards(0.35);
-    }
-
-    dragOffsetRef.current = 0;
-  };
-
-  const formattedCounter = `0${activeIndex + 1} / 0${totalCards}`;
-
-  // SVG Arch Path Definition for Desktop Coverflow Cards
-  const desktopCoverflowSvgPath = "M 1.5 175 A 173.5 173.5 0 0 1 348.5 175 L 348.5 532 A 6.5 6.5 0 0 1 342 538.5 L 8.5 538.5 A 6.5 6.5 0 0 1 1.5 532 Z";
+  const formattedCounter = `${String(activeIndex + 1).padStart(2, '0')} / ${String(totalCards).padStart(2, '0')}`;
+  const currentActiveItem = categoryItems[activeIndex] || categoryItems[0];
 
   return (
     <section
       ref={sectionRef}
       id="arch-collection-section"
-      className="w-full pt-12 pb-6 sm:pt-16 sm:pb-8 md:py-24 bg-ivory text-inkNavy border-b border-zariGold/15 overflow-hidden select-none"
+      className="w-full py-8 sm:py-14 pb-20 sm:pb-16 bg-ivory border-b border-zariGold/15 overflow-hidden relative select-none"
       onMouseEnter={() => setIsAutoplayActive(false)}
       onMouseLeave={() => setIsAutoplayActive(true)}
     >
-      <style>{`
-        @keyframes swipeHintWiggle {
-          0%   { transform: translateX(0); }
-          25%  { transform: translateX(-8px); }
-          55%  { transform: translateX(6px); }
-          80%  { transform: translateX(-3px); }
-          100% { transform: translateX(0); }
-        }
-
-        .swipe-hint-active {
-          animation: swipeHintWiggle 900ms ease-in-out 1 !important;
-          will-change: transform;
-        }
-      `}</style>
-
       <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-12">
-        {/* Reusable Editorial Section Header */}
-        <SectionHeader
-          kicker="FEATURED OCCASIONS"
-          title="Curated Fashion Collections"
-          subtitle="Discover Women's and Kids' fashion spanning festive ethnic wear, party frocks, contemporary co-ord sets, and everyday luxury."
-          actionLabel="EXPLORE ALL"
-          actionHref="/shop"
-        />
-
-        {/* 4-Column Interactive Visual Category Chips Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5 mb-8 sm:mb-12">
-          {[
-            {
-              title: "Festive Ethnic Wear",
-              subtitle: "Anarkalis & Silk Suits",
-              image: "/categories/anarkali-kurta-suit-sets.webp",
-              href: "/shop?category=anarkali-kurta-suit-sets",
-            },
-            {
-              title: "Party Wear Frocks",
-              subtitle: "Girls Designer Frocks",
-              image: "/categories/party-wear-frocks.webp",
-              href: "/shop?category=party-wear-frocks",
-            },
-            {
-              title: "Co-ord Sets",
-              subtitle: "Contemporary Sets",
-              image: "/categories/co-ord-set.webp",
-              href: "/shop?category=co-ord-set",
-            },
-            {
-              title: "Everyday Luxury",
-              subtitle: "Pattu & Silk Ensembles",
-              image: "/categories/kids-lehenga-blouse-or-pattu-pavadai.webp",
-              href: "/shop?target=kids",
-            },
-          ].map((chip, cIdx) => (
-            <Link
-              key={cIdx}
-              href={chip.href}
-              className="flex items-center gap-3 p-3 rounded-2xl bg-white border border-zariGold/30 hover:border-zariGold shadow-xs hover:shadow-md transition-all duration-300 group cursor-pointer"
-            >
-              <div className="relative w-12 h-14 sm:w-14 sm:h-16 rounded-xl overflow-hidden shrink-0 border border-zariGold/20 bg-sand/20">
-                <Image
-                  src={chip.image}
-                  alt={chip.title}
-                  fill
-                  sizes="60px"
-                  className="object-cover object-top group-hover:scale-105 transition-transform duration-500"
-                />
-              </div>
-              <div className="flex-1 min-w-0">
-                <h4 className="text-xs sm:text-sm font-serif font-bold text-navy group-hover:text-zariGold transition-colors truncate">
-                  {chip.title}
-                </h4>
-                <p className="text-[10px] sm:text-[11px] text-charcoal-muted font-sans truncate mt-0.5">
-                  {chip.subtitle}
-                </p>
-                <span className="text-[9.5px] font-bold text-zariGold tracking-widest uppercase mt-1 inline-flex items-center gap-0.5 group-hover:translate-x-0.5 transition-transform">
-                  VIEW <ArrowRight className="w-2.5 h-2.5" />
-                </span>
-              </div>
-            </Link>
-          ))}
-        </div>
-
-        {/* Counter Header Row (Mobile & Desktop) */}
-        <div className="flex items-center justify-between mb-4 md:mb-6 px-1">
-          <span className="font-serif font-bold text-xs sm:text-sm text-zariGold tracking-widest uppercase">
-            ARCH COLLECTION
-          </span>
-          <span className="font-serif font-bold text-xs sm:text-sm text-inkNavy/70 tracking-widest font-tnum">
-            {formattedCounter}
-          </span>
-        </div>
-
-        {/* Carousel Container */}
-        <div className="relative group/catScroll max-w-[420px] md:max-w-none mx-auto">
-          {/* Desktop Chevron Navigation Arrows */}
-          <button
-            onClick={goToPrev}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                goToPrev();
-              }
-            }}
-            className="hidden md:flex absolute left-2 lg:left-6 top-1/2 -translate-y-1/2 z-40 w-12 h-12 rounded-full border border-zariGold/50 bg-ivory/90 text-inkNavy opacity-80 backdrop-blur-md items-center justify-center hover:opacity-100 hover:bg-zariGold hover:border-zariGold hover:text-inkNavy hover:scale-105 transition-all duration-300 shadow-lg cursor-pointer focus-visible:ring-2 focus-visible:ring-zariGold"
-            aria-label="Previous Arch Collection category"
-          >
-            <ChevronLeft className="w-6 h-6 transition-colors" />
-          </button>
-
-          <button
-            onClick={goToNext}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                goToNext();
-              }
-            }}
-            className="hidden md:flex absolute right-2 lg:right-6 top-1/2 -translate-y-1/2 z-40 w-12 h-12 rounded-full border border-zariGold/50 bg-ivory/90 text-inkNavy opacity-80 backdrop-blur-md items-center justify-center hover:opacity-100 hover:bg-zariGold hover:border-zariGold hover:text-inkNavy hover:scale-105 transition-all duration-300 shadow-lg cursor-pointer focus-visible:ring-2 focus-visible:ring-zariGold"
-            aria-label="Next Arch Collection category"
-          >
-            <ChevronRight className="w-6 h-6 transition-colors" />
-          </button>
-
-          {/* ============================================================ */}
-          {/* MOBILE VIEW: Touch Peek Preview Carousel (UNTOUCHED)          */}
-          {/* ============================================================ */}
-          <div className="block md:hidden overflow-hidden py-2">
-            <div
-              className="relative w-full flex justify-center items-center h-[480px] xs:h-[500px] mx-auto touch-pan-y"
-              onTouchStart={handleTouchStart}
-              onTouchMove={handleTouchMove}
-              onTouchEnd={handleTouchEnd}
-            >
-              {CATEGORY_ITEMS.map((cat, idx) => {
-                let rIdx = idx - activeIndex;
-                if (rIdx > totalCards / 2) rIdx -= totalCards;
-                if (rIdx < -totalCards / 2) rIdx += totalCards;
-
-                const isActive = rIdx === 0;
-                const isPeek = Math.abs(rIdx) === 1;
-
-                return (
-                  <div
-                    key={cat.id}
-                    ref={(el) => {
-                      mobileCardRefs.current[idx] = el;
-                    }}
-                    className="absolute w-[76vw] xs:w-[78vw] max-w-[330px] h-full rounded-[240px_240px_8px_8px] overflow-hidden bg-ivory shadow-xl transition-shadow duration-300 origin-center will-change-transform transform-gpu"
-                    style={{
-                      zIndex: isActive ? 30 : isPeek ? 20 : 0,
-                    }}
-                  >
-                    <div
-                      ref={(el) => {
-                        wiggleRefs.current[idx] = el;
-                      }}
-                      className="w-full h-full relative"
-                    >
-                      <Link
-                        href={`/shop?category=${cat.slug}`}
-                        className="relative block w-full h-full text-ivory group"
-                        tabIndex={isActive ? 0 : -1}
-                        onClick={(e) => {
-                          if (!isActive) {
-                            e.preventDefault();
-                          }
-                        }}
-                      >
-                        <div className="arch-inner relative w-full h-full overflow-hidden rounded-[232px_232px_4px_4px] ring-[2.5px] ring-inset ring-[#D8BC82] border border-[#B4863C]/40 shadow-sm">
-                          {cat.image ? (
-                            <Image
-                              src={cat.image}
-                              alt={cat.name}
-                              fill
-                              className="object-cover group-hover:scale-105 transition-transform duration-700 opacity-95"
-                              sizes="(max-width: 640px) 78vw, 330px"
-                              priority={idx === 0}
-                            />
-                          ) : (
-                            <div
-                              className={`w-full h-full ${
-                                cat.gradientClass || 'bg-navy-silk'
-                              } flex flex-col justify-center items-center p-6 text-center`}
-                            >
-                              <span className="eyebrow-text text-zariGoldLight font-semibold text-xs tracking-[0.2em] mb-2">
-                                {cat.eyebrow}
-                              </span>
-                              <h3 className="text-3xl font-serif font-bold text-ivory leading-tight">
-                                {cat.name}
-                              </h3>
-                            </div>
-                          )}
-
-                          <div
-                            className="absolute inset-0 bg-inkNavy transition-opacity duration-300 pointer-events-none"
-                            style={{
-                              opacity: isActive ? 0 : isPeek ? 0.35 : 0.7,
-                            }}
-                          />
-
-                          <div
-                            ref={(el) => {
-                              lightSweepRefs.current[idx] = el;
-                            }}
-                            className="absolute inset-0 w-full h-full pointer-events-none opacity-0 bg-gradient-to-r from-transparent via-white/40 to-transparent transform -skew-x-12 z-20"
-                          />
-
-                          <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-inkNavy/95 via-inkNavy/60 to-transparent p-6 flex flex-col justify-end z-10">
-                            <span className="eyebrow-text text-zariGoldLight font-semibold text-[10px] tracking-[0.2em] mb-1">
-                              {cat.eyebrow}
-                            </span>
-                            <h3 className="text-2xl font-serif font-bold text-ivory leading-tight group-hover:text-zariGoldLight transition-colors">
-                              {cat.name}
-                            </h3>
-                            {cat.description && (
-                              <p className="text-xs font-sans text-ivory/80 mt-1 line-clamp-2">
-                                {cat.description}
-                              </p>
-                            )}
-                          </div>
-                        </div>
-                      </Link>
-                    </div>
-                  </div>
-                );
-              })}
+        
+        {/* Section Header */}
+        <div className="flex items-end justify-between gap-4 mb-6 sm:mb-10 border-b border-zariGold/15 pb-4">
+          <div>
+            <div className="flex items-center gap-1.5 mb-1">
+              <Sparkles className="w-3.5 h-3.5 text-zariGold" />
+              <span className="text-[11px] sm:text-xs font-sans font-bold tracking-[0.22em] uppercase text-zariGold">
+                {filter === 'women'
+                  ? "WOMEN'S HERITAGE SHOWCASE"
+                  : filter === 'kids'
+                  ? 'LITTLE ROYALTY SHOWCASE'
+                  : 'HERITAGE ARCH SHOWCASE'}
+              </span>
             </div>
+            <h2 className="text-2xl sm:text-4xl lg:text-5xl font-serif text-inkNavy font-bold tracking-tight leading-[1.1]">
+              The Arch Collection
+            </h2>
           </div>
 
-          {/* ============================================================ */}
-          {/* DESKTOP VIEW: 3D Coverflow Carousel with Arch Framing         */}
-          {/* ============================================================ */}
-          <div className="hidden md:flex justify-center items-center relative w-full h-[540px] lg:h-[580px] overflow-hidden py-4">
-            {CATEGORY_ITEMS.map((cat, idx) => {
-              let rIdx = idx - activeIndex;
-              if (rIdx > totalCards / 2) rIdx -= totalCards;
-              if (rIdx < -totalCards / 2) rIdx += totalCards;
+          {/* Desktop Controls */}
+          <div className="hidden sm:flex items-center gap-2">
+            <button
+              onClick={goToPrev}
+              className="w-10 h-10 rounded-full border border-zariGold/40 hover:border-zariGold hover:bg-zariGold hover:text-white flex items-center justify-center text-inkNavy transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-zariGold"
+              aria-label="Previous Arch Collection item"
+            >
+              <ChevronLeft className="w-5 h-5 text-zariGold hover:text-white" />
+            </button>
+            <button
+              onClick={goToNext}
+              className="w-10 h-10 rounded-full border border-zariGold/40 hover:border-zariGold hover:bg-zariGold hover:text-white flex items-center justify-center text-inkNavy transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-zariGold"
+              aria-label="Next Arch Collection item"
+            >
+              <ChevronRight className="w-5 h-5 text-zariGold hover:text-white" />
+            </button>
+          </div>
+        </div>
 
-              const isActive = rIdx === 0;
+        {/* Arch Showcase Track */}
+        <div>
+          
+          {/* MOBILE CAROUSEL WITH 14-20% PEEK + CARD-ANCHORED COUNTER + TEMPLE ARCH SILHOUETTE MASK */}
+          <div
+            ref={mobileScrollRef}
+            onScroll={handleMobileScroll}
+            className="flex md:hidden items-stretch gap-3.5 overflow-x-auto snap-x snap-mandatory px-4 pb-4 no-scrollbar scroll-smooth"
+            style={{ WebkitOverflowScrolling: 'touch', scrollSnapType: 'x mandatory' }}
+          >
+            {categoryItems.map((item, idx) => {
+              const href = `/shop?category=${item.slug}&target=${item.group}`;
+              const cardCounter = `${String(idx + 1).padStart(2, '0')} / ${String(totalCards).padStart(2, '0')}`;
 
               return (
                 <div
-                  key={cat.id}
-                  ref={(el) => {
-                    desktopCardRefs.current[idx] = el;
-                  }}
-                  onClick={() => {
-                    if (!isActive) {
-                      hasInteracted.current = true;
-                      setActiveIndex(idx);
-                    }
-                  }}
-                  className={`absolute w-[320px] lg:w-[350px] h-[500px] lg:h-[540px] rounded-[260px_260px_8px_8px] overflow-hidden bg-ivory shadow-2xl origin-center will-change-transform transform-gpu cursor-pointer transition-shadow duration-300 ${
-                    isActive ? 'shadow-2xl ring-1 ring-zariGold/40' : 'hover:opacity-80'
-                  }`}
+                  key={item.id}
+                  className="shrink-0 snap-start w-[74vw] max-w-[285px] cursor-pointer flex flex-col"
                 >
-                  <Link
-                    href={`/shop?category=${cat.slug}`}
-                    className="relative block w-full h-full text-ivory group"
-                    tabIndex={isActive ? 0 : -1}
-                    onClick={(e) => {
-                      if (!isActive) {
-                        e.preventDefault();
-                      }
-                    }}
-                  >
-                    <div className="arch-inner relative w-full h-full overflow-hidden rounded-[252px_252px_4px_4px]">
-                      {cat.image ? (
-                        <Image
-                          src={cat.image}
-                          alt={cat.name}
-                          fill
-                          className="object-cover group-hover:scale-[1.06] group-hover:translate-y-[-2%] transition-transform duration-[4000ms] cubic-bezier(0.25, 0.46, 0.45, 0.94) opacity-95"
-                          sizes="350px"
-                          priority={idx === 0}
-                        />
-                      ) : (
-                        <div
-                          className={`w-full h-full ${
-                            cat.gradientClass || 'bg-navy-silk'
-                          } flex flex-col justify-center items-center p-6 text-center`}
-                        >
-                          <span className="eyebrow-text text-zariGoldLight font-semibold text-xs tracking-[0.2em] mb-2">
-                            {cat.eyebrow}
-                          </span>
-                          <h3 className="text-3xl font-serif font-bold text-ivory leading-tight">
-                            {cat.name}
-                          </h3>
-                        </div>
-                      )}
+                  <Link href={href} className="block w-full h-full relative group/archMobile flex flex-col">
+                    {/* Arch Photo Frame — True Temple Arch Masking with border directly hugging photo silhouette */}
+                    <div className="relative w-full aspect-[4/5] rounded-t-full border-2 border-zariGold/40 bg-inkNavy overflow-hidden shadow-md">
+                      <Image
+                        src={item.image}
+                        alt={item.name}
+                        fill
+                        sizes="285px"
+                        className="object-cover object-top transition-transform duration-700 ease-out group-hover/archMobile:scale-105"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-inkNavy/70 via-transparent to-transparent" />
 
-                      {/* Content Scrim & Typography with Parallax Depth Offset */}
-                      <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-inkNavy/95 via-inkNavy/60 to-transparent p-8 flex flex-col justify-end z-10 group-hover:translate-y-[-4px] transition-transform duration-300">
-                        <span className="eyebrow-text text-zariGoldLight font-semibold text-xs tracking-[0.2em] mb-1.5">
-                          {cat.eyebrow}
+                      {/* Card-Anchored Counter Badge */}
+                      <div className="absolute top-3 right-3 z-10">
+                        <span className="px-2.5 py-0.5 rounded-full bg-inkNavy/85 backdrop-blur-md border border-zariGold/50 font-serif font-bold text-[10px] text-zariGold tracking-widest font-tnum shadow-sm">
+                          {cardCounter}
                         </span>
-                        <h3 className="text-2xl lg:text-3xl font-serif font-bold text-ivory leading-tight group-hover:text-zariGoldLight transition-colors">
-                          {cat.name}
-                        </h3>
-                        {cat.description && (
-                          <p className="text-xs lg:text-sm font-sans text-ivory/80 mt-2 line-clamp-2">
-                            {cat.description}
-                          </p>
-                        )}
                       </div>
+                    </div>
 
-                      {/* Desktop SVG Arch Frame Overlay */}
-                      <svg
-                        className="absolute inset-0 w-full h-full pointer-events-none z-30 drop-shadow-[0_1.5px_2.5px_rgba(13,14,26,0.6)]"
-                        viewBox="0 0 350 540"
-                        preserveAspectRatio="none"
-                      >
-                        <path
-                          d={desktopCoverflowSvgPath}
-                          fill="none"
-                          stroke="#B4863C"
-                          strokeWidth="3.5"
-                          strokeOpacity="0.85"
-                          vectorEffect="non-scaling-stroke"
-                        />
-                      </svg>
+                    {/* Card Text Box — Anchored directly to card */}
+                    <div className="p-3.5 bg-ivory border-2 border-t-0 border-zariGold/40 rounded-b-2xl flex flex-col justify-between flex-1 min-h-[92px]">
+                      <div>
+                        <span className="text-[9px] font-sans font-bold tracking-[0.2em] uppercase text-zariGold block">
+                          {item.eyebrow}
+                        </span>
+                        <h3 className="font-serif text-sm font-bold text-inkNavy truncate mt-0.5">
+                          {item.name}
+                        </h3>
+                      </div>
+                      <div className="flex items-center justify-between text-[10.5px] font-sans font-extrabold text-zariGold uppercase tracking-widest pt-2 border-t border-zariGold/15 mt-2">
+                        <span>EXPLORE CATEGORY</span>
+                        <ArrowRight className="w-3.5 h-3.5 group-hover/archMobile:translate-x-1 transition-transform" />
+                      </div>
                     </div>
                   </Link>
                 </div>
               );
             })}
           </div>
+
+          {/* DESKTOP 3D COVERFLOW SHOWCASE */}
+          <div className="hidden md:flex relative h-[500px] lg:h-[540px] w-full items-center justify-center overflow-hidden">
+            {categoryItems.map((item, idx) => {
+              const isActive = idx === activeIndex;
+              const href = `/shop?category=${item.slug}&target=${item.group}`;
+              const cardCounter = `${String(idx + 1).padStart(2, '0')} / ${String(totalCards).padStart(2, '0')}`;
+
+              return (
+                <div
+                  key={item.id}
+                  ref={(el) => { desktopCardRefs.current[idx] = el; }}
+                  onClick={() => {
+                    if (!isActive) setActiveIndex(idx);
+                  }}
+                  className="absolute w-[300px] lg:w-[340px] h-[460px] lg:h-[500px] cursor-pointer transition-all duration-300 flex flex-col"
+                >
+                  <Link href={href} className="block w-full h-full relative group/archDesktop flex flex-col">
+                    {/* Arch Photo Frame */}
+                    <div className="relative w-full h-[360px] lg:h-[390px] rounded-t-full border-2 border-zariGold/40 bg-inkNavy overflow-hidden shadow-2xl">
+                      <Image
+                        src={item.image}
+                        alt={item.name}
+                        fill
+                        sizes="(max-width: 1024px) 300px, 340px"
+                        className="object-cover object-top transition-transform duration-700 ease-out group-hover/archDesktop:scale-105"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-inkNavy/70 via-transparent to-transparent" />
+
+                      {/* Card-Anchored Counter Badge */}
+                      <div className="absolute top-4 right-4 z-10">
+                        <span className="px-3 py-1 rounded-full bg-inkNavy/85 backdrop-blur-md border border-zariGold/50 font-serif font-bold text-xs text-zariGold tracking-widest font-tnum shadow-sm">
+                          {cardCounter}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Card Text Box */}
+                    <div className="p-4 bg-ivory border-2 border-t-0 border-zariGold/40 rounded-b-3xl flex flex-col justify-between h-[100px] lg:h-[110px]">
+                      <div>
+                        <span className="text-[10px] font-sans font-bold tracking-[0.2em] uppercase text-zariGold block">
+                          {item.eyebrow}
+                        </span>
+                        <h3 className="font-serif text-lg font-bold text-inkNavy truncate mt-0.5">
+                          {item.name}
+                        </h3>
+                      </div>
+                      <div className="flex items-center justify-between text-xs font-sans font-bold text-zariGold uppercase tracking-widest pt-1">
+                        <span>EXPLORE CATEGORY</span>
+                        <ArrowRight className="w-4 h-4 group-hover/archDesktop:translate-x-1 transition-transform" />
+                      </div>
+                    </div>
+                  </Link>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Active Category Description Panel */}
+          {currentActiveItem && (
+            <div className="mt-6 sm:mt-8 max-w-xl mx-auto text-center px-4">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={currentActiveItem.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.35 }}
+                  className="space-y-2"
+                >
+                  <p className="text-xs sm:text-sm font-sans font-medium text-inkNavy/80 leading-relaxed">
+                    {currentActiveItem.description}
+                  </p>
+                  <Link
+                    href={`/shop?category=${currentActiveItem.slug}&target=${currentActiveItem.group}`}
+                    className="inline-flex items-center gap-1.5 text-xs font-sans font-extrabold tracking-widest text-zariGold hover:text-inkNavy uppercase transition-colors pt-1 min-h-[44px]"
+                  >
+                    <span>SHOP ALL {currentActiveItem.name.toUpperCase()}</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </Link>
+                </motion.div>
+              </AnimatePresence>
+            </div>
+          )}
+
         </div>
+
       </div>
     </section>
   );

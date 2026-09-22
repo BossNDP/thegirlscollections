@@ -257,10 +257,10 @@ export default function MobileNavbar() {
         <motion.div
           layout
           className={`backdrop-blur-[24px] saturate-[160%] overflow-hidden flex flex-col justify-between pointer-events-auto transition-colors duration-300 ${isOpen
-              ? 'bg-[#121212]/95 w-full h-[60vh] rounded-[28px] p-0'
+              ? 'bg-[#1C1F3B] w-full h-[60vh] rounded-[28px] p-0'
               : pdpInfo.active
-                ? 'bg-[#1a1a1a]/95 w-[330px] h-[44px] rounded-full p-1'
-                : 'bg-[#2a2a2a]/90 w-[250px] h-[44px] rounded-full p-1'
+                ? 'bg-[#1C1F3B] w-[330px] h-[44px] rounded-full p-1'
+                : 'bg-[#1C1F3B] w-[250px] h-[44px] rounded-full p-1'
             }`}
           style={{
             border: '1px solid rgba(255,255,255,0.08)',

@@ -290,7 +290,7 @@ export const FullScreenMenu: React.FC<FullScreenMenuProps> = ({ isOpen, onClose 
           animate="visible"
           exit="exit"
           onClick={handleCloseMenu}
-          className="fixed inset-0 z-[110] bg-inkNavy/65 backdrop-blur-md flex flex-col justify-end select-none"
+          className="fixed inset-0 z-[110] bg-[#1C1F3B]/75 backdrop-blur-md flex flex-col justify-end select-none"
         >
           {/* MAIN MENU TAKEOVER PANEL */}
           <motion.div

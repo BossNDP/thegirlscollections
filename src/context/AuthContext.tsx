@@ -295,7 +295,7 @@ export function AuthSessionProvider({ children }: { children: React.ReactNode })
   const startPhoneOTP = () => {
     if (isActionInProgress) return;
     setIsActionInProgress(true);
-    const finalClientId = process.env.NEXT_PUBLIC_PHONE_EMAIL_CLIENT_ID || '17565400827940866842';
+    const finalClientId = process.env.NEXT_PUBLIC_PHONE_EMAIL_CLIENT_ID || '19014171169408573674';
     // Use the canonical app URL (without www) to match the phone.email whitelist.
     // Falls back to window.location.origin for local development.
     const appBase = process.env.NEXT_PUBLIC_APP_URL || window.location.origin;

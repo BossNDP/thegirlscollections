@@ -249,7 +249,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Phone OTP verification is required to place an order.' }, { status: 400 });
     }
 
-    const clientId = process.env.PHONE_EMAIL_CLIENT_ID || process.env.NEXT_PUBLIC_PHONE_EMAIL_CLIENT_ID || 'mock_client_id';
+    const clientId = process.env.PHONE_EMAIL_CLIENT_ID || process.env.NEXT_PUBLIC_PHONE_EMAIL_CLIENT_ID || '19014171169408573674';
     let verifiedSuccess = false;
     let matchedPhone = '';
 

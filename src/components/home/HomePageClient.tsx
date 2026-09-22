@@ -1,0 +1,104 @@
+'use client';
+
+import React, { useState } from 'react';
+import dynamic from 'next/dynamic';
+import HeroCarousel from '@/components/home/HeroCarousel';
+import HomepageFilterBar, { HomepageFilterOption } from '@/components/home/HomepageFilterBar';
+import CircularCategoryScroller from '@/components/home/CircularCategoryScroller';
+import BannerSectionDivider from '@/components/home/BannerSectionDivider';
+import ShopByCategoryBento from '@/components/home/ShopByCategoryBento';
+import ProductCarousel from '@/components/home/ProductCarousel';
+import { Product } from '@/types';
+
+const CategoryShowcaseRow = dynamic(() => import('@/components/home/CategoryShowcaseRow'));
+const EditorialProductFeature = dynamic(() => import('@/components/home/EditorialProductFeature'));
+const TestimonialsSection = dynamic(() => import('@/components/home/TestimonialsSection'));
+
+interface HomePageClientProps {
+  trendingProducts: Product[];
+  newDrops: Product[];
+  spotlightProduct: Product | null;
+}
+
+export const HomePageClient: React.FC<HomePageClientProps> = ({
+  trendingProducts,
+  newDrops,
+  spotlightProduct,
+}) => {
+  const [homepageFilter, setHomepageFilter] = useState<HomepageFilterOption>('all');
+
+  return (
+    <div className="w-full bg-ivory text-inkNavy selection:bg-blush selection:text-navy pb-20 sm:pb-12">
+      {/* 1. TRUE FULL BLEED HERO CONTAINER (Hero Carousel starts at y=0 behind floating transparent Header & Filter Bar) */}
+      <div className="relative w-full h-screen h-[100dvh] overflow-hidden" style={{ height: '100dvh' }}>
+        {/* Floating Filter Bar (Layer 3 over hero, right below navbar) */}
+        <div className="absolute top-[108px] sm:top-[128px] inset-x-0 z-40 pointer-events-auto">
+          <HomepageFilterBar
+            activeFilter={homepageFilter}
+            onFilterChange={(newFilter) => setHomepageFilter(newFilter)}
+            isFloating={true}
+          />
+        </div>
+
+        {/* Hero Carousel (Layer 0 starting at y=0) */}
+        <HeroCarousel filter={homepageFilter} />
+      </div>
+
+      {/* CATEGORY UNIVERSE (Shop All / Women / Kids Circular Discovery) */}
+      <CircularCategoryScroller filter={homepageFilter} />
+
+      {/* FULL BLEED BANNER SECTION DIVIDER */}
+      <BannerSectionDivider filter={homepageFilter} />
+
+      {/* 5. ARCH COLLECTION (Driven by homepageFilter) */}
+      <ShopByCategoryBento filter={homepageFilter} />
+
+      {/* 6 & 7. TRENDING THIS WEEK (Driven by homepageFilter) */}
+      <ProductCarousel
+        title="Trending This Week"
+        accentWord="This Week"
+        eyebrow="MOST LOVED RIGHT NOW"
+        products={trendingProducts}
+        variant="trending"
+        filter={homepageFilter}
+        viewAllHref="/shop"
+        viewAllLabel="EXPLORE TRENDING"
+      />
+
+      {/* REPEATED CATEGORY CARD GRID SHOWCASE */}
+      <CategoryShowcaseRow
+        eyebrow="EXPLORE BY CATEGORY"
+        title="Handcrafted Wardrobe Showcase"
+        accentWord="Handcrafted"
+      />
+
+      {/* EDITORIAL BREAK — SPOTLIGHT PRODUCT */}
+      {spotlightProduct && (
+        <EditorialProductFeature
+          product={spotlightProduct}
+          kicker="PIECE OF THE SEASON"
+          narrative="Masterpiece artisan craftsmanship with signature hand detailing and tailored silhouettes designed for memorable celebrations."
+        />
+      )}
+
+      {/* FULL BLEED BANNER SECTION DIVIDER */}
+      <BannerSectionDivider filter={homepageFilter} />
+
+      {/* NEW DROPS */}
+      <ProductCarousel
+        title="New Drops & Recent Arrivals"
+        accentWord="Recent Arrivals"
+        eyebrow="JUST ADDED"
+        products={newDrops}
+        variant="new"
+        viewAllHref="/shop"
+        viewAllLabel="VIEW ALL DROPS"
+      />
+
+      {/* PATRON STORIES & TESTIMONIALS */}
+      <TestimonialsSection />
+    </div>
+  );
+};
+
+export default HomePageClient;

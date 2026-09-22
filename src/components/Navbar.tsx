@@ -3,95 +3,192 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Heart, ShoppingBag, User, Search, X } from 'lucide-react';
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { Search, ShoppingBag, User, X } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useShop } from '@/context/ShopContext';
 import { useAuthSession } from '@/context/AuthContext';
-import FullScreenMenu from './FullScreenMenu';
-import FlyingButterfly from './FlyingButterfly';
+import { usePathname } from 'next/navigation';
+import SlideInDrawer from './SlideInDrawer';
 
-const silkEase = [0.16, 1, 0.3, 1] as const;
+const HairlineButterfly: React.FC<{ className?: string }> = ({ className = 'w-4 h-3.5 text-current' }) => (
+  <svg
+    viewBox="0 0 24 20"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.3"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+    aria-hidden="true"
+  >
+    <path d="M12 4C10 1 4 2 5 8C6 12 11 12 12 10" />
+    <path d="M12 10C11 12 7 17 10 18C12 19 12 15 12 10" />
+    <path d="M12 4C14 1 20 2 19 8C18 12 13 12 12 10" />
+    <path d="M12 10C13 12 17 17 14 18C12 19 12 15 12 10" />
+    <path d="M12 3v13" />
+  </svg>
+);
 
-// Delicate Animated Gold Butterfly Accent for Middle Navbar Lockup
-const WordmarkButterfly: React.FC<{ shouldReduceMotion?: boolean }> = ({ shouldReduceMotion = false }) => {
+const SmallCircularLogoCrest: React.FC<{ className?: string }> = ({ className = '' }) => (
+  <div className={`relative flex items-center justify-center select-none shrink-0 w-9 h-9 xs:w-10 xs:h-10 sm:w-12 sm:h-12 ${className}`}>
+    {/* Ivory circular backing — lifts the crest off the navy navbar */}
+    <span
+      className="absolute inset-0 rounded-full"
+      style={{
+        background: 'radial-gradient(circle, #FAF7F2 60%, #F0EBE1 100%)',
+        boxShadow: '0 0 0 1.5px #C9A84C, 0 2px 8px rgba(0,0,0,0.22)',
+      }}
+    />
+    <Image
+      src="/logo.png"
+      alt="The Girls Collections Emblem"
+      width={56}
+      height={60}
+      className="relative w-[82%] h-[82%] object-contain hover:scale-105 transition-transform duration-300 z-10"
+      priority
+    />
+  </div>
+);
+
+
+const WORDMARK_THE = ['T', 'H', 'E'];
+const WORDMARK_GIRLS = ['G', 'I', 'R', 'L', 'S'];
+
+const AnimatedWordmark: React.FC<{
+  isScrolled: boolean;
+}> = ({ isScrolled }) => {
+  const [hasAnimated, setHasAnimated] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const animated = sessionStorage.getItem('tgc_wordmark_theatrical_v2');
+      if (animated) {
+        setHasAnimated(true);
+      } else {
+        sessionStorage.setItem('tgc_wordmark_theatrical_v2', 'true');
+        const timer = setTimeout(() => setHasAnimated(true), 1600);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, []);
+
   return (
-    <motion.svg
-      viewBox="0 0 40 32"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      className="w-4 h-3.5 sm:w-5 sm:h-4 text-zariGold inline-block filter drop-shadow-[0_1px_5px_rgba(201,162,75,0.45)] mb-0.5"
-      animate={!shouldReduceMotion ? { y: [-1, 1, -1] } : {}}
-      transition={{ duration: 3.5, ease: 'easeInOut', repeat: Infinity }}
-      aria-hidden="true"
+    <Link
+      href="/"
+      className="group focus:outline-none select-none"
+      aria-label="The Girls Collections - Haute Couture"
     >
-      <defs>
-        <linearGradient id="wmButterflyGold" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#F5E4B8" />
-          <stop offset="40%" stopColor="#C9A24B" />
-          <stop offset="80%" stopColor="#D8BC82" />
-          <stop offset="100%" stopColor="#8B6A2E" />
-        </linearGradient>
-      </defs>
-
-      {/* Left Wing (Hinge at center) */}
-      <motion.g
-        style={{ transformOrigin: '20px 16px' }}
-        animate={!shouldReduceMotion ? { rotate: [-5, 2, -5] } : {}}
-        transition={{ duration: 2.8, ease: 'easeInOut', repeat: Infinity }}
+      {/* Outer: scale on scroll — NOT overflow-hidden, so nothing ever clips */}
+      <div
+        className={`flex flex-col items-center justify-center transition-transform duration-300 ease-out origin-center ${
+          isScrolled ? 'scale-[0.9]' : 'scale-100'
+        }`}
       >
-        <path
-          d="M 20 12 C 12 2 2 6 5 16 C 8 22 16 20 20 17 Z"
-          fill="url(#wmButterflyGold)"
-          opacity="0.95"
-        />
-        <path
-          d="M 20 17 C 12 18 6 26 12 29 C 17 31 19 23 20 18 Z"
-          fill="url(#wmButterflyGold)"
-          opacity="0.85"
-        />
-      </motion.g>
+        {/* ── ROW 1: THE  |  GIRLS ───────────────────────── */}
+        {/* `whitespace-nowrap` keeps everything on one line;
+            no overflow:hidden anywhere so the text is never clipped */}
+        <div className="flex items-baseline justify-center gap-1.5 xs:gap-2 sm:gap-3 whitespace-nowrap">
 
-      {/* Right Wing (Hinge at center) */}
-      <motion.g
-        style={{ transformOrigin: '20px 16px' }}
-        animate={!shouldReduceMotion ? { rotate: [5, -2, 5] } : {}}
-        transition={{ duration: 2.8, ease: 'easeInOut', repeat: Infinity }}
-      >
-        <path
-          d="M 20 12 C 28 2 38 6 35 16 C 32 22 24 20 20 17 Z"
-          fill="url(#wmButterflyGold)"
-          opacity="0.95"
-        />
-        <path
-          d="M 20 17 C 28 18 34 26 28 29 C 23 31 21 23 20 18 Z"
-          fill="url(#wmButterflyGold)"
-          opacity="0.85"
-        />
-      </motion.g>
+          {/* "THE" — Fraunces Light, gold accent, deliberately smaller for hierarchy */}
+          <span className="font-serif font-light leading-none text-[10px] xs:text-[11.5px] sm:text-[14px] lg:text-[15px] tracking-[0.22em] text-zariGold/80 group-hover:text-zariGoldLight transition-colors duration-300 inline-block">
+            {hasAnimated
+              ? 'THE'
+              : WORDMARK_THE.map((char, i) => (
+                  <motion.span
+                    key={`the-${i}`}
+                    initial={{ opacity: 0, y: 6, filter: 'blur(3px)' }}
+                    animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                    transition={{ duration: 0.38, delay: 0.04 + i * 0.038, ease: [0.16, 1, 0.3, 1] }}
+                    className="inline-block"
+                  >
+                    {char}
+                  </motion.span>
+                ))}
+          </span>
 
-      {/* Center Body & Antennae */}
-      <g>
-        <path d="M 19 12 Q 15 5 12 4 M 21 12 Q 25 5 28 4" stroke="url(#wmButterflyGold)" strokeWidth="1" strokeLinecap="round" fill="none" />
-        <circle cx="12" cy="4" r="0.8" fill="url(#wmButterflyGold)" />
-        <circle cx="28" cy="4" r="0.8" fill="url(#wmButterflyGold)" />
-        <ellipse cx="20" cy="16" rx="1.2" ry="7" fill="url(#wmButterflyGold)" stroke="#14172E" strokeWidth="0.4" />
-      </g>
-    </motion.svg>
+          {/* Fine vertical gold hairline separator */}
+          <motion.span
+            initial={hasAnimated ? false : { opacity: 0, scaleY: 0 }}
+            animate={{ opacity: 1, scaleY: 1 }}
+            transition={{ duration: 0.4, delay: 0.16, ease: 'easeOut' }}
+            className="inline-block w-[0.75px] h-[11px] xs:h-[13px] sm:h-[16px] bg-zariGold/50 origin-top self-center shrink-0"
+          />
+
+          {/* "GIRLS" — Fraunces Semibold, ivory, the headline */}
+          <div className="relative inline-flex items-center">
+            <span className="font-serif font-semibold leading-none text-[15px] xs:text-[17.5px] sm:text-[22px] lg:text-[26px] tracking-[0.12em] xs:tracking-[0.14em] sm:tracking-[0.18em] text-ivory group-hover:text-zariGoldLight transition-colors duration-300 inline-block">
+              {hasAnimated
+                ? 'GIRLS'
+                : WORDMARK_GIRLS.map((char, i) => (
+                    <motion.span
+                      key={`girls-${i}`}
+                      initial={{ opacity: 0, y: 14, rotateX: 50, filter: 'blur(5px)' }}
+                      animate={{ opacity: 1, y: 0, rotateX: 0, filter: 'blur(0px)' }}
+                      transition={{ duration: 0.5, delay: 0.14 + i * 0.048, ease: [0.16, 1, 0.3, 1] }}
+                      className="inline-block"
+                    >
+                      {char}
+                    </motion.span>
+                  ))}
+            </span>
+
+            {/* Gold shimmer sweep — fires once on mount, never re-triggers on scroll */}
+            {!hasAnimated && (
+              <motion.span
+                initial={{ x: '-130%', opacity: 0 }}
+                animate={{ x: '230%', opacity: [0, 1, 1, 0] }}
+                transition={{ duration: 0.85, delay: 0.52, ease: [0.25, 0.46, 0.45, 0.94] }}
+                className="absolute inset-0 bg-gradient-to-r from-transparent via-zariGoldLight/95 to-transparent skew-x-[-22deg] pointer-events-none mix-blend-overlay rounded-sm"
+              />
+            )}
+          </div>
+        </div>
+
+        {/* ── ROW 2: — COLLECTIONS — ───────────────────── */}
+        <div className="flex items-center justify-center gap-1 xs:gap-1.5 sm:gap-2.5 mt-[3px] xs:mt-1">
+          <motion.span
+            initial={hasAnimated ? false : { scaleX: 0, opacity: 0 }}
+            animate={{ scaleX: 1, opacity: 0.7 }}
+            transition={{ duration: 0.55, delay: 0.42, ease: 'easeOut' }}
+            className="block w-3 xs:w-4 sm:w-7 h-[0.75px] bg-zariGold origin-right shrink-0"
+          />
+          <motion.span
+            initial={hasAnimated ? false : { opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.45, delay: 0.38, ease: [0.16, 1, 0.3, 1] }}
+            className="font-sans font-medium text-[7px] xs:text-[8px] sm:text-[9px] lg:text-[10.5px] tracking-[0.26em] xs:tracking-[0.3em] sm:tracking-[0.42em] text-zariGold uppercase whitespace-nowrap shrink-0"
+          >
+            COLLECTIONS
+          </motion.span>
+          <motion.span
+            initial={hasAnimated ? false : { scaleX: 0, opacity: 0 }}
+            animate={{ scaleX: 1, opacity: 0.7 }}
+            transition={{ duration: 0.55, delay: 0.42, ease: 'easeOut' }}
+            className="block w-3 xs:w-4 sm:w-7 h-[0.75px] bg-zariGold origin-left shrink-0"
+          />
+        </div>
+      </div>
+    </Link>
   );
 };
 
-export default function Navbar() {
+interface NavbarProps {
+  isFloating?: boolean;
+}
+
+export default function Navbar({ isFloating = false }: NavbarProps) {
+  const pathname = usePathname();
+  const isHomePage = pathname === '/';
+
   const { cartCount, wishlist, setIsCartOpen } = useShop();
   const { user, isSignedIn, openAuthModal, logout } = useAuthSession();
-  const shouldReduceMotion = !!useReducedMotion();
 
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [hasAnimated, setHasAnimated] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
+
   const searchInputRef = useRef<HTMLInputElement>(null);
   const userDropdownRef = useRef<HTMLDivElement>(null);
 
@@ -106,31 +203,13 @@ export default function Navbar() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Check initial entry animation state (runs once per session)
-  useEffect(() => {
-    try {
-      const animated = sessionStorage.getItem('tgc_header_wordmark_animated_v5');
-      if (animated || shouldReduceMotion) {
-        setHasAnimated(true);
-      } else {
-        sessionStorage.setItem('tgc_header_wordmark_animated_v5', 'true');
-        const timer = setTimeout(() => {
-          setHasAnimated(true);
-        }, 1200);
-        return () => clearTimeout(timer);
-      }
-    } catch (e) {
-      setHasAnimated(true);
-    }
-  }, [shouldReduceMotion]);
-
-  // RAF Throttled Scroll listener for sticky header compression
+  // RAF Throttled Scroll listener
   useEffect(() => {
     let ticking = false;
     const handleScroll = () => {
       if (!ticking) {
         window.requestAnimationFrame(() => {
-          setIsScrolled(window.scrollY > 35);
+          setIsScrolled(window.scrollY > 40);
           ticking = false;
         });
         ticking = true;
@@ -154,25 +233,6 @@ export default function Navbar() {
     }
   }, [isSearchExpanded]);
 
-  const wordmarkLine1 = 'THE GIRLS'.split('');
-
-  const line1Variants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.035, delayChildren: 0.08 },
-    },
-  };
-
-  const charVariants = {
-    hidden: { opacity: 0, y: 5 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.45, ease: silkEase },
-    },
-  };
-
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
@@ -186,262 +246,114 @@ export default function Navbar() {
   return (
     <>
       <header
-        className={`sticky top-0 z-[100] transition-all duration-350 ease-out border-b border-zariGold/20 select-none transform-gpu will-change-transform ${
-          isScrolled
-            ? 'h-[60px] sm:h-[70px] bg-ivory/95 backdrop-blur-md shadow-[0_4px_20px_rgba(28,31,59,0.05)]'
-            : 'h-[74px] sm:h-[86px] bg-ivory'
+        className={`w-full select-none bg-[#1C1F3B] text-ivory border-b border-white/10 transition-all duration-300 ease-out ${
+          isScrolled ? 'h-[62px] sm:h-[74px] shadow-md' : 'h-[74px] sm:h-[90px]'
         }`}
       >
-        <div className="max-w-[1440px] mx-auto h-full px-3.5 sm:px-6 lg:px-10 flex items-center justify-between relative">
+        {/* TRUE 3-COLUMN CSS GRID LAYOUT */}
+        <div className="max-w-[1440px] mx-auto h-full px-2 xs:px-2.5 sm:px-8 lg:px-12 grid grid-cols-[auto_1fr_auto] items-center gap-0.5 xs:gap-1 sm:gap-4 relative">
           
-          {/* ZONE 1 (LEFT): BRAND LOGO EMBLEM (UNTOUCHED ORIGINAL) */}
-          <div className="flex items-center shrink-0 py-1 z-20">
-            <Link
-              href="/"
-              className="flex items-center group focus:outline-none"
-              aria-label="The Girls Collections Home"
+          {/* COLUMN 1 (LEFT): HAMBURGER ICON + SCALED UP LOGO CREST */}
+          <div className="flex items-center gap-1 xs:gap-1.5 sm:gap-3 justify-start shrink-0 z-20">
+            <button
+              onClick={() => setMobileMenuOpen(true)}
+              className="p-1 hover:opacity-75 transition-opacity cursor-pointer focus:outline-none min-w-[34px] min-h-[34px] sm:min-w-[40px] sm:min-h-[40px] flex items-center justify-center -ml-0.5"
+              aria-label="Open Navigation Menu"
+              title="Menu"
             >
-              <motion.div
-                whileTap={{ scale: 0.96 }}
-                transition={{ duration: 0.15 }}
-                className="relative shrink-0 flex items-center justify-center"
-              >
-                <Image
-                  src="/logo.webp"
-                  alt="The Girls Collections Emblem"
-                  width={160}
-                  height={175}
-                  className={`w-auto object-contain transition-all duration-300 filter drop-shadow-xs group-hover:scale-105 ${
-                    isScrolled
-                      ? 'h-[42px] xs:h-[46px] sm:h-[52px] lg:h-[58px]'
-                      : 'h-[52px] xs:h-[60px] sm:h-[70px] lg:h-[78px]'
-                  }`}
-                  priority
-                />
-              </motion.div>
-            </Link>
-          </div>
-
-          {/* ZONE 2 (ABSOLUTE VIEWPORT CENTER): THE HERO BRAND WORDMARK LOCKUP WITH CONTINUOUS FLYING BUTTERFLY */}
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10 text-center flex flex-col items-center justify-center pointer-events-auto">
-            {/* Real 3D Flying Swallowtail/Monarch Butterfly continuous flight path */}
-            <FlyingButterfly />
-
-            <Link
-              href="/"
-              className="flex flex-col items-center justify-center group focus:outline-none py-0.5"
-              onMouseEnter={() => setIsHovered(true)}
-              onMouseLeave={() => setIsHovered(false)}
-              onClick={() => {
-                setIsHovered(true);
-                setTimeout(() => setIsHovered(false), 700);
-              }}
-            >
-              {/* Floating Delicate Gold Butterfly Icon */}
-              <div className="-mb-1 flex items-center justify-center">
-                <WordmarkButterfly shouldReduceMotion={shouldReduceMotion} />
+              <div className="w-[18px] xs:w-[20px] sm:w-[22px] h-[13px] xs:h-[14px] sm:h-[15px] flex flex-col justify-between group-hover:translate-y-[-1px] transition-transform duration-200">
+                <span className="w-full h-[1.75px] rounded-full transition-all bg-ivory" />
+                <span className="w-full h-[1.75px] rounded-full transition-all bg-ivory" />
+                <span className="w-full h-[1.75px] rounded-full transition-all bg-ivory" />
               </div>
+            </button>
 
-              {!hasAnimated && !shouldReduceMotion ? (
-                <div className="flex flex-col items-center justify-center overflow-hidden">
-                  
-                  {/* Line 1: THE GIRLS (Character-Staggered Reveal) */}
-                  <motion.div
-                    variants={line1Variants}
-                    initial="hidden"
-                    animate="visible"
-                    className={`flex items-center justify-center transition-all duration-300 ${
-                      isScrolled ? 'scale-92 origin-center' : 'scale-100'
-                    }`}
-                  >
-                    {wordmarkLine1.map((char, index) => (
-                      <motion.span
-                        key={`l1-${index}`}
-                        variants={charVariants}
-                        className="font-serif text-[12.5px] xs:text-[14px] sm:text-[16px] lg:text-[18px] font-bold uppercase leading-none text-inkNavy tracking-[0.18em] inline-block"
-                      >
-                        {char === ' ' ? '\u00A0' : char}
-                      </motion.span>
-                    ))}
-                  </motion.div>
-
-                  {/* Line 2: COLLECTIONS */}
-                  <motion.div
-                    initial={{ opacity: 0, y: 4, letterSpacing: '0.32em' }}
-                    animate={{ opacity: 1, y: 0, letterSpacing: '0.26em' }}
-                    transition={{ duration: 0.6, ease: silkEase, delay: 0.18 }}
-                    className={`relative mt-0.5 flex flex-col items-center transition-all duration-300 ${
-                      isScrolled ? 'scale-92 origin-center' : 'scale-100'
-                    }`}
-                  >
-                    <span className="font-serif text-[11px] xs:text-[12.5px] sm:text-[14.5px] lg:text-[16.5px] font-bold uppercase leading-none bg-gradient-to-r from-[#C9A24B] via-[#D8BC82] to-[#8B6A2E] bg-clip-text text-transparent relative z-10">
-                      COLLECTIONS
-                    </span>
-
-                    {/* Hairline Underline Stroke Reveal (~400ms) */}
-                    <svg
-                      viewBox="0 0 120 4"
-                      fill="none"
-                      className="w-24 xs:w-28 sm:w-32 lg:w-36 h-[3px] mt-0.5 text-zariGold"
-                      preserveAspectRatio="none"
-                      aria-hidden="true"
-                    >
-                      <motion.path
-                        d="M 0 2 L 120 2"
-                        stroke="currentColor"
-                        strokeWidth="1.2"
-                        strokeLinecap="round"
-                        initial={{ pathLength: 0, opacity: 0 }}
-                        animate={{ pathLength: 1, opacity: 0.85 }}
-                        transition={{ duration: 0.5, ease: silkEase, delay: 0.48 }}
-                      />
-                    </svg>
-
-                    {/* Zari Gold Light Sweep Shimmer across COLLECTIONS */}
-                    <motion.span
-                      initial={{ x: '-100%', opacity: 0 }}
-                      animate={{ x: '100%', opacity: [0, 0.45, 0] }}
-                      transition={{ duration: 0.75, ease: 'easeInOut', delay: 0.75 }}
-                      className="absolute inset-0 bg-gradient-to-r from-transparent via-white/80 to-transparent pointer-events-none z-20"
-                    />
-                  </motion.div>
-
-                </div>
-              ) : (
-                <div className="flex flex-col items-center justify-center relative overflow-hidden">
-                  <span className={`font-serif text-[12.5px] xs:text-[14px] sm:text-[16px] lg:text-[18px] font-bold uppercase leading-none text-inkNavy tracking-[0.18em] transition-all duration-300 ${
-                    isScrolled ? 'scale-92 origin-center' : 'scale-100'
-                  }`}>
-                    THE GIRLS
-                  </span>
-                  <div className={`relative mt-0.5 flex flex-col items-center transition-all duration-300 ${
-                    isScrolled ? 'scale-92 origin-center' : 'scale-100'
-                  }`}>
-                    <span className="font-serif text-[11px] xs:text-[12.5px] sm:text-[14.5px] lg:text-[16.5px] font-bold uppercase leading-none bg-gradient-to-r from-[#C9A24B] via-[#D8BC82] to-[#8B6A2E] bg-clip-text text-transparent tracking-[0.26em] relative z-10">
-                      COLLECTIONS
-                    </span>
-
-                    {/* Settled Underline with Idle Breathing Glow Pulse */}
-                    <motion.svg
-                      viewBox="0 0 120 4"
-                      fill="none"
-                      className="w-24 xs:w-28 sm:w-32 lg:w-36 h-[3px] mt-0.5 text-zariGold"
-                      preserveAspectRatio="none"
-                      aria-hidden="true"
-                      animate={
-                        !shouldReduceMotion
-                          ? {
-                              opacity: [0.65, 0.95, 0.65],
-                            }
-                          : { opacity: 0.8 }
-                      }
-                      transition={{
-                        duration: 4.8,
-                        ease: 'easeInOut',
-                        repeat: Infinity,
-                      }}
-                    >
-                      <path
-                        d="M 0 2 L 120 2"
-                        stroke="currentColor"
-                        strokeWidth="1.2"
-                        strokeLinecap="round"
-                      />
-                    </motion.svg>
-
-                    {/* Hover/Tap Replay Zari Gold Shimmer Sweep */}
-                    <AnimatePresence>
-                      {isHovered && !shouldReduceMotion && (
-                        <motion.span
-                          initial={{ x: '-100%', opacity: 0 }}
-                          animate={{ x: '100%', opacity: [0, 0.55, 0] }}
-                          exit={{ opacity: 0 }}
-                          transition={{ duration: 0.6, ease: 'easeInOut' }}
-                          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/80 to-transparent pointer-events-none z-20"
-                        />
-                      )}
-                    </AnimatePresence>
-                  </div>
-                </div>
-              )}
+            <Link href="/" className="hover:opacity-85 transition-opacity flex items-center shrink-0" title="The Girls Collections">
+              <SmallCircularLogoCrest />
             </Link>
           </div>
 
-          {/* ZONE 3 (RIGHT): ACTION CONTROLS (SEARCH & BAG) */}
-          <div className="flex items-center gap-1.5 xs:gap-2 sm:gap-4 shrink-0 text-inkNavy z-20">
+          {/* COLUMN 2 (CENTER — no min-w-0, no overflow-hidden — wordmark never clips) */}
+          <div className="flex items-center justify-center pointer-events-auto z-10">
+            <AnimatedWordmark isScrolled={isScrolled} />
+          </div>
 
-            {/* Inline Expanding Search Field */}
-            <AnimatePresence>
-              {isSearchExpanded ? (
-                <motion.form
-                  initial={{ width: 36, opacity: 0 }}
-                  animate={{ width: 135, opacity: 1 }}
-                  exit={{ width: 36, opacity: 0 }}
-                  transition={{ duration: 0.35, ease: silkEase }}
-                  onSubmit={handleSearchSubmit}
-                  className="relative flex items-center bg-ivory border border-zariGold/60 rounded-full px-2 py-1 shadow-md z-30 sm:w-[190px]"
-                >
-                  <Search className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-zariGold shrink-0 mr-1 stroke-[1.8]" />
-                  <input
-                    ref={searchInputRef}
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search..."
-                    className="w-full bg-transparent text-[11px] sm:text-xs font-sans text-inkNavy placeholder-inkNavy/50 focus:outline-none truncate"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setIsSearchExpanded(false);
-                      setSearchQuery('');
-                    }}
-                    className="p-0.5 text-inkNavy/60 hover:text-inkNavy shrink-0 ml-0.5 cursor-pointer"
-                    aria-label="Close search"
+          {/* COLUMN 3 (RIGHT): SEARCH, ACCOUNT, BAG */}
+          <div className="flex items-center justify-end gap-0.5 xs:gap-1 sm:gap-2.5 shrink-0 z-20">
+
+            {/* Search Trigger / Inline Field */}
+            <div className="relative flex items-center">
+              <AnimatePresence>
+                {isSearchExpanded ? (
+                  <motion.form
+                    initial={{ width: 36, opacity: 0 }}
+                    animate={{ width: 140, opacity: 1 }}
+                    exit={{ width: 36, opacity: 0 }}
+                    transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+                    onSubmit={handleSearchSubmit}
+                    className="relative flex items-center border-b py-1 pr-1 bg-[#1C1F3B] border-white/40 text-ivory"
                   >
-                    <X className="w-3.5 h-3.5" />
+                    <Search className="w-[17px] h-[17px] sm:w-[20px] sm:h-[20px] shrink-0 mr-1 stroke-[1.5]" />
+                    <input
+                      ref={searchInputRef}
+                      type="text"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      placeholder="Search..."
+                      className="w-full bg-transparent text-xs font-sans placeholder-current opacity-70 focus:outline-none truncate"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsSearchExpanded(false);
+                        setSearchQuery('');
+                      }}
+                      className="p-1 opacity-60 hover:opacity-100 shrink-0 cursor-pointer"
+                      aria-label="Close search"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </motion.form>
+                ) : (
+                  <button
+                    onClick={() => setIsSearchExpanded(true)}
+                    className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center hover:opacity-75 transition-opacity cursor-pointer focus:outline-none min-w-[40px] min-h-[40px]"
+                    title="Search Collection"
+                    aria-label="Search Collection"
+                  >
+                    <Search className="w-[19px] h-[19px] sm:w-[22px] sm:h-[22px] stroke-[1.5]" />
                   </button>
-                </motion.form>
-              ) : (
-                <motion.button
-                  whileTap={{ scale: 0.94 }}
-                  onClick={() => setIsSearchExpanded(true)}
-                  className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center hover:text-zariGold transition-colors cursor-pointer focus:outline-none"
-                  title="Search Collection"
-                  aria-label="Search Collection"
-                >
-                  <Search className="w-[20px] h-[20px] sm:w-[22px] sm:h-[22px] stroke-[1.5]" />
-                </motion.button>
-              )}
-            </AnimatePresence>
+                )}
+              </AnimatePresence>
+            </div>
 
-            {/* Account / Sign In Trigger (Mobile & Desktop) */}
+            {/* Account Icon */}
             <div className="relative">
               {isSignedIn ? (
                 <div ref={userDropdownRef} className="relative">
                   <button
                     onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-                    className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center hover:text-zariGold transition-colors cursor-pointer focus:outline-none rounded-full bg-zariGold/10 hover:bg-zariGold/20"
+                    className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center hover:opacity-75 transition-opacity cursor-pointer focus:outline-none min-w-[40px] min-h-[40px]"
                     title="Account Options"
                     aria-label="Account Options"
                   >
-                    <User className="w-[20px] h-[20px] sm:w-[22px] sm:h-[22px] stroke-[1.5] text-zariGold" />
+                    <User className="w-[19px] h-[19px] sm:w-[22px] sm:h-[22px] stroke-[1.5]" />
                   </button>
 
                   <AnimatePresence>
                     {userDropdownOpen && (
                       <motion.div
-                        initial={{ opacity: 0, y: 8, scale: 0.95 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 8, scale: 0.95 }}
-                        transition={{ duration: 0.18, ease: 'easeOut' }}
-                        className="absolute right-0 top-full mt-2 w-56 bg-ivory border border-zariGold/30 rounded-2xl shadow-2xl py-2.5 z-50 overflow-hidden"
+                        initial={{ opacity: 0, y: 6 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 6 }}
+                        transition={{ duration: 0.15 }}
+                        className="absolute right-0 top-full mt-2 w-52 bg-ivory border border-stone-300 py-2 z-50 shadow-lg text-inkNavy"
                       >
-                        <div className="px-4 py-2.5 border-b border-zariGold/15 bg-zariGold/5">
-                          <p className="text-xs font-serif font-bold text-inkNavy truncate">
+                        <div className="px-4 py-2 border-b border-stone-200">
+                          <p className="text-xs font-serif font-bold truncate">
                             {user?.name || user?.email || user?.phone || 'Valued Member'}
                           </p>
-                          <p className="text-[10px] font-sans text-zariGold font-medium truncate tracking-wide">
+                          <p className="text-[10px] font-sans text-inkNavy/60 truncate">
                             {user?.email || user?.phone || 'Account Member'}
                           </p>
                         </div>
@@ -450,48 +362,44 @@ export default function Navbar() {
                           <Link
                             href="/account/orders"
                             onClick={() => setUserDropdownOpen(false)}
-                            className="flex items-center justify-between px-4 py-2 text-xs font-sans text-inkNavy hover:bg-zariGold/10 hover:text-zariGold transition-colors font-semibold"
+                            className="block px-4 py-1.5 text-xs font-sans hover:bg-stone-100 transition-colors"
                           >
-                            <span>My Profile</span>
-                            <span className="text-[10px] text-zariGold uppercase font-mono">Profile</span>
+                            My Profile
                           </Link>
 
                           <Link
                             href="/account/orders"
                             onClick={() => setUserDropdownOpen(false)}
-                            className="flex items-center justify-between px-4 py-2 text-xs font-sans text-inkNavy hover:bg-zariGold/10 hover:text-zariGold transition-colors font-medium"
+                            className="block px-4 py-1.5 text-xs font-sans hover:bg-stone-100 transition-colors"
                           >
-                            <span>My Orders</span>
-                            <span className="text-[10px] text-zinc-400 uppercase font-mono">History</span>
+                            My Orders
                           </Link>
 
                           <Link
                             href="/track"
                             onClick={() => setUserDropdownOpen(false)}
-                            className="flex items-center justify-between px-4 py-2 text-xs font-sans text-inkNavy hover:bg-zariGold/10 hover:text-zariGold transition-colors"
+                            className="block px-4 py-1.5 text-xs font-sans hover:bg-stone-100 transition-colors"
                           >
-                            <span>Track Order</span>
-                            <span className="text-[10px] text-zinc-400 font-mono">Live</span>
+                            Track Order
                           </Link>
 
                           <Link
                             href="/wishlist"
                             onClick={() => setUserDropdownOpen(false)}
-                            className="flex items-center justify-between px-4 py-2 text-xs font-sans text-inkNavy hover:bg-zariGold/10 hover:text-zariGold transition-colors"
+                            className="block px-4 py-1.5 text-xs font-sans hover:bg-stone-100 transition-colors"
                           >
-                            <span>My Wishlist</span>
-                            <span className="text-[10px] text-zariGold font-bold font-mono">({wishlist.length})</span>
+                            My Wishlist ({wishlist.length})
                           </Link>
                         </div>
 
-                        <div className="border-t border-zariGold/15 my-1" />
+                        <div className="border-t border-stone-200 my-1" />
 
                         <button
                           onClick={async () => {
                             setUserDropdownOpen(false);
                             await logout();
                           }}
-                          className="w-full text-left px-4 py-2 text-xs font-sans text-rose-700 hover:bg-rose-50 transition-colors cursor-pointer font-bold"
+                          className="w-full text-left px-4 py-1.5 text-xs font-sans text-red-700 hover:bg-red-50 transition-colors font-medium"
                         >
                           Sign Out
                         </button>
@@ -500,66 +408,45 @@ export default function Navbar() {
                   </AnimatePresence>
                 </div>
               ) : (
-                <motion.button
-                  whileTap={{ scale: 0.94 }}
+                <button
                   onClick={() => openAuthModal('google')}
-                  className="w-8 h-8 sm:w-auto sm:h-[34px] sm:px-2.5 flex items-center justify-center gap-1 sm:gap-1.5 text-inkNavy hover:text-zariGold transition-colors rounded-full sm:rounded-lg cursor-pointer focus:outline-none sm:bg-zariGold/10"
+                  className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center hover:opacity-75 transition-opacity cursor-pointer focus:outline-none min-w-[40px] min-h-[40px]"
                   title="Sign In"
                   aria-label="Sign In"
                 >
-                  <User className="w-[20px] h-[20px] sm:w-[18px] sm:h-[18px] stroke-[1.6]" />
-                  <span className="hidden sm:inline font-sans text-[11px] font-bold tracking-[0.12em] uppercase">
-                    Sign In
-                  </span>
-                </motion.button>
+                  <User className="w-[19px] h-[19px] sm:w-[22px] sm:h-[22px] stroke-[1.5]" />
+                </button>
               )}
             </div>
 
-            {/* Desktop Wishlist Icon */}
-            <motion.div className="hidden lg:block" whileTap={{ scale: 0.94 }}>
-              <Link
-                href="/wishlist"
-                className="w-9 h-9 flex items-center justify-center hover:text-zariGold transition-colors relative"
-                title="Wishlist"
-                aria-label="Wishlist"
-              >
-                <Heart
-                  className={`w-5 h-5 stroke-[1.5] transition-all duration-200 ${wishlist.length > 0 ? 'text-zariGold fill-zariGold/20' : 'text-inkNavy'
-                    }`}
-                />
-                {wishlist.length > 0 && (
-                  <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-zariGold text-white text-[9px] font-bold flex items-center justify-center animate-badge-pop shadow-xs">
-                    {wishlist.length}
-                  </span>
-                )}
-              </Link>
-            </motion.div>
-
             {/* Shopping Bag Icon */}
-            <motion.button
-              whileTap={{ scale: 0.94 }}
+            <button
               onClick={() => setIsCartOpen(true)}
-              className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center hover:text-zariGold transition-colors relative cursor-pointer focus:outline-none"
+              className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center hover:opacity-75 transition-opacity relative cursor-pointer focus:outline-none min-w-[40px] min-h-[40px]"
               title="Shopping Bag"
               aria-label="Cart"
             >
-              <ShoppingBag className="w-[22px] h-[22px] stroke-[1.5]" />
+              <ShoppingBag className="w-[19px] h-[19px] sm:w-[22px] sm:h-[22px] stroke-[1.5]" />
               {cartCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-zariGold text-white text-[9px] font-bold flex items-center justify-center animate-badge-pop shadow-xs font-sans">
+                <span className="absolute top-1 right-1 w-4 h-4 rounded-full text-[9px] font-bold flex items-center justify-center font-sans bg-ivory text-inkNavy">
                   {cartCount}
                 </span>
               )}
-            </motion.button>
+            </button>
+
           </div>
 
         </div>
       </header>
 
-      {/* Full-Screen Navigation Takeover Menu */}
-      <FullScreenMenu
+      {/* Slide-In Navigation Drawer */}
+      <SlideInDrawer
         isOpen={mobileMenuOpen}
         onClose={() => setMobileMenuOpen(false)}
       />
     </>
   );
 }
+
+
+

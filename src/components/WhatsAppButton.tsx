@@ -18,12 +18,12 @@ export default function WhatsAppButton() {
     <div
       className={`fixed right-4 sm:right-6 z-[75] flex items-center group select-none pointer-events-auto transition-all duration-300 ease-out ${
         isPDP
-          ? 'bottom-[calc(76px+env(safe-area-inset-bottom))] sm:bottom-6'
-          : 'bottom-[calc(84px+env(safe-area-inset-bottom))] sm:bottom-6'
+          ? 'bottom-[calc(80px+env(safe-area-inset-bottom))] sm:bottom-8'
+          : 'bottom-[calc(88px+env(safe-area-inset-bottom))] sm:bottom-8'
       }`}
     >
       {/* Desktop Hover Label Badge */}
-      <span className="hidden sm:inline-block opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-2 group-hover:translate-x-0 text-[11px] font-sans font-semibold uppercase tracking-[0.1em] text-inkNavy bg-ivory/95 backdrop-blur-md px-3 py-1.5 rounded-full shadow-lg border border-zariGold/30 mr-2 pointer-events-none">
+      <span className="hidden sm:inline-block opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-2 group-hover:translate-x-0 text-[11px] font-sans font-semibold uppercase tracking-[0.12em] text-inkNavy bg-ivory/95 backdrop-blur-md px-3 py-1.5 shadow-md border border-inkNavy/15 mr-2.5 pointer-events-none">
         Stylist Assistance
       </span>
 
@@ -32,7 +32,7 @@ export default function WhatsAppButton() {
         href="https://wa.me/917483848505?text=Hello%20The%20Girls%20Collections!%20I%20have%20a%20question%20about%20your%20couture%20and%20festive%20wear."
         target="_blank"
         rel="noopener noreferrer"
-        className="w-9 h-9 sm:w-11 sm:h-11 active:scale-92 transition-transform duration-150 ease-out flex items-center justify-center shrink-0 shadow-md rounded-full bg-[#25D366] p-1.5"
+        className="w-10 h-10 sm:w-11 sm:h-11 active:scale-95 transition-transform duration-150 ease-out flex items-center justify-center shrink-0 shadow-md rounded-full bg-[#25D366] p-2"
         aria-label="Contact via WhatsApp"
         title="Chat with us on WhatsApp"
       >
@@ -45,3 +45,4 @@ export default function WhatsAppButton() {
     </div>
   );
 }
+

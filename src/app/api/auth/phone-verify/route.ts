@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server';
 import { redis } from '@/lib/redis';
 import { createOrUpdateUserFromPhone } from '@/lib/user-identity';
 
-const PHONE_EMAIL_CLIENT_ID = process.env.NEXT_PUBLIC_PHONE_EMAIL_CLIENT_ID || process.env.PHONE_EMAIL_CLIENT_ID;
+const PHONE_EMAIL_CLIENT_ID = process.env.NEXT_PUBLIC_PHONE_EMAIL_CLIENT_ID || process.env.PHONE_EMAIL_CLIENT_ID || '19014171169408573674';
 
 export async function POST(req: Request) {
   try {
